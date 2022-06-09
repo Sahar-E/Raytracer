@@ -1,7 +1,8 @@
 #include <iostream>
 #include <vector>
-#include <Vec3.h>
 #include <utils.h>
+#include <RayTracingGeneral.hpp>
+#include <Ray.hpp>
 
 
 int main() {
@@ -10,9 +11,9 @@ int main() {
     const int image_width = 1200;
     const int image_height = static_cast<int>(image_width / aspect_ratio);
 
-    Vec3 black = {0, 0, 0};
-    Vec3 white = {1, 1, 1};
-    std::vector<Vec3> data(image_height * image_width, black);
+    Color black = {0, 0, 0};
+    Color white = {1, 1, 1};
+    std::vector<Color> data(image_height * image_width, black);
 
     for (int row = 0; row < image_height; ++row) {
         for (int col = 0; col < image_width; ++col) {
@@ -21,6 +22,9 @@ int main() {
             }
         }
     }
+
+    Ray r{};
+    std::cout << r;
 
     std::string filename = "test.jpg";
     int channelCount = 3;

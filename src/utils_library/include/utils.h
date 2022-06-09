@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "Vec3.h"
+#include "Vec3.hpp"
 
 /**
  * Save image to JPG file.
@@ -16,7 +16,7 @@
  * @param channelCount  3 for RGB.
  */
 void saveImgAsJpg(const std::string &filename,
-                  const std::vector<Vec3> &data,
+                  const std::vector<Vec3<>> &data,
                   int width,
                   int height,
                   int channelCount);
