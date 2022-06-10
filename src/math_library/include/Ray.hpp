@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <RayTracingGeneral.hpp>
 
 class Ray {
 public:

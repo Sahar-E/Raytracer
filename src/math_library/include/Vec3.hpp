@@ -57,6 +57,12 @@ private:
     T _x[3];
 };
 
+
+// Using Vec3 with the following aliases:
+using Point3 =  Vec3<>;
+using Color =   Vec3<>;
+
+
 inline std::ostream& operator<<(std::ostream &out, const Vec3<> &v) {
     return out << v.x() << ' ' << v.y() << ' ' << v.z();
 }
