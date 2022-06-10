@@ -12,7 +12,7 @@ Color World::traceRay(const Ray &ray) const {
     for (const auto &sphere: _spheres) {
         sphere.hit(ray, 0.001, tHit, resColor, tHit);
     }
-    if(!fcmp(tHit, INF)) {
+    if(!std::isinf(tHit)) {
         return resColor;
     }
     return backgroundColor(ray);

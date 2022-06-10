@@ -24,7 +24,7 @@ bool Sphere::hit(const Ray &ray, double t_start, double t_end, Color &color, dou
             return false;
         }
     }
-    color = {1, 1, 1};
+    color = {0.5, 1, 0.5};
     tHit = root;
     return true;
 }
