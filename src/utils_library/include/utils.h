@@ -7,10 +7,6 @@
 #include <vector>
 #include "Vec3.hpp"
 
-const double BLACK_COLOR[3] = {0, 0, 0};
-const double WHITE_COLOR[3] = {1, 1, 1};
-const double SKY_COLOR[3] = {0.45, 0.6, 1.0};
-
 /**
  * Save image to JPG file.
  *
@@ -27,4 +23,22 @@ void saveImgAsJpg(const std::string &filename,
                   int channelCount);
 
 
+/**
+ * Performs alpha blending between 2 colors.
+ *
+ * @param c1        First color.
+ * @param c2        Second color.
+ * @param alpha     Ratio of colors. (e.g. 1 will be only c1)
+ * @return  new color.
+ */
 Color alphaBlending(Color c1, Color c2, double alpha);
+
+
+/**
+* Floating point comparison.
+*
+* @param a     First floating point value.
+* @param b     Second floating point value.
+* @return      true if the absolute difference between the two values is less than EPS.
+*/
+bool fcmp(double a, double b);

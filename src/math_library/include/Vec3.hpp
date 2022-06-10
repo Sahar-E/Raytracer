@@ -13,8 +13,6 @@ public:
 
     Vec3(double x, double y, double z) : _x{x, y, z} {}
 
-    explicit Vec3(const double arr[3]) : Vec3(arr[0], arr[1], arr[2]) {}
-
     [[nodiscard]] double x() const { return _x[0]; }
 
     [[nodiscard]] double y() const { return _x[1]; }

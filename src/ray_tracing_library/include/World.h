@@ -7,10 +7,24 @@
 
 #include <Vec3.hpp>
 #include <Ray.hpp>
+#include <utility>
+#include "Sphere.h"
 
 class World {
 public:
+
+    explicit World() = default;
+
+    void addSphere(const Sphere &s) {
+        _spheres.push_back(s);
+    }
+
     [[nodiscard]] Color traceRay(const Ray &ray) const;
+
+    [[nodiscard]] Color backgroundColor(const Ray &ray) const;
+
+private:
+    std::vector<Sphere> _spheres{};
 };
 
 

@@ -7,7 +7,7 @@
 #include "utils.h"
 
 std::vector<Color> Renderer::render() const {
-    std::vector<Color> data(_imageHeight * _imageWidth, Color(BLACK_COLOR));
+    std::vector<Color> data(_imageHeight * _imageWidth, {1,1,1});
 
     for (int row = 0; row < _imageHeight; ++row) {
         for (int col = 0; col < _imageWidth; ++col) {

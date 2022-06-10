@@ -6,7 +6,7 @@ add_library(${PROJECT_NAME} STATIC
         src/Renderer.cpp
         src/World.cpp
         src/Camera.cpp
-        )
+        src/Sphere.cpp include/Sphere.h)
 
 include_directories(PUBLIC include)
 include_directories(PUBLIC ../math_library/include)

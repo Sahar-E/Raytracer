@@ -9,13 +9,19 @@ int compare(int a) {
     return a == 15;
 }
 
+World initWorld() {
+    auto world = World();
+    world.addSphere(Sphere({0, 0, -2}, 0.5));
+    return world;
+}
+
 int main() {
     const auto aspect_ratio = 3.0 / 2.0;
     const int image_width = 1200;
     const int image_height = static_cast<int>(image_width / aspect_ratio);
 
 
-    auto world = World();
+    auto world = initWorld();
     auto camera = Camera({0,0,0});
     Renderer renderer(image_width, image_height, world, camera);
     std::vector<Color> renderedImage = renderer.render();
