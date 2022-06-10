@@ -1,8 +1,9 @@
 #include <iostream>
 #include <vector>
 #include <utils.h>
-#include <Renderer.h>
 #include "Ray.hpp"
+#include "src/ray_tracing_library/include/Renderer.h"
+#include "src/ray_tracing_library/include/Camera.h"
 
 int compare(int a) {
     return a == 15;
@@ -13,8 +14,11 @@ int main() {
     const int image_width = 1200;
     const int image_height = static_cast<int>(image_width / aspect_ratio);
 
-    Renderer renderer(image_width, image_height);
-    std::vector<Color> renderedImage = renderer.start();
+
+    auto world = World();
+    auto camera = Camera({0,0,0});
+    Renderer renderer(image_width, image_height, world, camera);
+    std::vector<Color> renderedImage = renderer.render();
 
     std::string filename = "test.jpg";
     int channelCount = 3;

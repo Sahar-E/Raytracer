@@ -6,7 +6,7 @@ add_subdirectory(utils_library)
 add_subdirectory(stb_library)
 add_subdirectory(ray_tracing_library)
 
-target_link_libraries(${PROJECT_NAME}
+target_link_libraries(${PROJECT_NAME} PUBLIC
         math_library
         utils_library
         stb_library

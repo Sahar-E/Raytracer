@@ -9,7 +9,7 @@
 #include "utils.h"
 
 void saveImgAsJpg(const std::string &filename,
-                  const std::vector<Vec3<>> &data,
+                  const std::vector<Vec3> &data,
                   const int width,
                   const int height,
                   const int channelCount) {
@@ -22,4 +22,8 @@ void saveImgAsJpg(const std::string &filename,
     }
     std::cout << "\nSaving image to " << filename << "\n";
     stbi_write_jpg(filename.c_str(), width, height, channelCount, dataCopy.get(), width * channelCount);
+}
+
+Color alphaBlending(Color c1, Color c2, double alpha) {
+    return c1 * alpha + c2 * (1 - alpha);
 }

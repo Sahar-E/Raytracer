@@ -4,18 +4,17 @@
 
 #include "Renderer.h"
 #include <vector>
+#include "utils.h"
 
-
-std::vector<Color> Renderer::start() const {
-    Color black = {0, 0, 0};
-    Color white = {1, 1, 1};
-    std::vector<Color> data(_imageHeight * _imageWidth, black);
+std::vector<Color> Renderer::render() const {
+    std::vector<Color> data(_imageHeight * _imageWidth, Color(BLACK_COLOR));
 
     for (int row = 0; row < _imageHeight; ++row) {
         for (int col = 0; col < _imageWidth; ++col) {
-            if ((_imageWidth / 4 <= col && col <= _imageWidth / 2) && (_imageHeight / 4 <= row && row <= _imageHeight / 2)) {
-                data[row * _imageWidth + col] = white;
-            }
+            auto h = static_cast<double>(col) / _imageWidth;
+            auto v = static_cast<double>(row) / _imageHeight;
+            Ray ray = _camera.getRay(h, v);
+            data[row * _imageWidth + col] = _world.traceRay(ray);
         }
     }
     return data;
