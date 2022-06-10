@@ -12,7 +12,7 @@ class Camera {
 
 public:
 
-    Camera(Vec3 origin);
+    Camera(Vec3 origin, double widthToHeight);
 
     [[nodiscard]] Ray getRay(double h_scalar, double v_scalar) const;
 private:
@@ -20,6 +20,7 @@ private:
     Point3 _lowerLeftCorner;
     Vec3 _horizontalVec;
     Vec3 _verticalVec;
+    double _widthToHeight;
 };
 
 

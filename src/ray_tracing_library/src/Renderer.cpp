@@ -11,8 +11,8 @@ std::vector<Color> Renderer::render() const {
 
     for (int row = 0; row < _imageHeight; ++row) {
         for (int col = 0; col < _imageWidth; ++col) {
-            auto h = static_cast<double>(col) / _imageWidth;
-            auto v = static_cast<double>(row) / _imageHeight;
+            auto h = static_cast<double>(col) / (_imageWidth - 1);
+            auto v = static_cast<double>(row) / (_imageHeight - 1);
             Ray ray = _camera.getRay(h, v);
             data[row * _imageWidth + col] = _world.traceRay(ray);
         }

@@ -15,10 +15,10 @@ Color World::traceRay(const Ray &ray) const {
     if(!std::isinf(tHit)) {
         return resColor;
     }
-    return backgroundColor(ray);
+    return World::backgroundColor(ray);
 }
 
-Color World::backgroundColor(const Ray &ray) const {
+Color World::backgroundColor(const Ray &ray) {
     auto unitDir = unit_vector(ray.direction());
     auto t = 0.5 * (unitDir.y() + 1.0);
     return alphaBlending({0.4, 0.4, 1}, {1, 1, 1}, t);

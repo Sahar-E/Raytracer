@@ -22,7 +22,7 @@ int main() {
 
 
     auto world = initWorld();
-    auto camera = Camera({0,0,0});
+    auto camera = Camera({0, 0, 0}, aspect_ratio);
     Renderer renderer(image_width, image_height, world, camera);
     std::vector<Color> renderedImage = renderer.render();
 

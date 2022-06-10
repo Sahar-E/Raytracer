@@ -21,7 +21,7 @@ public:
 
     [[nodiscard]] Color traceRay(const Ray &ray) const;
 
-    [[nodiscard]] Color backgroundColor(const Ray &ray) const;
+    [[nodiscard]] static Color backgroundColor(const Ray &ray) ;
 
 private:
     std::vector<Sphere> _spheres{};
