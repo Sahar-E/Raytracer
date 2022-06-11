@@ -5,9 +5,9 @@
 #include <string>
 #include <vector>
 #include <memory>
-#include <stb_library/stb_image_write.h>
 #include <constants.h>
-#include "utils.h"
+#include <stb_library/stb_image_write.h>
+#include "Vec3.h"
 
 void saveImgAsJpg(const std::string &filename,
                   const std::vector<Vec3> &data,

@@ -5,15 +5,16 @@
 #pragma once
 
 
-#include <Vec3.hpp>
+#include <Vec3.h>
 #include <Ray.hpp>
+#include "HitResult.h"
 
 class Sphere {
 
 public:
     Sphere(const Point3 &center, double radius);
 
-    bool hit(const Ray &ray, double t_start, double t_end, Color &color, double & tHit) const;
+    bool hit(const Ray &ray, double tStart, double tEnd, HitResult &hitRes) const;
 
 private:
     Point3 _center;

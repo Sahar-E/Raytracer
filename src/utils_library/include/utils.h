@@ -5,7 +5,7 @@
 #pragma once
 
 #include <vector>
-#include "Vec3.hpp"
+#include "Vec3.h"
 
 /**
  * Save image to JPG file.

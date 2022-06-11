@@ -5,10 +5,10 @@
 #pragma once
 
 
-#include <Vec3.hpp>
-#include <Ray.hpp>
-#include <utility>
+#include <vector>
 #include "Sphere.h"
+
+static const double CLOSEST_POSSIBLE_RAY_HIT = 0.001;
 
 class World {
 public:
@@ -19,7 +19,7 @@ public:
         _spheres.push_back(s);
     }
 
-    [[nodiscard]] Color traceRay(const Ray &ray) const;
+    [[nodiscard]] Color rayTrace(const Ray &ray, int bounce) const;
 
     [[nodiscard]] static Color backgroundColor(const Ray &ray) ;
 

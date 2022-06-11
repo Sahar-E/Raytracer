@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "Vec3.h"
 
 class Ray {
 public:
@@ -15,12 +16,16 @@ public:
 
     [[nodiscard]] Vec3 direction() const { return dir; }
 
+    [[nodiscard]] Point3 at(double t) const {
+        return orig + dir * t;
+    }
+
 public:
     Point3 orig;
     Vec3 dir;
 };
 
 
-inline std::ostream& operator<<(std::ostream &out, const Ray &r) {
+inline std::ostream &operator<<(std::ostream &out, const Ray &r) {
     return out << r.origin() << " + t * " << r.direction();
 }

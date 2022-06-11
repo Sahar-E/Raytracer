@@ -6,9 +6,16 @@ add_library(${PROJECT_NAME} STATIC
         src/Renderer.cpp
         src/World.cpp
         src/Camera.cpp
-        src/Sphere.cpp include/Sphere.h)
+        src/Sphere.cpp
+        )
 
-include_directories(PUBLIC include)
-include_directories(PUBLIC ../math_library/include)
-include_directories(PUBLIC ../stb_library/include)
-include_directories(PUBLIC ../utils_library/include)
+target_include_directories(${PROJECT_NAME} PUBLIC include)
+
+target_include_directories(${PROJECT_NAME} PUBLIC ../math_library)
+target_link_libraries(${PROJECT_NAME} math_library)
+
+target_include_directories(${PROJECT_NAME} PUBLIC ../stb_library)
+target_link_libraries(${PROJECT_NAME} stb_library)
+
+target_include_directories(${PROJECT_NAME} PUBLIC ../utils_library)
+target_link_libraries(${PROJECT_NAME} utils_library)

@@ -5,7 +5,7 @@
 #pragma once
 
 
-#include <Vec3.hpp>
+#include <Vec3.h>
 #include <Ray.hpp>
 
 class Camera {
