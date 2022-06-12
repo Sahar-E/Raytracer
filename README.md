@@ -1,4 +1,4 @@
-# ray_tracer
+# Ray Tracer
 
 Still under construction :)
 
