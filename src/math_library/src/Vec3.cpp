@@ -4,6 +4,7 @@
 
 #include <my_math.hpp>
 #include "Vec3.h"
+#include "../../utils_library/include/utils.h"
 
 
 Vec3 &Vec3::operator+=(const Vec3 &v) {
@@ -112,4 +113,8 @@ Vec3 randomInHemisphere(const Vec3 &normal) {
         return in_unit_sphere;
     else
         return -in_unit_sphere;
+}
+
+bool isZeroVec(const Vec3 &v) {
+    return fcmp(v.x(), 0) && fcmp(v.y(), 0) && fcmp(v.z(), 0);
 }

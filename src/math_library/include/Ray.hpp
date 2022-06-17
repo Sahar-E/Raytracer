@@ -19,7 +19,6 @@ public:
     [[nodiscard]] Point3 at(double t) const {
         return orig + dir * t;
     }
-
 public:
     Point3 orig;
     Vec3 dir;
@@ -28,4 +27,9 @@ public:
 
 inline std::ostream &operator<<(std::ostream &out, const Ray &r) {
     return out << r.origin() << " + t * " << r.direction();
+}
+
+inline Ray getZeroRay() {
+    return {{0, 0, 0},
+            {0, 0, 0}};
 }

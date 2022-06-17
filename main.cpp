@@ -8,8 +8,14 @@
 
 World initWorld() {
     auto world = World();
-    world.addSphere(Sphere({0, 0, -2}, 0.5));
-    world.addSphere(Sphere({0, -100.5, -2}, 100));
+    Color bluish = {0.2, 0.2, 1};
+    Color red = {0.8, 0.2, 0.1};
+
+    std::shared_ptr<Material> lambertianBlue = std::make_shared<Lambertian>(bluish);
+    std::shared_ptr<Material> lambertianRed = std::make_shared<Lambertian>(red);
+
+    world.addSphere(Sphere({0, 0, -2}, 0.5, lambertianBlue));
+    world.addSphere(Sphere({0, -100.5, -2}, 100, lambertianRed));
     return world;
 }
 

@@ -7,7 +7,7 @@ add_library(${PROJECT_NAME} STATIC
         src/World.cpp
         src/Camera.cpp
         src/Sphere.cpp
-        )
+        src/Material.cpp include/Material.h)
 
 target_include_directories(${PROJECT_NAME} PUBLIC include)
 

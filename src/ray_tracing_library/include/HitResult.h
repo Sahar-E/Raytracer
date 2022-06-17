@@ -3,14 +3,18 @@
 //
 
 #pragma once
+
+#include <memory>
 #include "Vec3.h"
 #include "Ray.hpp"
+#include "Material.h"
 
+class Material;
 
 struct HitResult {
     Ray reflectionRay{};
-    Color color{};
     double tOfHittingRay{};
     Point3 hitPoint{};
     Vec3 normal{};
+    std::shared_ptr<Material> material;
 };

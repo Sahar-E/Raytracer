@@ -3,9 +3,13 @@
 //
 
 #include <HitResult.h>
+
+#include <utility>
 #include "Sphere.h"
 
-Sphere::Sphere(const Point3 &center, double radius) : _center(center), _radius(radius) {}
+Sphere::Sphere(const Point3 &center,
+               double radius,
+               std::shared_ptr<Material> mat) : _center(center), _radius(radius), _material(std::move(mat)) {}
 
 bool Sphere::hit(const Ray &ray, double tStart, double tEnd, HitResult &hitRes) const {
     Vec3 oc = ray.origin() - _center;
@@ -35,7 +39,7 @@ bool Sphere::hit(const Ray &ray, double tStart, double tEnd, HitResult &hitRes) 
     Ray reflectedRay(hitPoint, dirOfReflection);
 
     hitRes.reflectionRay = reflectedRay;
-    hitRes.color = normalOfHitPoint / 2 + Vec3(0.5, 0.5, 0.5);
+    hitRes.material = _material;
     hitRes.tOfHittingRay = root;
     hitRes.hitPoint = hitPoint;
     hitRes.normal = normalOfHitPoint;

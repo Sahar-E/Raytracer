@@ -8,31 +8,41 @@
 #include "World.h"
 
 Color World::rayTrace(const Ray &ray, int bounce) const {
+    const static Color black = {0, 0, 0};
     if (bounce <= 0) {
-        const static Color black = {0, 0, 0};
         return black;
     }
     HitResult hitRes;
-    bool hit = false;
-    double tEnd = INF;
-    for (const auto &sphere: _spheres) {
-        if (sphere.hit(ray, CLOSEST_POSSIBLE_RAY_HIT, tEnd, hitRes)) {
-            hit = true;
-            hitRes.color = hitRes.color;
-            tEnd = hitRes.tOfHittingRay;
-        }
-    }
+    bool hit = getHitResult(ray, hitRes);
 
     if (hit) {
-        Vec3 rayRandomDirection = randomVecOnTangentSphere(hitRes.normal, hitRes.hitPoint) - hitRes.hitPoint;
-        Ray diffusedRay{hitRes.hitPoint, rayRandomDirection};
-        return rayTrace(diffusedRay, bounce - 1) * 0.5;
-
+        Color attenuation;
+        Ray reflectionRay;
+        Ray refractionRay;
+//        isZeroVec() // TODO-Sahar: use this.
+        if (hitRes.material->getColor(hitRes, attenuation, reflectionRay, refractionRay)) {
+            Color scatterColor = rayTrace(reflectionRay, bounce - 1) * attenuation;
+            return scatterColor;
+        } else {
+            return black;
+        }
 //        const Ray &reflectionRay = hitRes.reflectionRay;
 //        return rayTrace(reflectionRay, bounce - 1) * 0.5;
     } else {
         return World::backgroundColor(ray);
     }
+}
+
+bool World::getHitResult(const Ray &ray, HitResult &hitRes) const {
+    bool hit = false;
+    double tEnd = INF;
+    for (const auto &sphere: _spheres) {
+        if (sphere.hit(ray, CLOSEST_POSSIBLE_RAY_HIT, tEnd, hitRes)) {
+            hit = true;
+            tEnd = hitRes.tOfHittingRay;
+        }
+    }
+    return hit;
 }
 
 Color World::backgroundColor(const Ray &ray) {
