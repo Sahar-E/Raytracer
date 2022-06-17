@@ -78,3 +78,5 @@ Vec3 randomUnitVec();
 Vec3 randomInUnitSphere();
 
 Vec3 randomInHemisphere(const Vec3 &normal);
+
+Vec3 randomVecOnTangentSphere(const Vec3 &normal, const Vec3 & hitPoint);

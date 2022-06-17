@@ -24,7 +24,7 @@ Color World::rayTrace(const Ray &ray, int bounce) const {
     }
 
     if (hit) {
-        Vec3 rayRandomDirection = (hitRes.hitPoint + hitRes.normal + randomInHemisphere(hitRes.normal)) - hitRes.hitPoint;
+        Vec3 rayRandomDirection = randomVecOnTangentSphere(hitRes.normal, hitRes.hitPoint) - hitRes.hitPoint;
         Ray diffusedRay{hitRes.hitPoint, rayRandomDirection};
         return rayTrace(diffusedRay, bounce - 1) * 0.5;
 

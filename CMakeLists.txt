@@ -12,6 +12,7 @@ endif()
 
 #set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
+#add_library(${PROJECT_NAME} STATIC main.cpp)
 add_executable(${PROJECT_NAME} main.cpp)
 
 add_subdirectory(src/math_library)

@@ -93,6 +93,10 @@ Vec3 randomUnitVec() {
     return unitVector({2 * randomDouble() - 1, 2 * randomDouble() - 1, 2 * randomDouble() - 1});
 }
 
+Vec3 randomVecOnTangentSphere(const Vec3 &normal, const Vec3 &hitPoint) {
+    return normal + hitPoint + randomUnitVec();
+}
+
 Vec3 randomInUnitSphere() {
     while (true) {
         auto p = randomVec();
