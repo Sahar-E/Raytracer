@@ -34,11 +34,7 @@ bool Sphere::hit(const Ray &ray, double tStart, double tEnd, HitResult &hitRes) 
     Point3 hitPoint = ray.at(root);
     Vec3 normalOfHitPoint = unitVector(hitPoint - _center);
 
-    // Get reflected ray:
-    Vec3 dirOfReflection = reflect(ray.direction(), normalOfHitPoint);
-    Ray reflectedRay(hitPoint, dirOfReflection);
-
-    hitRes.reflectionRay = reflectedRay;
+    hitRes.hittingRay = ray;
     hitRes.material = _material;
     hitRes.tOfHittingRay = root;
     hitRes.hitPoint = hitPoint;

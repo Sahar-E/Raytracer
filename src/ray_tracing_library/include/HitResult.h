@@ -12,7 +12,7 @@
 class Material;
 
 struct HitResult {
-    Ray reflectionRay{};
+    Ray hittingRay{};
     double tOfHittingRay{};
     Point3 hitPoint{};
     Vec3 normal{};

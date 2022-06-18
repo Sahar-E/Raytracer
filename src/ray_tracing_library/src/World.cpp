@@ -48,7 +48,7 @@ bool World::getHitResult(const Ray &ray, HitResult &hitRes) const {
 Color World::backgroundColor(const Ray &ray) {
     auto unitDir = unitVector(ray.direction());
     auto t = 0.5 * (unitDir.y() + 1.0);
-    return alphaBlending({0.4, 0.4, 1}, {1, 1, 1}, t);
+    return alphaBlending({0.4, 0.4, 1}, {.9, .9, .9}, 1-t);
 }
 
 

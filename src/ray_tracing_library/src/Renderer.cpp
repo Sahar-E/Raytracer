@@ -19,6 +19,8 @@ std::vector<Color> Renderer::render() const {
             Color pixelSum{};
             auto h = static_cast<double>(col) / (_imageWidth - 1);
             auto v = 1 - static_cast<double>(row) / (_imageHeight - 1);
+//            auto h = (static_cast<double>(col) + randomDouble()) / (_imageWidth - 1);     // the random number is for simple Anti-aliasing
+//            auto v = 1 - (static_cast<double>(row) + randomDouble()) / (_imageHeight - 1);
             Ray ray = _camera.getRay(h, v);
             for (int i = 0; i < _nSamplesPerPixel; ++i) {
                 pixelSum += _world.rayTrace(ray, _nRayBounces);

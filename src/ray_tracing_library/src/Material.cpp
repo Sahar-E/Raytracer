@@ -15,3 +15,12 @@ bool Lambertian::getColor(const HitResult &hitRes, Color &attenuation, Ray &refl
 Lambertian::Lambertian(const Color &albedo) : _albedo(albedo) {}
 
 
+bool Metal::getColor(const HitResult &hitRes, Color &attenuation, Ray &reflectionRay, Ray &refractionRay) const {
+    attenuation = _albedo;
+    Vec3 randomDirection = randomVecOnTangentSphere(hitRes.normal, hitRes.hitPoint) - hitRes.hitPoint;
+    Vec3 dirOfReflection = reflect(hitRes.hittingRay.direction(), hitRes.normal) + randomDirection * _fuzziness;
+
+    reflectionRay = Ray(hitRes.hitPoint, dirOfReflection);
+    refractionRay = getZeroRay();
+    return true;
+}
