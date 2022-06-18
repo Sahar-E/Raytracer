@@ -5,6 +5,7 @@
 #include <Camera.h>
 #include <Renderer.h>
 #include <utils.h>
+#include <chrono>
 
 World initWorld() {
     auto world = World();
@@ -20,11 +21,12 @@ World initWorld() {
 }
 
 int main() {
+    auto start = std::chrono::steady_clock::now();
     const auto aspect_ratio = 3.0 / 2.0;
     const int image_width = 1200;
     const int image_height = static_cast<int>(image_width / aspect_ratio);
-    const int rayBounces = 50;
-    int nSamplesPerPixel = 100;
+    const int rayBounces = 12;
+    int nSamplesPerPixel = 50;
 
     auto world = initWorld();
     auto camera = Camera({0, 0, 0}, aspect_ratio);
@@ -32,10 +34,13 @@ int main() {
     std::vector<Color> renderedImage = renderer.render();
 
     std::string filename = "test.jpg";
-    Vec3 v = randomVec();
-    std::cout << v;
     int channelCount = 3;
     saveImgAsJpg(filename, renderedImage, image_width, image_height, channelCount);
+
+    auto end = std::chrono::steady_clock::now();
+    long duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+
     std::cout << "Done." << "\n";
+    std::cout << "Duration (ms): " << duration << "\n";
     return 0;
 }

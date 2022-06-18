@@ -10,6 +10,11 @@ elseif(WIN32)
     message("This is a Windows System")
 endif()
 
+
+# OpenMP:
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
+find_package(OpenMP REQUIRED)
+
 #set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 #add_library(${PROJECT_NAME} STATIC main.cpp)

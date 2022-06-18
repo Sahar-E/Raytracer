@@ -5,12 +5,16 @@
 #include <vector>
 #include <Vec3.h>
 #include <Renderer.h>
+#include <omp.h>
 
 std::vector<Color> Renderer::render() const {
     std::vector<Color> data(_imageHeight * _imageWidth, {1, 1, 1});
 
+#pragma omp parallel for schedule(dynamic) default(none) shared(std::cerr, data)
     for (int row = 0; row < _imageHeight; ++row) {
-        std::cerr << "\rRows left to render: " << _imageHeight - row << ' ' << std::flush;
+        if (omp_get_thread_num() == 0) {
+            std::cerr << "\rRows left to render: " << _imageHeight - row << ' ' << std::flush;
+        }
         for (int col = 0; col < _imageWidth; ++col) {
             Color pixelSum{};
             auto h = static_cast<double>(col) / (_imageWidth - 1);
