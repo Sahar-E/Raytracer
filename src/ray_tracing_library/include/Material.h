@@ -21,7 +21,7 @@ class Lambertian : public Material {
 
 public:
 
-    explicit Lambertian(const Color &albedo);
+    explicit Lambertian(const Color &albedo) : _albedo(albedo) {}
 
     /**
      * // TODO-Sahar:
@@ -45,11 +45,11 @@ private:
 class Metal : public Material {
 
 public:
-    Metal(const Color &albedo, double fuzziness) : _albedo(albedo), _fuzziness(fuzziness) {}
+    Metal(const Color &albedo, double fuzziness) : _albedo(albedo), _roughness(fuzziness) {}
 
     bool getColor(const HitResult &hitRes, Color &attenuation, Ray &reflectionRay, Ray &refractionRay) const override;
 
 private:
     Color _albedo;
-    double _fuzziness;
+    double _roughness;
 };
