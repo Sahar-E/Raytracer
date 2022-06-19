@@ -4,20 +4,16 @@
 
 #include "Material.h"
 
-bool Lambertian::getColor(const HitResult &hitRes, Color &attenuation, Ray &reflectionRay, Ray &refractionRay) const {
-    attenuation = _albedo;
-    Vec3 randomDirection = randomVecOnTangentSphere(hitRes.normal, hitRes.hitPoint) - hitRes.hitPoint;
-    reflectionRay = Ray(hitRes.hitPoint, randomDirection);
-    refractionRay = getZeroRay();
-    return true;
-}
 
-bool Metal::getColor(const HitResult &hitRes, Color &attenuation, Ray &reflectionRay, Ray &refractionRay) const {
-    attenuation = _albedo;
+std::tuple<Color, Ray> Material::getColorAndSecondaryRay(const HitResult &hitRes) const {
     Vec3 randomDirection = randomVecOnTangentSphere(hitRes.normal, hitRes.hitPoint) - hitRes.hitPoint;
-    Vec3 dirOfReflection = unitVector(reflect(hitRes.hittingRay.direction(), hitRes.normal)) + unitVector(randomDirection) * _roughness;
-
-    reflectionRay = Ray(hitRes.hitPoint, dirOfReflection);
-    refractionRay = getZeroRay();
-    return true;
+    Vec3 dirOfReflection;
+    if (_roughness > 0.99f) {
+        dirOfReflection = randomDirection;
+    } else {
+        dirOfReflection = unitVector(reflect(hitRes.hittingRay.direction(), hitRes.normal)) +
+                          unitVector(randomDirection) * _roughness;
+    }
+    Ray secondaryRay = Ray(hitRes.hitPoint, dirOfReflection);
+    return {_albedo, secondaryRay};
 }

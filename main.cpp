@@ -17,15 +17,15 @@ World initWorld1() {
     Color redBrown = {141 / 255.0, 78 / 255.0,44 / 255.0};
     Color darkGreen = {74 / 255.0, 71 / 255.0,51 / 255.0};
 
-//    std::shared_ptr<Material> metalGreen = std::make_shared<Metal>(whiteGreenish, 0.99);
-    std::shared_ptr<Material> mirror = std::make_shared<Metal>(white, 0.0);
-    std::shared_ptr<Material> mirrorRedBrown = std::make_shared<Metal>(redBrown, 0.0);
-    std::shared_ptr<Material> lambertianBezh = std::make_shared<Lambertian>(bezh);
-    std::shared_ptr<Material> lambertianGreen = std::make_shared<Lambertian>(green);
-    std::shared_ptr<Material> lambertianBrown = std::make_shared<Lambertian>(brown);
-    std::shared_ptr<Material> lambertianRedBrown = std::make_shared<Lambertian>(redBrown);
-    std::shared_ptr<Material> metalGreen = std::make_shared<Metal>(green, 0.0);
-    std::shared_ptr<Material> lambertianDarkGreen = std::make_shared<Lambertian>(darkGreen);
+//    Material metalGreen = Material(whiteGreenish, 0.99);
+    Material mirror = Material(white, 0.0);
+    Material mirrorRedBrown = Material(redBrown, 0.0);
+    Material lambertianBezh = Material::getLambertian(bezh);
+    Material lambertianGreen = Material::getLambertian(green);
+    Material lambertianBrown = Material::getLambertian(brown);
+    Material lambertianRedBrown = Material::getLambertian(redBrown);
+    Material metalGreen = Material(green, 0.0);
+    Material lambertianDarkGreen = Material::getLambertian(darkGreen);
 
     world.addSphere(Sphere({0, 0, -2}, 0.5, lambertianRedBrown));
     world.addSphere(Sphere({1.2, 0, -3}, 0.5, mirror));
@@ -50,15 +50,15 @@ World initWorld2() {
     Color white = {1,1,1};
     Color bezh = {0.96,0.96,0.86};
 
-    std::shared_ptr<Material> lambertianBlue = std::make_shared<Lambertian>(bluish);
-    std::shared_ptr<Material> metalGreen = std::make_shared<Metal>(whiteGreenish, 0.99);
-    std::shared_ptr<Material> mirror = std::make_shared<Metal>(white, 0.0);
-    std::shared_ptr<Material> lambertianRed = std::make_shared<Lambertian>(red);
-    std::shared_ptr<Material> lambertianGreen = std::make_shared<Lambertian>(green);
-    std::shared_ptr<Material> lambertianBezh = std::make_shared<Lambertian>(bezh);
-//    std::shared_ptr<Material> glass = std::make_shared<Glass>(white, 1.5);
+    Material lambertianBlue = Material::getLambertian(bluish);
+    Material metalGreen = Material(whiteGreenish, 0.99);
+    Material mirror = Material(white, 0.0);
+    Material lambertianRed = Material::getLambertian(red);
+    Material lambertianGreen = Material::getLambertian(green);
+    Material lambertianBezh = Material::getLambertian(bezh);
+//    Material glass = std::make_shared<Glass>(white, 1.5);
 
-//    std::shared_ptr<Material> light = std::make_shared<Light>(white, 100);
+//    Material light = std::make_shared<Light>(white, 100);
 
     world.addSphere(Sphere({0, 0, -2}, 0.5, metalGreen));
     world.addSphere(Sphere({1, 0, -3}, 0.5, mirror));

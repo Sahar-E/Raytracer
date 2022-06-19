@@ -26,7 +26,7 @@ public:
 private:
     std::vector<Sphere> _spheres{};
 
-    bool getHitResult(const Ray &ray, HitResult &hitRes) const;
+    bool getHitResult(const Ray &ray, HitResult &hitRes, Material &material) const;
 };
 
 

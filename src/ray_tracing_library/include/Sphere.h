@@ -12,14 +12,18 @@
 class Sphere {
 
 public:
-    Sphere(const Point3 &center, double radius, std::shared_ptr<Material> material);
+    Sphere(const Point3 &center, double radius, const Material& mat) : _center(center), _radius(radius), _material(mat) {}
 
     bool hit(const Ray &ray, double tStart, double tEnd, HitResult &hitRes) const;
+
+    [[nodiscard]] const Material &getMaterial() const {
+        return _material;
+    }
 
 private:
     Point3 _center;
     double _radius;
-    std::shared_ptr<Material> _material;
+    Material _material;
 };
 
 

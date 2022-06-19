@@ -11,45 +11,19 @@ struct HitResult;
 
 class Material {
 public:
-    [[nodiscard]] virtual bool getColor(const HitResult &hitRes,
-                                        Color &attenuation,
-                                        Ray &reflectionRay,
-                                        Ray &refractionRay) const = 0;
-};
+    Material() = default;
+    Material(const Color &albedo, double roughness) : _albedo(albedo), _roughness(roughness) {}
 
-class Lambertian : public Material {
+    [[nodiscard]]
+    std::tuple<Color, Ray> getColorAndSecondaryRay(const HitResult &hitRes) const;
 
-public:
-
-    explicit Lambertian(const Color &albedo) : _albedo(albedo) {}
-
-    /**
-     * // TODO-Sahar:
-     * For Lambertian materials, the reflectionRay is the diffuse reflection from the surface.
-     * There is no reflection from this material.
-     *
-     * @param hitRes
-     * @param attenuation
-     * @param reflectionRay
-     * @param refractionRay
-     * @return
-     */
-    bool getColor(const HitResult &hitRes, Color &attenuation, Ray &reflectionRay, Ray &refractionRay) const override;
+    [[nodiscard]]
+    static Material getLambertian(const Color &albedo) {
+        return {albedo, 1.0};
+    }
 
 private:
     Color _albedo;
-};
+    double _roughness{};
 
-
-
-class Metal : public Material {
-
-public:
-    Metal(const Color &albedo, double fuzziness) : _albedo(albedo), _roughness(fuzziness) {}
-
-    bool getColor(const HitResult &hitRes, Color &attenuation, Ray &reflectionRay, Ray &refractionRay) const override;
-
-private:
-    Color _albedo;
-    double _roughness;
 };

@@ -13,34 +13,31 @@ Color World::rayTrace(const Ray &ray, int bounce) const {
         return black;
     }
     HitResult hitRes;
-    bool hit = getHitResult(ray, hitRes);
+    Material material;
+    bool hit = getHitResult(ray, hitRes, material);
 
     if (hit) {
-        Color attenuation;
-        Ray reflectionRay;
-        Ray refractionRay;
-//        isZeroVec() // TODO-Sahar: use this.
-        if (hitRes.material->getColor(hitRes, attenuation, reflectionRay, refractionRay)) {
-            Color scatterColor = rayTrace(reflectionRay, bounce - 1) * attenuation;
-            return scatterColor;
-        } else {
-            return black;
-        }
-//        const Ray &reflectionRay = hitRes.reflectionRay;
-//        return rayTrace(reflectionRay, bounce - 1) * 0.5;
+        auto [attenuation, secondaryRay] = material.getColorAndSecondaryRay(hitRes);
+        Color scatterColor = rayTrace(secondaryRay, bounce - 1) * attenuation;
+        return scatterColor;
     } else {
         return World::backgroundColor(ray);
     }
 }
 
-bool World::getHitResult(const Ray &ray, HitResult &hitRes) const {
+bool World::getHitResult(const Ray &ray, HitResult &hitRes, Material &material) const {
     bool hit = false;
     double tEnd = INF;
-    for (const auto &sphere: _spheres) {
-        if (sphere.hit(ray, CLOSEST_POSSIBLE_RAY_HIT, tEnd, hitRes)) {
+    int hitSphereIdx = -1;
+    for (int i = 0; i < _spheres.size(); ++i) {
+        if (_spheres[i].hit(ray, CLOSEST_POSSIBLE_RAY_HIT, tEnd, hitRes)) {
             hit = true;
             tEnd = hitRes.tOfHittingRay;
+            hitSphereIdx = i;
         }
+    }
+    if (hit) {
+        material = _spheres[hitSphereIdx].getMaterial();
     }
     return hit;
 }

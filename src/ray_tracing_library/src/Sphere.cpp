@@ -7,9 +7,6 @@
 #include <utility>
 #include "Sphere.h"
 
-Sphere::Sphere(const Point3 &center,
-               double radius,
-               std::shared_ptr<Material> mat) : _center(center), _radius(radius), _material(std::move(mat)) {}
 
 bool Sphere::hit(const Ray &ray, double tStart, double tEnd, HitResult &hitRes) const {
     Vec3 oc = ray.origin() - _center;
@@ -35,7 +32,6 @@ bool Sphere::hit(const Ray &ray, double tStart, double tEnd, HitResult &hitRes) 
     Vec3 normalOfHitPoint = unitVector(hitPoint - _center);
 
     hitRes.hittingRay = ray;
-    hitRes.material = _material;
     hitRes.tOfHittingRay = root;
     hitRes.hitPoint = hitPoint;
     hitRes.normal = normalOfHitPoint;
