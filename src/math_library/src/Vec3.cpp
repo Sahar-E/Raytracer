@@ -78,7 +78,7 @@ Vec3 cross(const Vec3 &u, const Vec3 &v) {
             u.x() * v.y() - u.y() * v.x()};
 }
 
-Vec3 unitVector(Vec3 v) {
+Vec3 normalize(Vec3 v) {
     return v / v.length();
 }
 
@@ -91,7 +91,7 @@ Vec3 randomVec() {
 }
 
 Vec3 randomUnitVec() {
-    return unitVector({2 * randomDouble() - 1, 2 * randomDouble() - 1, 2 * randomDouble() - 1});
+    return normalize({2 * randomDouble() - 1, 2 * randomDouble() - 1, 2 * randomDouble() - 1});
 }
 
 Vec3 randomVecOnTangentSphere(const Vec3 &normal, const Vec3 &hitPoint) {

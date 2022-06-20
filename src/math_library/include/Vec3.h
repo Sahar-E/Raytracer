@@ -66,7 +66,7 @@ std::ostream &operator<<(std::ostream &out, const Vec3 &v);
 
 [[nodiscard]] Vec3 cross(const Vec3 &u, const Vec3 &v);
 
-[[nodiscard]] Vec3 unitVector(Vec3 v);
+[[nodiscard]] Vec3 normalize(Vec3 v);
 
 Vec3 reflect(const Vec3& v, const Vec3& n);
 

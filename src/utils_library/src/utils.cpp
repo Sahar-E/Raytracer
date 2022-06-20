@@ -25,8 +25,8 @@ void saveImgAsJpg(const std::string &filename,
     stbi_write_jpg(filename.c_str(), width, height, channelCount, dataCopy.get(), width * channelCount);
 }
 
-Color alphaBlending(Color c1, Color c2, double alpha) {
-    return c1 * alpha + c2 * (1 - alpha);
+Vec3 alphaBlending(Vec3 v1, Vec3 v2, double alpha) {
+    return v1 * (1 - alpha) + v2 * alpha;
 }
 
 bool fcmp(double a, double b) {

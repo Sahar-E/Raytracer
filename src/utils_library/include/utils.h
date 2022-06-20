@@ -26,12 +26,12 @@ void saveImgAsJpg(const std::string &filename,
 /**
  * Performs alpha blending between 2 colors.
  *
- * @param c1        First color.
- * @param c2        Second color.
+ * @param v1        First color.
+ * @param v2        Second color.
  * @param alpha     Ratio of colors. (e.g. 1 will be only c1)
  * @return  new color.
  */
-Color alphaBlending(Color c1, Color c2, double alpha);
+Color alphaBlending(Color v1, Color v2, double alpha);
 
 
 /**

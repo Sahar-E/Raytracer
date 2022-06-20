@@ -12,18 +12,31 @@ struct HitResult;
 class Material {
 public:
     Material() = default;
-    Material(const Color &albedo, double roughness) : _albedo(albedo), _roughness(roughness) {}
 
     [[nodiscard]]
     std::tuple<Color, Ray> getColorAndSecondaryRay(const HitResult &hitRes) const;
 
     [[nodiscard]]
     static Material getLambertian(const Color &albedo) {
-        return {albedo, 1.0};
+        return Material(albedo);
+    }
+
+    [[nodiscard]]
+    static Material getSpecular(const Color &albedo, double roughness, double percentSpecular) {
+        return {albedo, roughness, percentSpecular};
     }
 
 private:
-    Color _albedo;
-    double _roughness{};
+    explicit Material(const Color &albedo) : Material(albedo, 0, 0) {}
 
+    Material(const Color &albedo,
+             double roughnessSquared,
+             double percentSpecular) :
+            _albedo(albedo), _roughnessSquared(roughnessSquared * roughnessSquared),
+            _percentSpecular(percentSpecular), _emissiveLight(0) {}
+
+    Color _albedo;
+    double _roughnessSquared{};
+    double _percentSpecular{};
+    double _emissiveLight{};      // TODO-Sahar: add const.
 };
