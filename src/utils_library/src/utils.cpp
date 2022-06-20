@@ -32,3 +32,23 @@ Vec3 alphaBlending(Vec3 v1, Vec3 v2, double alpha) {
 bool fcmp(double a, double b) {
     return std::fabs(a - b) < EPS;
 }
+
+Color gammaCorrection(Color const &color) {
+    return {std::sqrt(color.x()), std::sqrt(color.y()), std::sqrt(color.z())};
+}
+
+double clamp(double toClamp, double low, double high) {
+    if (toClamp < low) {
+        return low;
+    }
+    if (toClamp > high) {
+        return high;
+    }
+    return toClamp;
+}
+
+Vec3 clamp(const Vec3 &toClamp, double low, double high) {
+    return {clamp(toClamp.x(), low, high),
+            clamp(toClamp.y(), low, high),
+            clamp(toClamp.z(), low, high)};
+}

@@ -37,7 +37,7 @@ World initWorld1() {
     world.addSphere(Sphere({-0.5, -0.4, -1.6}, 0.1, mirror));
     world.addSphere(Sphere({-0.15, -0.4, -1.1}, 0.1, lambertianGreen));
     world.addSphere(Sphere({-0.8, -0.4, -1.3}, 0.1, lambertianRedBrown));
-    world.addSphere(Sphere({0, -100.5, -2}, 100, lambertianBrown));
+    world.addSphere(Sphere({0, -1000.5, -2}, 1000, lambertianBrown));
     return world;
 }
 

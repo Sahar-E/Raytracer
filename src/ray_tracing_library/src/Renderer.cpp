@@ -6,6 +6,7 @@
 #include <Vec3.h>
 #include <Renderer.h>
 #include <omp.h>
+#include <utils.h>
 
 std::vector<Color> Renderer::render() const {
     std::vector<Color> data(_imageHeight * _imageWidth, {1, 1, 1});
@@ -26,7 +27,9 @@ std::vector<Color> Renderer::render() const {
             Ray ray = _camera.getRay(h, v);
             pixelSum += _world.rayTrace(ray, _nRayBounces);
         }
-        data[row * _imageWidth + col] = pixelSum / _nSamplesPerPixel;
+        Vec3 pixelColor = pixelSum / _nSamplesPerPixel;
+        pixelColor = clamp(gammaCorrection(pixelColor), 0.0, 0.999);
+        data[row * _imageWidth + col] = pixelColor;
     }
     return data;
 }

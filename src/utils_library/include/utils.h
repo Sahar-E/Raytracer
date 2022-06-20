@@ -42,3 +42,30 @@ Color alphaBlending(Color v1, Color v2, double alpha);
 * @return      true if the absolute difference between the two values is less than EPS.
 */
 bool fcmp(double a, double b);
+
+
+/**
+ * Do gamma correction (of 2.0) to the given color.
+ * @param color The color to do gamma correction to.
+ * @return  Corrected color.
+ */
+Color gammaCorrection(Color const &color);
+
+
+/**
+ * Clamp the number between 2 values.
+ * @param toClamp   Number to clamp.
+ * @param low       Low bound.
+ * @param high      High bound.
+ * @return  Clamp result.
+ */
+double clamp(double toClamp, double low, double high);
+
+/**
+ * Clamp the vector between 2 values.
+ * @param toClamp   Number to clamp.
+ * @param low       Low bound.
+ * @param high      High bound.
+ * @return  Clamp result.
+ */
+Vec3 clamp(const Vec3 &toClamp, double low, double high);

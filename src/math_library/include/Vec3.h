@@ -82,5 +82,3 @@ Vec3 randomInHemisphere(const Vec3 &normal);
 Vec3 randomVecOnTangentSphere(const Vec3 &normal, const Vec3 & hitPoint);
 
 bool isZeroVec(const Vec3 &v);
-
-bool isZeroVec(const Vec3 &v);
