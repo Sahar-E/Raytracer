@@ -32,8 +32,8 @@ World initWorld1() {
     Material metalGreen = Material::getSpecular(green, green, 0.2, 0.3);
     Material lambertianDarkGreen = Material::getLambertian(darkGreen);
 
-    Material neonPurpleGlow = Material::getGlowing(white*.8, neonPurple*3);
-    Material neonGreenGlow = Material::getGlowing(white*.8, neonGreen*3);
+    Material neonPurpleGlow = Material::getGlowing(white * .8, neonPurple * 3);
+    Material neonGreenGlow = Material::getGlowing(white * .8, neonGreen * 3);
 
     world.addSphere(Sphere({0, 0, -2}, 0.5, lambertianRedBrown));
     world.addSphere(Sphere({1.2, 0, -3}, 0.5, mirror));
