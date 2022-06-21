@@ -17,9 +17,9 @@ Color World::rayTrace(const Ray &ray, int bounce) const {
     bool hit = getHitResult(ray, hitRes, material);
 
     if (hit) {
-        auto [attenuation, secondaryRay] = material.getColorAndSecondaryRay(hitRes);
+        auto [emittedColor, attenuation, secondaryRay] = material.getColorAndSecondaryRay(hitRes);
         Color scatterColor = rayTrace(secondaryRay, bounce - 1) * attenuation;
-        return scatterColor;
+        return emittedColor + scatterColor;
     } else {
         return World::backgroundColor(ray);
     }
@@ -45,7 +45,7 @@ bool World::getHitResult(const Ray &ray, HitResult &hitRes, Material &material) 
 Color World::backgroundColor(const Ray &ray) {
     auto unitDir = normalize(ray.direction());
     auto t = 0.5 * (unitDir.y() + 1.0);
-    return alphaBlending({0.4, 0.4, 1}, {.9, .9, .9}, t);
+    return alphaBlending({0.4, 0.4, 1}, {.9, .9, .9}, t) * 0.8;
 }
 
 
