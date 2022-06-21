@@ -6,22 +6,25 @@
 #include "Material.h"
 
 
-std::tuple<Color, Ray> Material::getColorAndSecondaryRay(const HitResult &hitRes) const {
+std::tuple<Color, Color, Ray> Material::getColorAndSecondaryRay(const HitResult &hitRes) const {
     Vec3 secondaryRayDir;
-    bool shouldDoSpecular = randomDouble() < _percentSpecular;
     Vec3 diffuseDir = normalize((hitRes.normal + randomUnitVec()));
+    Color resultColor;
+
+    double specularChance = randomDouble();
+    bool shouldDoSpecular = specularChance < _percentSpecular;
     if (shouldDoSpecular) {
         Vec3 specularDir = reflect(hitRes.hittingRay.direction(), hitRes.normal);
         specularDir = normalize(alphaBlending(specularDir, diffuseDir, _roughnessSquared));
         secondaryRayDir = specularDir;
+        resultColor = alphaBlending(_specularColor, _albedo, specularChance);
     } else {
         secondaryRayDir = diffuseDir;
+        resultColor = _albedo;
     }
 
-    Color resultColor = _albedo;    // TODO-Sahar: Should use see how to include emissive materials.
-
     Ray secondaryRay = Ray(hitRes.hitPoint, secondaryRayDir);
-    return {resultColor, secondaryRay};
+    return {_emittedColor, resultColor, secondaryRay};
 }
 
 //bool Glass::getColor(const HitResult &hitRes, Color &attenuation, Ray &reflectionRay, Ray &refractionRay) const {

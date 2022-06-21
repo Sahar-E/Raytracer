@@ -14,7 +14,7 @@ public:
     Material() = default;
 
     [[nodiscard]]
-    std::tuple<Color, Ray> getColorAndSecondaryRay(const HitResult &hitRes) const;
+    std::tuple<Color, Color, Ray> getColorAndSecondaryRay(const HitResult &hitRes) const;
 
     [[nodiscard]]
     static Material getLambertian(const Color &albedo) {
@@ -22,21 +22,34 @@ public:
     }
 
     [[nodiscard]]
-    static Material getSpecular(const Color &albedo, double roughness, double percentSpecular) {
-        return {albedo, roughness, percentSpecular};
+    static Material
+    getSpecular(const Color &albedo, const Color &specularColor, double roughness, double percentSpecular) {
+        return {albedo, specularColor, roughness, percentSpecular};
+    }
+
+    [[nodiscard]]
+    static Material getGlowing(const Color &albedo, const Color &emittedColor) {
+        return {albedo, {0, 0, 0}, 0, 0, emittedColor};
     }
 
 private:
-    explicit Material(const Color &albedo) : Material(albedo, 0, 0) {}
+    explicit Material(const Color &albedo) :
+            Material(albedo, {0, 0, 0}, 0, 0) {}
 
     Material(const Color &albedo,
+             const Color &specularColor,
              double roughnessSquared,
-             double percentSpecular) :
-            _albedo(albedo), _roughnessSquared(roughnessSquared * roughnessSquared),
-            _percentSpecular(percentSpecular), _emissiveLight(0) {}
+             double percentSpecular,
+             const Color &emittedColor = {0, 0, 0})
+            : _albedo(albedo),
+              _specularColor(specularColor),
+              _emittedColor(emittedColor),
+              _percentSpecular(percentSpecular),
+              _roughnessSquared(roughnessSquared * roughnessSquared) {}
 
     Color _albedo;
+    Color _specularColor{};
+    Color _emittedColor{};
     double _roughnessSquared{};
     double _percentSpecular{};
-    double _emissiveLight{};      // TODO-Sahar: add const.
 };
