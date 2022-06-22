@@ -30,12 +30,11 @@ bool Sphere::hit(const Ray &ray, double tStart, double tEnd, HitResult &hitRes) 
     // Get color by normal of the hit point:
     Point3 hitPoint = ray.at(root);
     Vec3 normalOfHitPoint = normalize(hitPoint - _center);
-    double eps = 0.001;
-    hitPoint += normalOfHitPoint * eps;
-
-    hitRes.hittingRay = ray;
-    hitRes.tOfHittingRay = root;
-    hitRes.hitPoint = hitPoint;
-    hitRes.normal = normalOfHitPoint;
+    bool isOutwards = dot(ray.direction(), normalOfHitPoint) < 0;
+    hitRes = HitResult(ray,
+                       isOutwards ? normalOfHitPoint : -normalOfHitPoint,
+                       hitPoint,
+                       root,
+                       isOutwards);
     return true;
 }

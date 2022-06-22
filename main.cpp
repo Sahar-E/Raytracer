@@ -34,17 +34,24 @@ World initWorld1() {
 
     Material neonPurpleGlow = Material::getGlowing(white * .8, neonPurple * 3);
     Material neonGreenGlow = Material::getGlowing(white * .8, neonGreen * 3);
+    Material whiteLight = Material::getGlowing(white * .8, white * 10);
+
+    Material glass = Material::getGlass(white, 1.5);
+
+    world.addSphere(Sphere({4, 4.5, -3}, 0.5, whiteLight));
 
     world.addSphere(Sphere({0, 0, -2}, 0.5, lambertianRedBrown));
     world.addSphere(Sphere({1.2, 0, -3}, 0.5, mirror));
     world.addSphere(Sphere({-1.2, -0.2, -2.5}, 0.3, metalGold));
     world.addSphere(Sphere({0.6, -0.4, -2.2}, 0.1, lambertianDarkGreen));
-    world.addSphere(Sphere({0.4, -0.4, -1.2}, 0.1, lambertianBezh));
+    world.addSphere(Sphere({0.4, -0.4, -1.5}, 0.1, lambertianBezh));
+    world.addSphere(Sphere({0.5, -0.4, -1.2}, 0.1, glass));
     world.addSphere(Sphere({1, -0.4, -1.5}, 0.1, metalGreen));
     world.addSphere(Sphere({-0.9, -0.4, -3.3}, 0.1, lambertianGreen));
-    world.addSphere(Sphere({-0.5, -0.4, -1.6}, 0.1, mirror));
+    world.addSphere(Sphere({-0.5, -0.4, -1.8}, 0.1, mirror));
     world.addSphere(Sphere({-0.8, -0.4, -1.7}, 0.1, neonPurpleGlow));
     world.addSphere(Sphere({-0.15, -0.4, -1.1}, 0.1, lambertianGreen));
+    world.addSphere(Sphere({-0.45, -0.4, -1.2}, 0.1, glass));
     world.addSphere(Sphere({0.15, -0.4, -1.45}, 0.1, neonGreenGlow));
     world.addSphere(Sphere({-0.8, -0.4, -1.3}, 0.1, lambertianRedBrown));
     world.addSphere(Sphere({0, -1000.5, -2}, 1000, lambertianBrown));
@@ -85,10 +92,10 @@ World initWorld1() {
 int main() {
     auto start = std::chrono::steady_clock::now();
     const auto aspect_ratio = 3.0 / 2.0;
-    const int image_width = 2400;
+    const int image_width = 200;
     const int image_height = static_cast<int>(image_width / aspect_ratio);
-    const int rayBounces = 12;
-    int nSamplesPerPixel = 800;
+    const int rayBounces = 6;
+    int nSamplesPerPixel = 1500;
 
     auto world = initWorld1();
     auto camera = Camera({0, 0, 0}, aspect_ratio);

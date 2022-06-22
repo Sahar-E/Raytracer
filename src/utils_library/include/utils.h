@@ -69,3 +69,32 @@ double clamp(double toClamp, double low, double high);
  * @return  Clamp result.
  */
 Vec3 clamp(const Vec3 &toClamp, double low, double high);
+
+/**
+ * Check if it is possible to refract the ray according to the cosine of the angle between the normal and the
+ * incoming ray, and using the refractionIdxRatio that is the previous material refractionIdx divided by the target
+ * refractionIdx of the target material.
+ *
+ * Snell's Law is:
+ * sin(theta1) / sin(theta2)  =  eta1 / eta2
+ *
+ * <==> sin(theta1) = (eta1 / eta2) * sin(theta2)
+ *
+ *
+ * Reminder that sin(theta1) is bounded by [-1,1].
+ *
+ * @param cosTheta              The cosine of the angle theta1. (Reminder that cos(angle) is equal to the dot product
+ *                                  between the two vectors, if they have the same origin and are normalized)
+ * @param refractionIdxRatio    Refraction index of first material divided by the second.
+ * @return  If possible to refract according to Snell's Law.
+ */
+bool cannotRefractBySnellsLaw(double cosTheta, double refractionIdxRatio);
+
+/**
+ * Check if shouldn't refract by using Schlick's approximation for Frensel equations.
+ *
+ * @param cosTheta              The cosine of the angle theta. The angle between the normal and the incoming ray.
+ * @param refractionIdxRatio    Refraction index of first material divided by the second.
+ * @return  If should ref
+ */
+double reflectSchlickApproxForFrensel(double cosTheta, double refractionIdxRatio);

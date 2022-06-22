@@ -2,22 +2,18 @@
 // Created by Sahar on 11/06/2022.
 //
 
-#include <utils.h>
+#include "utils.h"
 #include "Material.h"
 
 
 std::tuple<Color, Color, Ray> Material::getColorAndSecondaryRay(const HitResult &hitRes) const {
     Vec3 secondaryRayDir;
-    Vec3 diffuseDir = normalize((hitRes.normal + randomUnitVec()));
     Color resultColor;
+    Vec3 diffuseDir = normalize((hitRes.normal + randomUnitVec()));
 
     double specularChance = randomDouble();
-    bool shouldDoSpecular = specularChance < _percentSpecular;
-    if (shouldDoSpecular) {
-        Vec3 specularDir = reflect(hitRes.hittingRay.direction(), hitRes.normal);
-        specularDir = normalize(alphaBlending(specularDir, diffuseDir, _roughnessSquared));
-        secondaryRayDir = specularDir;
-        resultColor = alphaBlending(_specularColor, _albedo, specularChance);
+    if (specularChance < _percentSpecular) {
+        std::tie(secondaryRayDir,resultColor ) = getSpecularResult(hitRes, diffuseDir, specularChance);
     } else {
         secondaryRayDir = diffuseDir;
         resultColor = _albedo;
@@ -27,23 +23,29 @@ std::tuple<Color, Color, Ray> Material::getColorAndSecondaryRay(const HitResult 
     return {_emittedColor, resultColor, secondaryRay};
 }
 
-//bool Glass::getColor(const HitResult &hitRes, Color &attenuation, Ray &reflectionRay, Ray &refractionRay) const {
-//    attenuation = _albedo;
-//    double hitRay_dot_normal = dot(hitRes.hittingRay.direction(), hitRes.normal);
-//    bool front_face = hitRay_dot_normal < 0;
-//    double refraction_ratio = front_face ? (1.0 / _refractiveIndex) : _refractiveIndex;
-//
-//    Vec3 unit_direction = unitVector(hitRes.hittingRay.direction());
-//    double cos_theta = fmin(-hitRay_dot_normal, 1.0);
-//    double sin_theta = sqrt(1.0 - cos_theta*cos_theta);
-//
-//    bool cannot_refract = refraction_ratio * sin_theta > 1.0;
-//    Vec3 direction;
-//    if (cannot_refract || reflectance(cos_theta, refraction_ratio) > randomDouble()) {
-//        direction = reflect(unit_direction, hitRes.normal);
-//    } else {
-//        direction = refract(unit_direction, hitRes.normal, refraction_ratio);
-//    }
-//    refractionRay = Ray(hitRes.hitPoint, direction);
-//    return true;
-//}
+std::tuple<Vec3, Color> Material::getSpecularResult(const HitResult &hitRes,
+                                                    Vec3 &diffuseDir,
+                                                    double specularChance) const {
+    double refractionIdxRatio = hitRes.isOutwardsNormal ? 1.0 / _refractionIdx : _refractionIdx;
+    Vec3 rayDirNormalized = normalize(hitRes.hittingRay.direction());
+
+    Vec3 specularDir;
+    bool doReflection = shouldDoReflection(hitRes, refractionIdxRatio, rayDirNormalized);
+    if (doReflection) {
+        specularDir = reflect(hitRes.hittingRay.direction(), hitRes.normal);
+    } else {
+        specularDir = refract(rayDirNormalized, hitRes.normal, refractionIdxRatio);
+    }
+
+    specularDir = normalize(alphaBlending(specularDir, diffuseDir, _roughnessSquared));
+    Color color = alphaBlending(_specularColor, _albedo, specularChance);
+    return {specularDir, color};
+}
+
+bool Material::shouldDoReflection(const HitResult &hitRes, double refractionIdxRatio, Vec3 &rayDirNormalized) const {
+    double cosTheta = fmin(dot(-rayDirNormalized, hitRes.normal), 1.0);
+    bool cannotRefract = cannotRefractBySnellsLaw(cosTheta, refractionIdxRatio);
+    bool reflectBySchlickApprox = reflectSchlickApproxForFrensel(cosTheta, refractionIdxRatio) > randomDouble();
+    bool doReflection = !_isRefractable || cannotRefract || !reflectBySchlickApprox;
+    return doReflection;
+}

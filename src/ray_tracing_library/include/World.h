@@ -8,7 +8,7 @@
 #include <vector>
 #include "Sphere.h"
 
-static const double CLOSEST_POSSIBLE_RAY_HIT = 0.0001;
+static const double CLOSEST_POSSIBLE_RAY_HIT = 0.001;
 
 class World {
 public:

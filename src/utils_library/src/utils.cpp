@@ -2,11 +2,12 @@
 // Created by Sahar on 08/06/2022.
 //
 
+#include "utils.h"
 #include <string>
 #include <vector>
 #include <memory>
-#include <constants.h>
-#include <stb_library/stb_image_write.h>
+#include "constants.h"
+#include "stb_library/stb_image_write.h"
 #include "Vec3.h"
 
 void saveImgAsJpg(const std::string &filename,
@@ -51,4 +52,16 @@ Vec3 clamp(const Vec3 &toClamp, double low, double high) {
     return {clamp(toClamp.x(), low, high),
             clamp(toClamp.y(), low, high),
             clamp(toClamp.z(), low, high)};
+}
+
+bool cannotRefractBySnellsLaw(double cosTheta, double refractionIdxRatio) {
+    double sinTheta = sqrt(1.0 - cosTheta * cosTheta);
+    bool cannotRefract = refractionIdxRatio * sinTheta > 1.0;
+    return cannotRefract;
+}
+
+double reflectSchlickApproxForFrensel(double cosTheta, double refractionIdxRatio) {
+    double r0 = (1 - refractionIdxRatio) / (1 + refractionIdxRatio);
+    r0 = r0 * r0;
+    return r0 + (1 - r0) * pow(1 - cosTheta, 5);
 }

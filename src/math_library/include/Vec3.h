@@ -70,6 +70,7 @@ std::ostream &operator<<(std::ostream &out, const Vec3 &v);
 
 Vec3 reflect(const Vec3& v, const Vec3& n);
 
+Vec3 refract(const Vec3 &rayDirNormalized, const Vec3 &n, double refractionIdxRatio);
 
 Vec3 randomVec();
 

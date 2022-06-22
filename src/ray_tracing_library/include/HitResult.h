@@ -11,7 +11,17 @@
 
 struct HitResult {
     Ray hittingRay{};
-    double tOfHittingRay{};
-    Point3 hitPoint{};
     Vec3 normal{};
+    Point3 hitPoint{};
+    double tOfHittingRay{};
+    bool isOutwardsNormal{};
+
+    HitResult() = default;
+
+    HitResult(const Ray &hittingRay,
+              const Vec3 &normal,
+              const Point3 &hitPoint,
+              double tOfHittingRay,
+              bool outwardsNormal) : hittingRay(hittingRay), normal(normal), hitPoint(hitPoint),
+                                     tOfHittingRay(tOfHittingRay), isOutwardsNormal(outwardsNormal) {}
 };

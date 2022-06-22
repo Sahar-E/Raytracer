@@ -2,14 +2,14 @@
 // Created by Sahar on 10/06/2022.
 //
 
-#include <HitResult.h>
-#include <constants.h>
-#include <utils.h>
+#include "HitResult.h"
+#include "constants.h"
+#include "utils.h"
 #include "World.h"
 
 Color World::rayTrace(const Ray &ray, int bounce) const {
-    const static Color black = {0, 0, 0};
     if (bounce <= 0) {
+        Color black = {0, 0, 0};
         return black;
     }
     HitResult hitRes;
