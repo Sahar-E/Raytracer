@@ -7,7 +7,6 @@
 #include <memory>
 #include "Vec3.h"
 #include "Ray.hpp"
-#include "Material.h"
 
 struct HitResult {
     Ray hittingRay{};

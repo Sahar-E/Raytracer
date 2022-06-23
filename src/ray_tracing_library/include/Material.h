@@ -7,8 +7,6 @@
 
 #include "HitResult.h"
 
-struct HitResult;
-
 /**
  * Represent a material property for the renderer.
  *

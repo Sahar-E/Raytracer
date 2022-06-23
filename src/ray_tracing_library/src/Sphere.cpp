@@ -2,9 +2,6 @@
 // Created by Sahar on 10/06/2022.
 //
 
-#include <HitResult.h>
-
-#include <utility>
 #include "Sphere.h"
 
 

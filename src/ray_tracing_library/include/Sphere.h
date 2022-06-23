@@ -5,9 +5,10 @@
 #pragma once
 
 
-#include <Vec3.h>
-#include <Ray.hpp>
+#include "Vec3.h"
+#include "Ray.hpp"
 #include "HitResult.h"
+#include "Material.h"
 
 class Sphere {
 
