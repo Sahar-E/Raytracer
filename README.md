@@ -13,4 +13,4 @@ cmake --build .
 
 Last rendered image:
 
-![Image Render Example](test.jpg?raw=true "Image Render Example.")
+![Image Render Example](test1.jpg?raw=true "Image Render Example.")
