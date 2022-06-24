@@ -15,11 +15,13 @@ public:
     /**
      * Camera object that after initialization, can return rays going thourgh the image plane.
      *
-     * @param origin        Origin of the camera.
+     * @param lookFrom      Origin of the camera.
+     * @param lookAt        Target of the camera.
+     * @param vUp           Vector of up direction in the world space.
      * @param aspectRatio   Aspect ratio of the image between the width and the height.
      * @param vFov          Vertical FOV of the image plane in degrees.
      */
-    Camera(Vec3 origin, double aspectRatio, double vFov);
+    Camera(Vec3 lookFrom, Vec3 lookAt, Vec3 vUp, double aspectRatio, double vFov);
 
     /**
      * Returns ray using the specified scalars.

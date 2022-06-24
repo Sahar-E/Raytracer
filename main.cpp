@@ -32,8 +32,8 @@ World initWorld1() {
     Material metalGreen = Material::getSpecular(green, green, 0.2, 0.3);
     Material lambertianDarkGreen = Material::getLambertian(darkGreen);
 
-    Material neonPurpleGlow = Material::getGlowing(white * .8, neonPurple * 3);
-    Material neonGreenGlow = Material::getGlowing(white * .8, neonGreen * 3);
+    Material neonPurpleGlow = Material::getGlowing(white * .8, neonPurple * 4);
+    Material neonGreenGlow = Material::getGlowing(white * .8, neonGreen * 4);
     Material whiteLight = Material::getGlowing(white * .8, white * 10);
 
     Material glass = Material::getGlass(white, 1.5);
@@ -58,48 +58,20 @@ World initWorld1() {
     return world;
 }
 
-//World initWorld2() {
-//    auto world = World();
-//    Color bluish = {0.2, 0.2, 1};
-//    Color whiteGreenish = {0.4, 1, .4};
-//    Color red = {0.8, 0.2, 0.1};
-//    Color green = {0.2, 0.8, 0.1};
-//    Color white = {1,1,1};
-//    Color bezh = {0.96,0.96,0.86};
-//
-//    Material lambertianBlue = Material::getLambertian(bluish);
-//    Material metalGreen = Material::getSpecular(whiteGreenish, whiteGreenish, 0.99, 1.0);
-//    Material mirror = Material::getSpecular(white, white, 0.0, 1.0);
-//    Material lambertianRed = Material::getLambertian(red);
-//    Material lambertianGreen = Material::getLambertian(green);
-//    Material lambertianBezh = Material::getLambertian(bezh);
-////    Material glass = std::make_shared<Glass>(white, 1.5);
-//
-////    Material light = std::make_shared<Light>(white, 100);
-//
-//    world.addSphere(Sphere({0, 0, -2}, 0.5, metalGreen));
-//    world.addSphere(Sphere({1, 0, -3}, 0.5, mirror));
-//    world.addSphere(Sphere({-1, 0, -2.5}, 0.5, lambertianBlue));
-//    world.addSphere(Sphere({-0.5, -0.4, -1.5}, 0.1, mirror));
-////    world.addSphere(Sphere({0, 1, -2}, 0.2, light));                    // Light source
-//
-//    world.addSphere(Sphere({0, -1000.5, -2}, 1000, lambertianBezh));    // Floor
-////    world.addSphere(Sphere({-1000.5, 0, -2}, 1000, lambertianRed));     // left wall
-////    world.addSphere(Sphere({1000.5, 0, -2}, 1000, lambertianGreen));    // left wall
-//    return world;
-//}
-
 int main() {
     auto start = std::chrono::steady_clock::now();
     const auto aspectRatio = 3.0 / 2.0;
-    const int image_width = 200;
+    const int image_width = 2400;
     const int image_height = static_cast<int>(image_width / aspectRatio);
     const int rayBounces = 6;
-    int nSamplesPerPixel = 500;
+    int nSamplesPerPixel = 1500;
     int vFov = 26;
+    Vec3 vUp = {0, 1, 0};
+    Vec3 lookFrom = {0, 1, 2};
+    Vec3 lookAt = {0., -0., -1.45};
 
     auto world = initWorld1();
-    auto camera = Camera({0, 0, 2}, aspectRatio, vFov);
+    auto camera = Camera(lookFrom, lookAt, vUp, aspectRatio, vFov);
     Renderer renderer(image_width, image_height, world, camera, rayBounces, nSamplesPerPixel);
     std::vector<Color> renderedImage = renderer.render();
 
