@@ -4,13 +4,16 @@
 
 #include "Camera.h"
 
-Camera::Camera(Vec3 origin, double widthToHeight) : _origin(origin), _widthToHeight(widthToHeight){
+Camera::Camera(Vec3 origin, double aspectRatio, double vFov) : _origin(origin), _aspectRatio(aspectRatio){
+    auto vTheta = deg2rad(vFov);
     double focal_length = 1.0;
-    double viewPortHeight = 1.0;
-    double viewPortWidth = _widthToHeight * viewPortHeight;
+    auto h = tan(vTheta / 2); // Multiplied by focal_length
+    auto viewportHeight = 2.0 * h;
+    auto viewportWidth = _aspectRatio * viewportHeight;
 
-    _horizontalVec = Vec3(viewPortWidth, 0, 0);
-    _verticalVec = Vec3(0, viewPortHeight, 0);
+
+    _horizontalVec = Vec3(viewportWidth, 0, 0);
+    _verticalVec = Vec3(0, viewportHeight, 0);
     _lowerLeftCorner = origin - _horizontalVec/2 - _verticalVec/2 - Vec3(0, 0, focal_length);
 }
 

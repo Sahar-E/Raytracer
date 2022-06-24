@@ -91,14 +91,15 @@ World initWorld1() {
 
 int main() {
     auto start = std::chrono::steady_clock::now();
-    const auto aspect_ratio = 3.0 / 2.0;
+    const auto aspectRatio = 3.0 / 2.0;
     const int image_width = 200;
-    const int image_height = static_cast<int>(image_width / aspect_ratio);
+    const int image_height = static_cast<int>(image_width / aspectRatio);
     const int rayBounces = 6;
-    int nSamplesPerPixel = 1500;
+    int nSamplesPerPixel = 500;
+    int vFov = 26;
 
     auto world = initWorld1();
-    auto camera = Camera({0, 0, 0}, aspect_ratio);
+    auto camera = Camera({0, 0, 2}, aspectRatio, vFov);
     Renderer renderer(image_width, image_height, world, camera, rayBounces, nSamplesPerPixel);
     std::vector<Color> renderedImage = renderer.render();
 

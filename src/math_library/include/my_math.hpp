@@ -15,3 +15,7 @@ inline double randomDouble() {
     return distribution(generator);
 //    return ((double)rand()/(double)RAND_MAX);   // Speed is top priority, hence using the old school way. // Not thread safe, has a lock.
 }
+
+inline double deg2rad(double degree) {
+    return degree * M_PI / 180.0;
+}
