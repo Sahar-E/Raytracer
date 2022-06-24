@@ -11,9 +11,12 @@
  */
 inline double randomDouble() {
     static std::uniform_real_distribution<double> distribution(0.0, 1.0);
-    static std::minstd_rand generator;
+    static std::minstd_rand generator(1);
     return distribution(generator);
-//    return ((double)rand()/(double)RAND_MAX);   // Speed is top priority, hence using the old school way. // Not thread safe, has a lock.
+}
+
+inline double randomDouble(double from, double to) {
+    return randomDouble() * (from - to) + from;
 }
 
 inline double deg2rad(double degree) {

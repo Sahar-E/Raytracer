@@ -37,7 +37,6 @@ public:
     [[nodiscard]] double length_squared() const;
 
 
-
 private:
     double _x[3];
 };
@@ -68,18 +67,22 @@ std::ostream &operator<<(std::ostream &out, const Vec3 &v);
 
 [[nodiscard]] Vec3 normalize(Vec3 v);
 
-Vec3 reflect(const Vec3& v, const Vec3& n);
+Vec3 reflect(const Vec3 &v, const Vec3 &n);
 
 Vec3 refract(const Vec3 &rayDirNormalized, const Vec3 &n, double refractionIdxRatio);
 
 Vec3 randomVec();
 
+Vec3 randomVec(double from, double to);
+
 Vec3 randomUnitVec();
+
+Vec3 randomVecInUnitDisk();
 
 Vec3 randomInUnitSphere();
 
 Vec3 randomInHemisphere(const Vec3 &normal);
 
-Vec3 randomVecOnTangentSphere(const Vec3 &normal, const Vec3 & hitPoint);
+Vec3 randomVecOnTangentSphere(const Vec3 &normal, const Vec3 &hitPoint);
 
 bool isZeroVec(const Vec3 &v);

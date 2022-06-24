@@ -43,7 +43,7 @@ bool World::getHitResult(const Ray &ray, HitResult &hitRes, Material &material) 
 }
 
 Color World::backgroundColor(const Ray &ray) {
-    double intensity = 0.7;
+    double intensity = 0.5;
     auto unitDir = normalize(ray.direction());
     auto t = 0.5 * (unitDir.y() + 1.0);
     return alphaBlending({0.4, 0.4, 1}, {.9, .9, .9}, t) * intensity;

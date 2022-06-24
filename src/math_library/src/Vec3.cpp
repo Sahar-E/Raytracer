@@ -88,13 +88,17 @@ Vec3 reflect(const Vec3 &v, const Vec3 &n) {
 
 Vec3 refract(const Vec3 &rayDirNormalized, const Vec3 &n, double refractionIdxRatio) {
     double cos_theta = fmin(dot(-rayDirNormalized, n), 1.0);
-    Vec3 r_out_perp =  refractionIdxRatio * (rayDirNormalized + cos_theta * n);
+    Vec3 r_out_perp = refractionIdxRatio * (rayDirNormalized + cos_theta * n);
     Vec3 r_out_parallel = -sqrt(fabs(1.0 - r_out_perp.length_squared())) * n;
     return r_out_perp + r_out_parallel;
 }
 
 Vec3 randomVec() {
-    return {2 * randomDouble() - 1, 2 * randomDouble() - 1, 2 * randomDouble() - 1};
+    return {randomDouble(-1, 1), randomDouble(-1, 1), randomDouble(-1, 1)};
+}
+
+Vec3 randomVec(double from, double to) {
+    return {randomDouble(from, to), randomDouble(from, to), randomDouble(from, to)};
 }
 
 Vec3 randomUnitVec() {
@@ -103,6 +107,15 @@ Vec3 randomUnitVec() {
 
 Vec3 randomVecOnTangentSphere(const Vec3 &normal, const Vec3 &hitPoint) {
     return normal + hitPoint + randomUnitVec();
+}
+
+Vec3 randomVecInUnitDisk() {
+    while (true) {
+        auto p = randomVec();
+        if (1 <= p.length_squared()) {
+            return p;
+        }
+    }
 }
 
 Vec3 randomInUnitSphere() {

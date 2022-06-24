@@ -28,8 +28,8 @@ public:
         return {albedo, specularColor, roughness, percentSpecular};
     }
 
-    [[nodiscard]] static Material getGlowing(const Color &albedo, const Color &emittedColor) {
-        return {albedo, emittedColor};
+    [[nodiscard]] static Material getGlowing(const Color &albedo, const Color &emittedColor, double intensity) {
+        return {albedo, emittedColor * intensity};
     }
 
     [[nodiscard]] static Material getGlass(const Color &albedo, double refractionIdx) {
