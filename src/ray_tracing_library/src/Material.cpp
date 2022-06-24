@@ -46,6 +46,6 @@ bool Material::shouldDoReflection(const HitResult &hitRes, double refractionIdxR
     double cosTheta = fmin(dot(-rayDirNormalized, hitRes.normal), 1.0);
     bool cannotRefract = cannotRefractBySnellsLaw(cosTheta, refractionIdxRatio);
     bool reflectBySchlickApprox = reflectSchlickApproxForFrensel(cosTheta, refractionIdxRatio) > randomDouble();
-    bool doReflection = !_isRefractable || cannotRefract || !reflectBySchlickApprox;
+    bool doReflection = !_isRefractable || cannotRefract || reflectBySchlickApprox;
     return doReflection;
 }
