@@ -6,20 +6,22 @@
 #include <Renderer.h>
 #include <utils.h>
 #include <chrono>
+#include <cuda_runtime_api.h>
+#include <c++/9/algorithm>
 
 World initWorld1() {
     auto world = World();
     Color red = {0.8, 0.2, 0.1};
-    Color white = {1,1,1};
-    Color gold1 = {212 / 255.0,175 / 255.0,55 / 255.0};
-    Color gold2 = {218 / 255.0,165 / 255.0,32 / 255.0};
-    Color bezh = {227 / 255.0,203 / 255.0,165 / 255.0};
-    Color green = {51 / 255.0, 83 / 255.0,69 / 255.0};
-    Color brown = {118 / 255.0, 91 / 255.0,70 / 255.0};
-    Color redBrown = {141 / 255.0, 78 / 255.0,44 / 255.0};
-    Color darkGreen = {74 / 255.0, 71 / 255.0,51 / 255.0};
-    Color neonPurple = {176 / 255.0, 38 / 255.0,255 / 255.0};
-    Color neonGreen = {57 / 255.0, 255 / 255.0,20 / 255.0};
+    Color white = {1, 1, 1};
+    Color gold1 = {212 / 255.0, 175 / 255.0, 55 / 255.0};
+    Color gold2 = {218 / 255.0, 165 / 255.0, 32 / 255.0};
+    Color bezh = {227 / 255.0, 203 / 255.0, 165 / 255.0};
+    Color green = {51 / 255.0, 83 / 255.0, 69 / 255.0};
+    Color brown = {118 / 255.0, 91 / 255.0, 70 / 255.0};
+    Color redBrown = {141 / 255.0, 78 / 255.0, 44 / 255.0};
+    Color darkGreen = {74 / 255.0, 71 / 255.0, 51 / 255.0};
+    Color neonPurple = {176 / 255.0, 38 / 255.0, 255 / 255.0};
+    Color neonGreen = {57 / 255.0, 255 / 255.0, 20 / 255.0};
 
 //    Material metalGreen = Material(whiteGreenish, 0.99);
     Material mirror = Material::getSpecular(white, white, 0.0, 1.0);
@@ -62,22 +64,24 @@ World initWorld1() {
 
 World initWorld2() {
     auto world = World();
-    Color brown = {118 / 255.0, 91 / 255.0,70 / 255.0};
+    Color brown = {118 / 255.0, 91 / 255.0, 70 / 255.0};
     Material lambertianBrown = Material::getLambertian(brown);
     auto floor = Sphere({0, -5000, 0}, 5000, lambertianBrown);
     world.addSphere(floor);
 
 
-    Color white = {1,1,1};
+    Color white = {1, 1, 1};
     Material whiteLight = Material::getGlowing(white * .8, white, 10);
     world.addSphere(Sphere({4, 5, 4}, 1, whiteLight));
 
 
     double radius = 1;
-    std::vector<Vec3> bigBallsLocs = {{1.5, radius, 4}, {0.5, radius, 2}, {-0.5, radius, 0}};
+    std::vector<Vec3> bigBallsLocs = {{1.5,  radius, 4},
+                                      {0.5,  radius, 2},
+                                      {-0.5, radius, 0}};
     Material mirror = Material::getSpecular(white, white, 0.0, 1.0);
     world.addSphere(Sphere(bigBallsLocs[0], radius, mirror));
-    Color redBrown = {141 / 255.0, 78 / 255.0,44 / 255.0};
+    Color redBrown = {141 / 255.0, 78 / 255.0, 44 / 255.0};
     Material lambertianRedBrown = Material::getLambertian(redBrown);
     world.addSphere(Sphere(bigBallsLocs[1], radius, lambertianRedBrown));
     Material glass = Material::getGlass(white, 1.5);
@@ -112,17 +116,17 @@ World initWorld2() {
             }
         }
     }
-    
+
     return world;
 }
 
-int main() {
+int main2() {
     auto start = std::chrono::steady_clock::now();
     const auto aspectRatio = 3.0 / 2.0;
-    const int image_width = 2000;
+    const int image_width = 200;
     const int image_height = static_cast<int>(image_width / aspectRatio);
     const int rayBounces = 10;
-    int nSamplesPerPixel = 800;
+    int nSamplesPerPixel = 100;
     int vFov = 26;
     Vec3 vUp = {0, 1, 0};
 
@@ -141,9 +145,82 @@ int main() {
     saveImgAsJpg(filename, renderedImage, image_width, image_height, channelCount);
 
     auto end = std::chrono::steady_clock::now();
-    long duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+    long duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
 
     std::cout << "Done." << "\n";
     std::cout << "Duration (ms): " << duration << "\n";
+    return 0;
+}
+
+
+
+// function to add the elements of two arrays
+__global__
+void add(int n, float *x, float *y) {
+    for (int i = blockIdx.x * blockDim.x + threadIdx.x;
+         i < n;
+         i += blockDim.x * gridDim.x) {
+//    for (int i = 0; i < n ; ++i) {
+        y[i] = x[i] + y[i];
+    }
+}
+
+double sahar2(int a) {
+    return randomDouble();
+}
+
+void sahar1(int a) {
+    for (int i = 0; i < 10000000; i++) {
+        if (sahar2(2 * a) > 100) {
+            std::cout << "Bigger than 100";
+        }
+    }
+}
+
+int main() {
+    // Testing.
+    int N = 1 << 23; // 1M elements
+
+//    float *x = new float[N];
+//    float *y = new float[N];
+    float *x, *y;
+    cudaMallocManaged(reinterpret_cast<void **>(&x), N * sizeof(float));
+    cudaMallocManaged(reinterpret_cast<void **>(&y), N * sizeof(float));
+
+
+    // initialize x and y arrays on the host
+    for (int i = 0; i < N; i++) {
+        x[i] = 1.0f;
+        y[i] = 2.0f;
+    }
+
+    // Run kernel on 1M elements on the CPU
+    auto start = std::chrono::steady_clock::now();
+//    add(N, x, y);
+    int blockSize = 256;
+    int numBlocks = (N + blockSize - 1) / blockSize;
+
+    add<<<numBlocks, blockSize>>>(N, x, y);
+    cudaDeviceSynchronize();
+
+    auto end = std::chrono::steady_clock::now();
+
+    // Check for errors (all values should be 3.0f)
+    float maxError = 0.0f;
+    for (int i = 0; i < N; i++)
+        maxError = fmax(maxError, fabs(y[i] - 3.0f));
+    std::cout << "Max error: " << maxError << "\n";
+
+//    // Free memory
+//    delete [] x;
+//    delete [] y;
+//    // Free memory
+    cudaFree(x);
+    cudaFree(y);
+
+    long duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+
+    std::cout << "Done." << "\n";
+    std::cout << "Duration (micro-s): " << duration << "\n";
     return 0;
 }

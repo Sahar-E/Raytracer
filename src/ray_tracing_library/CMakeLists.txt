@@ -6,12 +6,24 @@ project(ray_tracing_library)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
 find_package(OpenMP REQUIRED)
 
-add_library(${PROJECT_NAME} STATIC
-        src/Renderer.cpp
-        src/World.cpp
-        src/Camera.cpp
-        src/Sphere.cpp
-        src/Material.cpp include/Material.h)
+if(DEFINED CUDA_ENABLE)
+    add_library(${PROJECT_NAME} STATIC
+            src/World.cpp
+            src/Camera.cpp
+            src/Renderer.cu
+            src/Sphere.cpp
+            src/Material.cpp include/Material.h)
+    message("Inlcuded src/Renderer.cu")
+else()
+    add_library(${PROJECT_NAME} STATIC
+            src/World.cpp
+            src/Camera.cpp
+            src/Renderer.cpp
+            src/Sphere.cpp
+            src/Material.cpp include/Material.h)
+    message("Inlcuded src/Renderer.cpp and not src/Renderer.cu")
+endif()
+
 
 target_include_directories(${PROJECT_NAME} PUBLIC include)
 
