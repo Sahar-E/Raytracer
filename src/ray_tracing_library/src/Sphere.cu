@@ -2,9 +2,9 @@
 // Created by Sahar on 10/06/2022.
 //
 
-#include "Sphere.h"
+#include "Sphere.cuh"
 
-
+__host__ __device__
 bool Sphere::hit(const Ray &ray, double tStart, double tEnd, HitResult &hitRes) const {
     Vec3 oc = ray.origin() - _center;
     auto a = ray.direction().length_squared();

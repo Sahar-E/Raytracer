@@ -4,5 +4,7 @@
 
 #pragma once
 
-const double INF = std::numeric_limits<double>::infinity();
+#include <cfloat>
+
+const double INF = DBL_MAX;
 const double EPS = 1.0e-6;

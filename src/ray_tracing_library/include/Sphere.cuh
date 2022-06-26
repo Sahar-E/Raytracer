@@ -5,26 +5,30 @@
 #pragma once
 
 
-#include "Vec3.h"
-#include "Ray.hpp"
 #include "HitResult.h"
-#include "Material.h"
+#include "Material.cuh"
 
 class Sphere {
 
 public:
+    __host__ __device__
+    Sphere() = default;
+
+    __host__ __device__
     Sphere(const Point3 &center, double radius, const Material& mat) : _center(center), _radius(radius), _material(mat) {}
 
+    __host__ __device__
     bool hit(const Ray &ray, double tStart, double tEnd, HitResult &hitRes) const;
 
-    [[nodiscard]] const Material &getMaterial() const {
+    __host__ __device__
+    const Material &getMaterial() const {
         return _material;
     }
 
 private:
-    Point3 _center;
-    double _radius;
-    Material _material;
+    Point3 _center{};
+    double _radius{};
+    Material _material{};
 };
 
 

@@ -5,8 +5,7 @@
 #pragma once
 
 #include <memory>
-#include "Vec3.h"
-#include "Ray.hpp"
+#include "Ray.cuh"
 
 struct HitResult {
     Ray hittingRay{};
@@ -15,8 +14,10 @@ struct HitResult {
     double tOfHittingRay{};
     bool isOutwardsNormal{};
 
+    __host__ __device__
     HitResult() = default;
 
+    __host__ __device__
     HitResult(const Ray &hittingRay,
               const Vec3 &normal,
               const Point3 &hitPoint,

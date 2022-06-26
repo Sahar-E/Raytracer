@@ -5,8 +5,8 @@
 #pragma once
 
 
-#include <Vec3.h>
-#include <Ray.hpp>
+#include "Vec3.cuh"
+#include "Ray.cuh"
 
 class Camera {
 
@@ -34,20 +34,21 @@ public:
      * @param v_scalar  vertical scalar between [0,1].
      * @return  New ray in that direction from the camera origin.
      */
-    [[nodiscard]] Ray getRay(double h_scalar, double v_scalar) const;
+    __host__ __device__
+    Ray getRay(double h_scalar, double v_scalar, int &randState) const;
 
 private:
-    Point3 _origin;
-    Point3 _lowerLeftCorner;
-    Vec3 _horizontalVec;
-    Vec3 _verticalVec;
+    Point3 _origin{};
+    Point3 _lowerLeftCorner{};
+    Vec3 _horizontalVec{};
+    Vec3 _verticalVec{};
 
-    Vec3 zVec;
-    Vec3 xVec;
-    Vec3 yVec;
+    Vec3 zVec{};
+    Vec3 xVec{};
+    Vec3 yVec{};
 
-    double _aspectRatio;
-    double _lensRadius;
+    double _aspectRatio{};
+    double _lensRadius{};
 };
 
 

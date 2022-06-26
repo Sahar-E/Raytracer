@@ -4,11 +4,10 @@
 
 #pragma once
 
-
+#include "cuda_runtime_api.h"
 #include <vector>
-#include <Vec3.h>
-#include "World.h"
-#include "Camera.h"
+#include "World.cuh"
+#include "Camera.cuh"
 
 class Renderer {
 

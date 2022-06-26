@@ -6,32 +6,28 @@ project(ray_tracing_library)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
 find_package(OpenMP REQUIRED)
 
-if(DEFINED CUDA_ENABLE)
-    add_library(${PROJECT_NAME} STATIC
-            src/World.cpp
-            src/Camera.cpp
-            src/Renderer.cu
-            src/Sphere.cpp
-            src/Material.cpp include/Material.h)
-    message("Inlcuded src/Renderer.cu")
-else()
-    add_library(${PROJECT_NAME} STATIC
-            src/World.cpp
-            src/Camera.cpp
-            src/Renderer.cpp
-            src/Sphere.cpp
-            src/Material.cpp include/Material.h)
-    message("Inlcuded src/Renderer.cpp and not src/Renderer.cu")
-endif()
+add_library(${PROJECT_NAME} STATIC
+        src/World.cu
+        src/Camera.cu
+        src/Renderer.cu
+        include/Renderer.cuh
+        src/Sphere.cu
+        src/Material.cu
+        include/Material.cuh
+        src/Ray.cu
+        include/Ray.cuh
+        src/Vec3.cu
+        include/Vec3.cuh
+        src/utils.cpp
+        include/constants.h)
 
+target_compile_options(${PROJECT_NAME} PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:
+        --relocatable-device-code=true
+        >)
+
+set_target_properties(${PROJECT_NAME} PROPERTIES CUDA_RESOLVE_DEVICE_SYMBOLS ON)
 
 target_include_directories(${PROJECT_NAME} PUBLIC include)
 
-target_include_directories(${PROJECT_NAME} PUBLIC ../math_library)
-target_link_libraries(${PROJECT_NAME} math_library)
-
 target_include_directories(${PROJECT_NAME} PUBLIC ../stb_library)
 target_link_libraries(${PROJECT_NAME} stb_library)
-
-target_include_directories(${PROJECT_NAME} PUBLIC ../utils_library)
-target_link_libraries(${PROJECT_NAME} utils_library)
