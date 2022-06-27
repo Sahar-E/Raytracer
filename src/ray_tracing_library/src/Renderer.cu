@@ -77,7 +77,7 @@ void getPixel2(Color &pixel,
 }
 
 std::vector<Color> Renderer::render() const {
-//    int demoRand = 0;
+    World **d_world = allocateWorldInDeviceMemory(_world.getSpheres(), _world.getNSpheres());
 
     std::vector<Color> data(_imageHeight * _imageWidth, {1, 1, 1});
     for (int pixel_idx = 0; pixel_idx < _imageHeight * _imageWidth; ++pixel_idx) {
@@ -89,41 +89,53 @@ std::vector<Color> Renderer::render() const {
         checkCudaErrors(cudaMallocManaged(&pixelRes, sizeof(Color) * 1));
         checkCudaErrors(cudaMallocManaged(&randState, sizeof(int) * 1));
 
-        Sphere * sphereArr;
-        size_t nSpheres = _world.getNSpheres();
-        checkCudaErrors(cudaMallocManaged((void **)&sphereArr, sizeof(Sphere) * nSpheres));
-        for (int i = 0; i < nSpheres; ++i) {
-            sphereArr[i] = _world.getSpheres()[i];
-        }
-        World **d_world;
-        checkCudaErrors(cudaMallocManaged(&d_world, sizeof(World *) * 1));
-
-        createWorld<<<1,1>>>(d_world, sphereArr, nSpheres);
-        checkCudaErrors(cudaGetLastError());
-        checkCudaErrors(cudaDeviceSynchronize());
-        checkCudaErrors(cudaFree(sphereArr));
 
         getPixel<<<1, 1>>>(pixelRes, _camera, d_world, _nSamplesPerPixel, row, col, randState, _imageWidth, _imageHeight, _nRayBounces);
         checkCudaErrors(cudaGetLastError());
         checkCudaErrors(cudaDeviceSynchronize());
 
-        freeWorld<<<1,1>>>(d_world);
-        checkCudaErrors(cudaGetLastError());
-        checkCudaErrors(cudaDeviceSynchronize());
-
-        checkCudaErrors(cudaFree(d_world));
-
-
         Vec3 pixelColor = *pixelRes;
         checkCudaErrors(cudaFree(pixelRes));
         checkCudaErrors(cudaFree(randState));
 
-        // TODO-Sahar: Remove:
+//        // TODO-Sahar: Remove:
 //        Vec3 pixelColor{};
+//        int demoRand = 0;
 //        getPixel2(pixelColor, _camera, _world, _nSamplesPerPixel, row, col, &demoRand, _imageWidth, _imageHeight, _nRayBounces);
 
         pixelColor = clamp(gammaCorrection(pixelColor), 0.0, 0.999);
         data[row * _imageWidth + col] = pixelColor;
     }
+    freeWorldFromDeviceAndItsPtr(d_world);
     return data;
+}
+
+void Renderer::freeWorldFromDeviceAndItsPtr(World **d_world) {
+    // Free world object from the device.
+    freeWorld<<<1,1>>>(d_world);
+    checkCudaErrors(cudaGetLastError());
+    checkCudaErrors(cudaDeviceSynchronize());
+
+    // Free the pointer to the world object.
+    checkCudaErrors(cudaFree(d_world));
+}
+
+World **Renderer::allocateWorldInDeviceMemory(const Sphere *ptrSpheres, size_t nSpheres) {
+    // Copy the sphereArr to the GPU memory.
+    Sphere * sphereArr;
+    checkCudaErrors(cudaMallocManaged((void **) &sphereArr, sizeof(Sphere) * nSpheres));
+    for (int i = 0; i < nSpheres; ++i) {
+        sphereArr[i] = ptrSpheres[i];
+    }
+
+    // Create d_world with the sphereArr.
+    World **d_world;
+    checkCudaErrors(cudaMallocManaged(&d_world, sizeof(World *) * 1));
+    createWorld<<<1,1>>>(d_world, sphereArr, nSpheres);
+    checkCudaErrors(cudaGetLastError());
+    checkCudaErrors(cudaDeviceSynchronize());
+
+    // Free the sphereArr memory from the GPU memory.
+    checkCudaErrors(cudaFree(sphereArr));
+    return d_world;
 }

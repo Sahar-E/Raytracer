@@ -19,7 +19,8 @@ public:
              const Camera &camera,
              int rayBounces,
              int nSamplesPerPixel)
-            : _imageWidth(imageWidth), _imageHeight(imageHeight), _world(world), _camera(camera), _nRayBounces(rayBounces),
+            : _imageWidth(imageWidth), _imageHeight(imageHeight), _world(world), _camera(camera),
+              _nRayBounces(rayBounces),
               _nSamplesPerPixel(nSamplesPerPixel) {}
 
     [[nodiscard]] std::vector<Color> render() const;
@@ -31,6 +32,10 @@ private:
     const Camera &_camera;
     const int _nRayBounces;
     const int _nSamplesPerPixel;
+
+    static World **allocateWorldInDeviceMemory(const Sphere *ptrSpheres, size_t nSpheres);
+
+    static void freeWorldFromDeviceAndItsPtr(World **d_world);
 };
 
 
