@@ -21,7 +21,7 @@ public:
     bool hit(const Ray &ray, double tStart, double tEnd, HitResult &hitRes) const;
 
     __host__ __device__
-    const Material &getMaterial() const {
+    [[nodiscard]] const Material &getMaterial() const {
         return _material;
     }
 

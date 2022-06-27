@@ -12,8 +12,8 @@ Material::getColorAndSecondaryRay(const HitResult &hitRes, int &randState,
                                   Color &resEmittedColor, Color &resColor, Ray &resSecondaryRay) const {
     Vec3 secondaryRayDir{};
     Color resultColor{};
-    Vec3 diffuseDir = normalize((hitRes.normal + randomUnitVec(randState)));
 
+    Vec3 diffuseDir = normalize((hitRes.normal + randomUnitVec(randState)));
     double specularChance = randomDouble(randState);
     if (specularChance < _percentSpecular) {
         getSpecularResult(hitRes, diffuseDir, specularChance, secondaryRayDir, resultColor, randState);

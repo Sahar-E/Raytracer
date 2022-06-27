@@ -38,7 +38,7 @@ void freeWorld(World **deviceWorld) {
 __global__
 void getPixel(Color *pixel,
               Camera c,
-              World *d_world,
+              World **d_world,
               int nSamplesPerPixel,
               int row,
               int col,
@@ -51,14 +51,14 @@ void getPixel(Color *pixel,
         auto h = (static_cast<double>(col) + randomDouble(*randState)) / (imWidth - 1);
         auto v = 1 - ((static_cast<double>(row) + randomDouble(*randState)) / (imHeight - 1));
         Ray ray = c.getRay(h, v, *randState);
-        pixelSum += d_world->rayTrace(ray, nBounces, *randState);
+        pixelSum += (*d_world)->rayTrace(ray, nBounces, *randState);
     }
     *pixel = pixelSum;
 }
 
-void getPixel2(Color *pixel,
-               Camera c,
-               World **d_world,
+void getPixel2(Color &pixel,
+               const Camera &c,
+               const World &d_world,
                int nSamplesPerPixel,
                int row,
                int col,
@@ -71,67 +71,56 @@ void getPixel2(Color *pixel,
         auto h = (static_cast<double>(col) + randomDouble(*randState)) / (imWidth - 1);
         auto v = 1 - ((static_cast<double>(row) + randomDouble(*randState)) / (imHeight - 1));
         Ray ray = c.getRay(h, v, *randState);
-        pixelSum += (*d_world)->rayTrace(ray, nBounces, *randState);
+        pixelSum += d_world.rayTrace(ray, nBounces, *randState);
     }
-    *pixel = pixelSum;
+    pixel = pixelSum / nSamplesPerPixel;
 }
 
 std::vector<Color> Renderer::render() const {
+//    int demoRand = 0;
+
     std::vector<Color> data(_imageHeight * _imageWidth, {1, 1, 1});
     for (int pixel_idx = 0; pixel_idx < _imageHeight * _imageWidth; ++pixel_idx) {
         int row = pixel_idx / _imageWidth;
         int col = pixel_idx % _imageWidth;
+
         Color *pixelRes;
         int *randState;
-//        pixelRes = new Color;
-//        randState = new int;
-//        World **d_world;
-        checkCudaErrors(cudaMallocManaged(&randState, sizeof(int) * 1));
         checkCudaErrors(cudaMallocManaged(&pixelRes, sizeof(Color) * 1));
-//        checkCudaErrors(cudaMallocManaged(&d_world, sizeof(void **) * 1));
-        World *d_world;
+        checkCudaErrors(cudaMallocManaged(&randState, sizeof(int) * 1));
+
         Sphere * sphereArr;
-        checkCudaErrors(cudaMallocManaged(&d_world, sizeof(World) * 1));
         size_t nSpheres = _world.getNSpheres();
-        checkCudaErrors(cudaMallocManaged(&sphereArr, sizeof(Sphere) * nSpheres));
+        checkCudaErrors(cudaMallocManaged((void **)&sphereArr, sizeof(Sphere) * nSpheres));
         for (int i = 0; i < nSpheres; ++i) {
             sphereArr[i] = _world.getSpheres()[i];
         }
-        *d_world = World(sphereArr, nSpheres);
+        World **d_world;
+        checkCudaErrors(cudaMallocManaged(&d_world, sizeof(World *) * 1));
+
+        createWorld<<<1,1>>>(d_world, sphereArr, nSpheres);
+        checkCudaErrors(cudaGetLastError());
+        checkCudaErrors(cudaDeviceSynchronize());
+        checkCudaErrors(cudaFree(sphereArr));
 
         getPixel<<<1, 1>>>(pixelRes, _camera, d_world, _nSamplesPerPixel, row, col, randState, _imageWidth, _imageHeight, _nRayBounces);
+        checkCudaErrors(cudaGetLastError());
+        checkCudaErrors(cudaDeviceSynchronize());
 
-
+        freeWorld<<<1,1>>>(d_world);
         checkCudaErrors(cudaGetLastError());
         checkCudaErrors(cudaDeviceSynchronize());
 
         checkCudaErrors(cudaFree(d_world));
-        checkCudaErrors(cudaFree(sphereArr));
 
-
-//        createWorld<<<1, 1>>>(d_world, _world.getObjects().getSpheres(), _world.getObjects().getNSpheres());
-//        checkCudaErrors(cudaGetLastError());
-//        checkCudaErrors(cudaDeviceSynchronize());
-//        *randState = 0;
-//        *pixelRes = {0, 0, 0};
-
-//        getPixel<<<1, 1>>>(pixelRes, _camera, d_world, _nSamplesPerPixel, row, col, randState, _imageWidth, _imageHeight, _nRayBounces);
-//        checkCudaErrors(cudaGetLastError());
-//        checkCudaErrors(cudaDeviceSynchronize());
-
-//        getPixel2(pixelRes, _camera, _world, _nSamplesPerPixel, row, col, randState, _imageWidth, _imageHeight, _nRayBounces);
 
         Vec3 pixelColor = *pixelRes;
-//        Vec3 pixelColor = {0,0,0};
-//
         checkCudaErrors(cudaFree(pixelRes));
         checkCudaErrors(cudaFree(randState));
-//        freeWorld<<<1,1>>>(d_world);
-//        checkCudaErrors(cudaGetLastError());
-//        checkCudaErrors(cudaFree(d_world));
 
-//        delete pixelRes;
-//        delete randState;
+        // TODO-Sahar: Remove:
+//        Vec3 pixelColor{};
+//        getPixel2(pixelColor, _camera, _world, _nSamplesPerPixel, row, col, &demoRand, _imageWidth, _imageHeight, _nRayBounces);
 
         pixelColor = clamp(gammaCorrection(pixelColor), 0.0, 0.999);
         data[row * _imageWidth + col] = pixelColor;
