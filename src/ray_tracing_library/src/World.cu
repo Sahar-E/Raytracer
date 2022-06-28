@@ -43,6 +43,8 @@ Color World::rayTrace(const Ray &ray, int bounce, int &randState) const{
     for(int i = hitCount-1; i >= 0; --i) {
         res = emittedColors[i] + attenuationColors[i] * res;
     }
+    delete[] attenuationColors;
+    delete[] emittedColors;
     return res;
 
 //    if (bounce <= 0) {

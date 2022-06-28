@@ -24,6 +24,7 @@ public:
               _nSamplesPerPixel(nSamplesPerPixel) {}
 
     [[nodiscard]] std::vector<Color> render() const;
+    [[nodiscard]] std::vector<Color> render2() const;
 
 private:
     int _imageWidth;

@@ -48,7 +48,7 @@ private:
     double _percentSpecular{};
     double _roughnessSquared{};
     double _refractionIdx = 1.0;
-    bool _isRefractable = false;
+    bool _isRefractable{false};
 
 
     __host__ __device__

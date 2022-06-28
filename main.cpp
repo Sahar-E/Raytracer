@@ -122,10 +122,10 @@ World initWorld2() {
 int main() {
     auto start = std::chrono::steady_clock::now();
     const auto aspectRatio = 3.0 / 2.0;
-    const int image_width = 50;
+    const int image_width = 300;
     const int image_height = static_cast<int>(image_width / aspectRatio);
-    const int rayBounces = 5;
-    int nSamplesPerPixel = 2;
+    const int rayBounces = 7;
+    int nSamplesPerPixel = 100;
     int vFov = 26;
     Vec3 vUp = {0, 1, 0};
 
