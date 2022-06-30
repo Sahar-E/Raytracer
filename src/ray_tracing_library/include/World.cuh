@@ -8,32 +8,32 @@
 #include <vector>
 #include "Sphere.cuh"
 
-static const double CLOSEST_POSSIBLE_RAY_HIT = 0.001;
+#define CLOSEST_POSSIBLE_RAY_HIT 0.001
 
-class ArrayOfObjects {
-public:
-    __host__ __device__ ArrayOfObjects(const Sphere *spheresArr, size_t numSpheres);
-
-    __host__ __device__ ArrayOfObjects(const ArrayOfObjects &other);
-
-    __host__ __device__ ArrayOfObjects &operator=(ArrayOfObjects other);
-
-    __host__ __device__ void swap(ArrayOfObjects &first, ArrayOfObjects &second);
-
-    __host__ __device__ virtual ~ArrayOfObjects();
-
-    __host__ __device__ [[nodiscard]] size_t getNSpheres() const;
-
-    __host__ __device__ void setNSpheres(size_t nSpheres);
-
-    __host__ __device__ [[nodiscard]] Sphere *getSpheres() const;
-
-    __host__ __device__ void setSpheres(Sphere *spheres);
-
-private:
-    size_t _nSpheres{};
-    Sphere *_spheres{};
-};
+//class ArrayOfObjects {
+//public:
+//    __host__ __device__ ArrayOfObjects(const Sphere *spheresArr, size_t numSpheres);
+//
+//    __host__ __device__ ArrayOfObjects(const ArrayOfObjects &other);
+//
+////    __host__ __device__ ArrayOfObjects &operator=(ArrayOfObjects other);
+//
+////    __host__ __device__ void swap(ArrayOfObjects &first, ArrayOfObjects &second);
+//
+//    __host__ __device__ virtual ~ArrayOfObjects();
+//
+//    __host__ __device__ size_t getNSpheres() const;
+//
+//    __host__ __device__ void setNSpheres(size_t nSpheres);
+//
+//    __host__ __device__ Sphere *getSpheres() const;
+//
+//    __host__ __device__ void setSpheres(Sphere *spheres);
+//
+//private:
+//    size_t _nSpheres{};
+//    Sphere *_spheres{};
+//};
 
 class World {
 public:
@@ -69,21 +69,12 @@ public:
     }
 
 
-//    __host__ __device__ explicit World(const ArrayOfObjects &objects) : _objects(objects) {}
-
-//    __host__ __device__ void copyObjectList(Sphere *arrayOfObjects, size_t nSpheres) {
-//        if () {}
-//    }
-
     __host__ __device__ Color rayTrace(const Ray &ray, int bounce, int &randState) const;
 
     __host__ __device__ static Color backgroundColor(const Ray &ray);
 
     __host__ __device__ bool getHitResult(const Ray &ray, HitResult &hitRes, Material &material) const;
 
-//    __host__ __device__ [[nodiscard]] const auto &getObjects() const {
-//        return _objects;
-//    }
 
     size_t getNSpheres() const;
 

@@ -8,7 +8,8 @@
 #include "cuda_runtime.h"
 #include <math_constants.h>
 #include <cmath>
-#include "constants.h"
+//#include <curand_uniform.h>
+//#include <curand_kernel.h>
 
 
 /**
@@ -26,6 +27,10 @@ __host__ __device__ inline double randomDouble(int &randState) {
 //    return distribution(generator);
 }
 
+//__host__ __device__ inline float randomFloatCuda(curandStateMtgp32_t *state) {
+//    return curand_uniform(state);
+//}
+
 __host__ __device__ inline double randomDouble(int &randState, double from, double to) {
     return randomDouble(randState) * (from - to) + from;
 }
@@ -39,10 +44,10 @@ __host__ __device__ inline double deg2rad(double degree) {
 *
 * @param a     First floating point value.
 * @param b     Second floating point value.
-* @return      true if the absolute difference between the two values is less than EPS.
+* @return      true if the absolute difference between the two values is less than 1e-6.
 */
 __host__ __device__ inline bool fcmp(double a, double b) {
-    return fabs(a - b) < EPS;
+    return fabs(a - b) < 1e-6;
 }
 
 

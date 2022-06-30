@@ -3,9 +3,11 @@
 //
 
 #include <vector>
-#include <Renderer.cuh>
+#include "Renderer.cuh"
 #include "utils.cuh"
+#include "TimeThis.h"
 #include <iostream>
+#include <cuda_runtime_api.h>
 
 #define checkCudaErrors(val) check_cuda( (val), #val, __FILE__, __LINE__ )
 
@@ -98,7 +100,7 @@ void writePixels(Color *pixelsOut,
         int row = pixel_idx / imWidth;
         int col = pixel_idx % imWidth;
         if (threadIdx.x == 0) {
-            printf("Rows left to process: %d\n\r", imHeight - row);
+//            printf("Rows left to process: %d\n\r", imHeight - row);
         }
         Color pixelSum{0, 0, 0};
         for (int i = 0; i < nSamplesPerPixel; ++i) {
@@ -112,18 +114,19 @@ void writePixels(Color *pixelsOut,
     }
 }
 
-void writePixels2(Color *pixelsOut,
-                 Camera c,
-                 World **d_world,
-                 int nSamplesPerPixel,
-                 int *randStates,
-                 int imWidth,
-                 int imHeight,
-                 int nBounces) {
+void writePixels_2(Color *pixelsOut,
+                   Camera c,
+                   World **d_world,
+                   int nSamplesPerPixel,
+                   int *randStates,
+                   int imWidth,
+                   int imHeight,
+                   int nBounces) {
+
     for (int pixel_idx = 1; pixel_idx < imHeight * imWidth; pixel_idx += 1) {
         int row = pixel_idx / imWidth;
         int col = pixel_idx % imWidth;
-        printf("Rows left to process: %d\n\r", imHeight - row);
+//        printf("Rows left to process: %d\n\r", imHeight - row);
         Color pixelSum{0, 0, 0};
         for (int i = 0; i < nSamplesPerPixel; ++i) {
             auto h = (static_cast<double>(col) + randomDouble(randStates[pixel_idx])) / (imWidth - 1);
@@ -137,20 +140,26 @@ void writePixels2(Color *pixelsOut,
 }
 
 std::vector<Color> Renderer::render() const {
+    TimeThis t;
     Color *pixelsOut;
     int *randStates;
     int nPixels = _imageHeight * _imageWidth;
     checkCudaErrors(cudaMallocManaged(&pixelsOut, sizeof(Color) * nPixels));
     checkCudaErrors(cudaMallocManaged(&randStates, sizeof(int) * nPixels));
+    for (int i = 0; i < nPixels; ++i) {
+        pixelsOut[i] = {0,0,0};
+        randStates[i] = i;
+    }
+
     World **d_world = allocateWorldInDeviceMemory(_world.getSpheres(), _world.getNSpheres());
 
 
-//    pixelsOut = new Color[nPixels];
+//    pixelsOut = new Color[nPixels]();
 //    randStates = new int[nPixels]();
 
 //    World **d_world = allocateWorldInDeviceMemory2(_world.getSpheres(), _world.getNSpheres());
 
-    int blockSize = 512;
+    int blockSize = 256;
     int numBlocks = (nPixels + blockSize - 1) / blockSize;
     writePixels<<<numBlocks, blockSize>>>(pixelsOut, _camera, d_world, _nSamplesPerPixel, randStates, _imageWidth, _imageHeight,_nRayBounces);
 
@@ -210,14 +219,18 @@ std::vector<Color> Renderer::render() const {
 
 
 std::vector<Color> Renderer::render2() const {
+    TimeThis t;
     Color *pixelsOut;
     int *randStates;
     int nPixels = _imageHeight * _imageWidth;
     pixelsOut = new Color[nPixels];
     randStates = new int[nPixels]();
-
+    for (int i = 0; i < nPixels; ++i) {
+        pixelsOut[i] = {0,0,0};
+        randStates[i] = i;
+    }
     World **d_world = allocateWorldInDeviceMemory2(_world.getSpheres(), _world.getNSpheres());
-    writePixels2(pixelsOut, _camera, d_world, _nSamplesPerPixel, randStates, _imageWidth, _imageHeight,_nRayBounces);
+    writePixels_2(pixelsOut, _camera, d_world, _nSamplesPerPixel, randStates, _imageWidth, _imageHeight,_nRayBounces);
 
     freeWorldFromDeviceAndItsPtr2(d_world);
 

@@ -4,8 +4,9 @@
 #include <Camera.cuh>
 #include <Renderer.cuh>
 #include "utils.cuh"
+#include "TimeThis.h"
 #include <chrono>
-#include <c++/9/algorithm>
+#include <string>
 
 //World initWorld1() {
 ////    auto world = World();
@@ -89,9 +90,12 @@ World initWorld2() {
     int randState = 1;
     for (int xLoc = -8; xLoc < 8; ++xLoc) {
         for (int zLoc = -17; zLoc < 12; ++zLoc) {
-            bool locIsFree = !std::any_of(bigBallsLocs.begin(), bigBallsLocs.end(), [xLoc, zLoc](const Vec3 &ballLoc) {
-                return fabs(ballLoc[0] - xLoc) < 1 && fabs(ballLoc[2] - zLoc) < 1;
-            });
+            bool locIsFree = false;
+            for (int i = 0; i < bigBallsLocs.size(); ++i) {
+                if (fabs(bigBallsLocs[i][0] - xLoc) > 1 && fabs(bigBallsLocs[i][2] - zLoc) > 1) {
+                    locIsFree = true;
+                }
+            }
             if (locIsFree) {
                 Point3 sphereLoc = {xLoc + 0.7 * randomDouble(randState), smallSphereRadius, zLoc + 0.7 * randomDouble(
                         randState)};
@@ -119,13 +123,14 @@ World initWorld2() {
     return {sphereList.data(), sphereList.size()};
 }
 
+
 int main() {
-    auto start = std::chrono::steady_clock::now();
+    TimeThis t;
     const auto aspectRatio = 3.0 / 2.0;
-    const int image_width = 300;
+    const int image_width = 1200;
     const int image_height = static_cast<int>(image_width / aspectRatio);
-    const int rayBounces = 7;
-    int nSamplesPerPixel = 100;
+    const int rayBounces = 7;   // TODO-Sahar: not more than 10
+    int nSamplesPerPixel = 1;
     int vFov = 26;
     Vec3 vUp = {0, 1, 0};
 
@@ -138,6 +143,15 @@ int main() {
     auto camera = Camera(lookFrom, lookAt, vUp, aspectRatio, vFov, aperture, focusDist);
     Renderer renderer(image_width, image_height, world, camera, rayBounces, nSamplesPerPixel);
     std::vector<Color> renderedImage = renderer.render();
+    renderedImage = renderer.render();
+    renderedImage = renderer.render();
+    renderedImage = renderer.render();
+    renderedImage = renderer.render();
+    renderedImage = renderer.render();
+    renderedImage = renderer.render();
+    renderedImage = renderer.render();
+
+
 
     std::string filename = "test.jpg";
     int channelCount = 3;
@@ -148,16 +162,16 @@ int main() {
 
     saveImgAsJpg(filename, rgb, image_width, image_height, channelCount);
 
-    auto end = std::chrono::steady_clock::now();
-    long duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+//    auto end = std::chrono::steady_clock::now();
+//    long duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 
     std::cout << "Done." << "\n";
-    std::cout << "Duration (ms): " << duration << "\n";
+//    std::cout << "Duration (ms): " << duration << "\n";
     return 0;
 }
 
 
-
+//
 //// function to add the elements of two arrays
 //__global__
 //void add(int n, float *x, float *y) {
@@ -165,15 +179,18 @@ int main() {
 //         i < n;
 //         i += blockDim.x * gridDim.x) {
 ////    for (int i = 0; i < n ; ++i) {
-//        y[i] = x[i] + y[i];
+//        for (int k = 0; k < 200; ++k) {
+//            y[i] = x[i] + y[i] * x[i] - y[i] * (x[i] + y[i]);
+//        }
 //    }
 //}
-
-
+//
+//#include <chrono>
+//#include <iostream>
+//
 //int main() {
 //    // Testing.
 //    int N = 1 << 23; // 1M elements
-//
 ////    float *x = new float[N];
 ////    float *y = new float[N];
 //    float *x, *y;
@@ -193,8 +210,22 @@ int main() {
 //    int blockSize = 256;
 //    int numBlocks = (N + blockSize - 1) / blockSize;
 //
+////    add(N, x, y);
 //    add<<<numBlocks, blockSize>>>(N, x, y);
 //    cudaDeviceSynchronize();
+//
+//
+////    add(N, x, y);
+////    add<<<numBlocks, blockSize>>>(N, x, y);
+////    cudaDeviceSynchronize();
+//
+////    add(N, x, y);
+////    add<<<numBlocks, blockSize>>>(N, x, y);
+////    cudaDeviceSynchronize();
+//
+////    add(N, x, y);
+////    add<<<numBlocks, blockSize>>>(N, x, y);
+////    cudaDeviceSynchronize();
 //
 //    auto end = std::chrono::steady_clock::now();
 //
@@ -204,10 +235,10 @@ int main() {
 //        maxError = fmax(maxError, fabs(y[i] - 3.0f));
 //    std::cout << "Max error: " << maxError << "\n";
 //
-////    // Free memory
+//    // Free memory
 ////    delete [] x;
 ////    delete [] y;
-////    // Free memory
+//// //     Free memory
 //    cudaFree(x);
 //    cudaFree(y);
 //

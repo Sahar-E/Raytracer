@@ -7,7 +7,7 @@
 #include <vector>
 #include "Vec3.cuh"
 #include "cuda_runtime_api.h"
-
+#include <string>
 
 /**
  * Save image to JPG file.

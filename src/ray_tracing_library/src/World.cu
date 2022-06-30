@@ -2,19 +2,20 @@
 // Created by Sahar on 10/06/2022.
 //
 
+#include <cfloat>
 #include "HitResult.h"
-#include "constants.h"
 #include "World.cuh"
 #include "Vec3.cuh"
 #include "utils.cuh"
 
+#define MAX_BOUNCE 10
 
 __host__ __device__
 Color World::rayTrace(const Ray &ray, int bounce, int &randState) const{
 //    rayTrace0 = emitted1 + atten1 * rayTrace1 = emitted1 + atten1(emitted2 + atten2 * rayTrace2)
     auto curRay(ray);
-    auto *attenuationColors = new Color[bounce];
-    auto *emittedColors = new Color[bounce];
+    Color attenuationColors[MAX_BOUNCE];
+    Color emittedColors[MAX_BOUNCE];
     int hitCount = 0;
     while (hitCount < bounce - 1) { // when hitCount = bounce-1, will get black scatterColor.
         HitResult hitRes;
@@ -43,8 +44,8 @@ Color World::rayTrace(const Ray &ray, int bounce, int &randState) const{
     for(int i = hitCount-1; i >= 0; --i) {
         res = emittedColors[i] + attenuationColors[i] * res;
     }
-    delete[] attenuationColors;
-    delete[] emittedColors;
+//    delete[] attenuationColors;   // TODO-Sahar: note if needed
+//    delete[] emittedColors;
     return res;
 
 //    if (bounce <= 0) {
@@ -69,13 +70,15 @@ Color World::rayTrace(const Ray &ray, int bounce, int &randState) const{
 __host__ __device__
 bool World::getHitResult(const Ray &ray, HitResult &hitRes, Material &material) const {
     bool hit = false;
-    double tEnd = INF;
+    double tEnd = DBL_MAX;
     int hitSphereIdx = -1;
-    for (int i = 0; i < _nSpheres; ++i) {
-        if (_spheres[i].hit(ray, CLOSEST_POSSIBLE_RAY_HIT, tEnd, hitRes)) {
-            hit = true;
-            tEnd = hitRes.tOfHittingRay;
-            hitSphereIdx = i;
+    if (_spheres != nullptr) {
+        for (int i = 0; i < _nSpheres; ++i) {
+            if (_spheres[i].hit(ray, CLOSEST_POSSIBLE_RAY_HIT, tEnd, hitRes)) {
+                hit = true;
+                tEnd = hitRes.tOfHittingRay;
+                hitSphereIdx = i;
+            }
         }
     }
     if (hit) {
@@ -109,63 +112,63 @@ Sphere *World::getSpheres() const {
 //}
 
 
-__host__ __device__
-ArrayOfObjects::ArrayOfObjects(const Sphere *spheresArr, size_t numSpheres) : _nSpheres(numSpheres) {
-    _spheres = new Sphere[_nSpheres];
-    for (int i = 0; i < _nSpheres; ++i) {
-        _spheres[i] = spheresArr[i];
-    }
-}
-
-__host__ __device__
-ArrayOfObjects &ArrayOfObjects::operator=(ArrayOfObjects other) {
-    swap(*this, other);
-    return *this;
-}
-
-
-
-__host__ __device__
-size_t ArrayOfObjects::getNSpheres() const {
-    return _nSpheres;
-}
-
-__host__ __device__
-void ArrayOfObjects::setNSpheres(size_t nSpheres) {
-    _nSpheres = nSpheres;
-}
-
-__host__ __device__
-Sphere *ArrayOfObjects::getSpheres() const {
-    return _spheres;
-}
-
-__host__ __device__
-void ArrayOfObjects::setSpheres(Sphere *spheres) {
-    _spheres = spheres;
-}
-
-__host__ __device__
-void ArrayOfObjects::swap(ArrayOfObjects &first, ArrayOfObjects &second)
-{
-    auto temp1 = second._nSpheres;
-    second._nSpheres = first._nSpheres;
-    first._nSpheres = temp1;
-
-    auto temp2 = second._spheres;
-    second._spheres = first._spheres;
-    first._spheres = temp2;
-}
-
-__host__ __device__
-ArrayOfObjects::~ArrayOfObjects() {
-    delete[] _spheres;
-}
-
-__host__ __device__
-ArrayOfObjects::ArrayOfObjects(const ArrayOfObjects &other) : _nSpheres(other._nSpheres) {
-    _spheres = new Sphere[_nSpheres];
-    for (int i = 0; i < _nSpheres; ++i) {
-        _spheres[i] = other._spheres[i];
-    }
-}
+//__host__ __device__
+//ArrayOfObjects::ArrayOfObjects(const Sphere *spheresArr, size_t numSpheres) : _nSpheres(numSpheres) {
+//    _spheres = new Sphere[_nSpheres];
+//    for (int i = 0; i < _nSpheres; ++i) {
+//        _spheres[i] = spheresArr[i];
+//    }
+//}
+//
+////__host__ __device__
+////ArrayOfObjects &ArrayOfObjects::operator=(ArrayOfObjects other) {
+////    swap(*this, other);
+////    return *this;
+////}
+//
+//
+//
+//__host__ __device__
+//size_t ArrayOfObjects::getNSpheres() const {
+//    return _nSpheres;
+//}
+//
+//__host__ __device__
+//void ArrayOfObjects::setNSpheres(size_t nSpheres) {
+//    _nSpheres = nSpheres;
+//}
+//
+//__host__ __device__
+//Sphere *ArrayOfObjects::getSpheres() const {
+//    return _spheres;
+//}
+//
+//__host__ __device__
+//void ArrayOfObjects::setSpheres(Sphere *spheres) {
+//    _spheres = spheres;
+//}
+//
+//__host__ __device__
+//void ArrayOfObjects::swap(ArrayOfObjects &first, ArrayOfObjects &second)
+//{
+//    auto temp1 = second._nSpheres;
+//    second._nSpheres = first._nSpheres;
+//    first._nSpheres = temp1;
+//
+//    auto temp2 = second._spheres;
+//    second._spheres = first._spheres;
+//    first._spheres = temp2;
+//}
+//
+//__host__ __device__
+//ArrayOfObjects::~ArrayOfObjects() {
+//    delete[] _spheres;
+//}
+//
+//__host__ __device__
+//ArrayOfObjects::ArrayOfObjects(const ArrayOfObjects &other) : _nSpheres(other._nSpheres) {
+//    _spheres = new Sphere[_nSpheres];
+//    for (int i = 0; i < _nSpheres; ++i) {
+//        _spheres[i] = other._spheres[i];
+//    }
+//}
