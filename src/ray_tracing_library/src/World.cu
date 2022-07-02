@@ -56,17 +56,19 @@ bool World::getHitResult(Sphere *spheres, size_t n_spheres, const Ray &ray, HitR
     bool hit = false;
     double tEnd = DBL_MAX;
     int hitSphereIdx = -1;
+    double rootRes;
     if (spheres != nullptr) {
-        for (int i = 0; i < n_spheres; ++i) {
-            if (spheres[i].hit(ray, CLOSEST_POSSIBLE_RAY_HIT, tEnd, hitRes)) {
+        for (int i = 0; i < n_spheres; ++i) {   // TODO-Sahar: revert this line
+            if (spheres[i].isHit(ray, CLOSEST_POSSIBLE_RAY_HIT, tEnd, rootRes)) {
                 hit = true;
-                tEnd = hitRes.tOfHittingRay;
+                tEnd = rootRes;
                 hitSphereIdx = i;
             }
         }
     }
     if (hit) {
         material = spheres[hitSphereIdx].getMaterial();
+        spheres[hitSphereIdx].getHitResult(ray, rootRes, hitRes);
     }
     return hit;
 }
@@ -131,15 +133,15 @@ World World::initWorld2() {
                 double randomMaterialChooser = randomDouble(randState);
                 Material mat;
                 if (randomMaterialChooser < 0.5) {
-                    auto albedo = randomVec(0.0, 1.0, randState) * randomVec(0.0, 1.0, randState);
+                    auto albedo = randomVec0to1(randState) * randomVec0to1(randState);
                     mat = Material::getLambertian(albedo);
                 } else if (randomMaterialChooser < 0.8) {
-                    auto albedo = randomVec(0.0, 1.0, randState) * randomVec(0.0, 1.0, randState);
-                    auto specularColor = albedo + randomVec(0.0, 1.0, randState) * 0.2;
+                    auto albedo = randomVec0to1(randState) * randomVec0to1(randState);
+                    auto specularColor = albedo + randomVec0to1(randState) * 0.2;
                     mat = Material::getSpecular(albedo, specularColor, randomDouble(randState), randomDouble(randState));
                 } else if (randomMaterialChooser < 0.9) {
-                    auto albedo = randomVec(0.0, 1.0, randState) * randomVec(0.0, 1.0, randState);
-                    auto emittedColor = randomVec(0.0, 1.0, randState) * randomVec(0.0, 1.0, randState);
+                    auto albedo = randomVec0to1(randState) * randomVec0to1(randState);
+                    auto emittedColor = randomVec0to1(randState) * randomVec0to1(randState);
                     mat = Material::getGlowing(albedo, emittedColor, 8);
                 } else {
                     mat = Material::getGlass(white, 1.5);

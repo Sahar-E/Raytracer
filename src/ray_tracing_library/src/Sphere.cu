@@ -5,7 +5,19 @@
 #include "Sphere.cuh"
 
 __host__ __device__
-bool Sphere::hit(const Ray &ray, double tStart, double tEnd, HitResult &hitRes) const {
+void Sphere::getHitResult(const Ray &ray, double rootRes, HitResult &hitRes) const {
+    Point3 hitPoint = ray.at(rootRes);
+    Vec3 normalOfHitPoint = normalize(hitPoint - _center);
+    bool isOutwards = dot(ray.direction(), normalOfHitPoint) < 0;
+    hitRes = HitResult(ray,
+                       isOutwards ? normalOfHitPoint : -normalOfHitPoint,
+                       hitPoint,
+                       rootRes,
+                       isOutwards);
+}
+
+__host__ __device__
+bool Sphere::isHit(const Ray &ray, double tStart, double tEnd, double &rootRes) const {
     Vec3 oc = ray.origin() - _center;
     auto a = ray.direction().length_squared();
     auto half_b = dot(oc, ray.direction());
@@ -23,15 +35,7 @@ bool Sphere::hit(const Ray &ray, double tStart, double tEnd, HitResult &hitRes) 
             return false;
         }
     }
-
-    Point3 hitPoint = ray.at(root);
-    Vec3 normalOfHitPoint = normalize(hitPoint - _center);
-    bool isOutwards = dot(ray.direction(), normalOfHitPoint) < 0;
-    hitRes = HitResult(ray,
-                       isOutwards ? normalOfHitPoint : -normalOfHitPoint,
-                       hitPoint,
-                       root,
-                       isOutwards);
+    rootRes = root;
     return true;
 }
 

@@ -67,7 +67,7 @@ void Renderer::render() {
     checkCudaErrors(cudaGetLastError());
     checkCudaErrors(cudaDeviceSynchronize());
 
-    getAverageForPixels<<<numBlocks, blockSize>>>(_pixelsOut, _pixelsOut, _renderedPixels, nPixels, ++_nSamplesPerPixel);
+    getAverageForPixels<<<numBlocks, blockSize>>>(_pixelsOut, _pixelsOut, _renderedPixels, nPixels, ++_nSamplesPerPixel);   // TODO-Sahar: 60ms - slow.
     checkCudaErrors(cudaGetLastError());
     checkCudaErrors(cudaDeviceSynchronize());
 }

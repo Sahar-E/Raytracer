@@ -4,6 +4,9 @@
 
 #pragma once
 
+#include <cuda_runtime_api.h>
+#include <cuda_runtime.h>
+#include <curand_kernel.h>
 #include "my_math_cuda.cuh"
 
 class Vec3 {
@@ -52,8 +55,8 @@ __host__ __device__ Vec3 normalize(Vec3 v);
 __host__ __device__ Vec3 reflect(const Vec3 &v, const Vec3 &n);
 __host__ __device__ Vec3 refract(const Vec3 &rayDirNormalized, const Vec3 &n, double refractionIdxRatio);
 
-__host__ Vec3 randomVec(int &randState);
-__host__ Vec3 randomVec(double from, double to, int &randState);
+__host__ Vec3 randomVec0to1(int &randState);
+__device__ Vec3 randomVec0to1(curandState *randState);
 __host__ Vec3 randomUnitVec(int &randState);
 __device__ Vec3 randomUnitVec(curandState *randState);
 __host__ Vec3 randomVecInUnitDisk(int &randState);

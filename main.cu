@@ -19,7 +19,7 @@ int main() {
     int vFov = 26;
     double aperture = 0.05;
     double focusDist = 10.0;
-    int nFrames = 1;
+    int nFrames = 500;
 
     assert(0 < rayBounces && rayBounces <= MAX_BOUNCES);
 
@@ -30,6 +30,7 @@ int main() {
 
 
     auto world = World::initWorld2();
+//    std::cout << "Size: " << world.getNSpheres()  << "\n";
     auto camera = Camera(lookFrom, lookAt, vUp, aspectRatio, vFov, aperture, focusDist);
     Renderer renderer(image_width, image_height, world, camera, rayBounces);
 

@@ -90,14 +90,16 @@ __host__ __device__ Vec3 refract(const Vec3 &rayDirNormalized, const Vec3 &n, do
     return r_out_perp + r_out_parallel;
 }
 
-__host__ Vec3 randomVec(int &randState) {
-    return {randomDouble(randState), randomDouble(randState), randomDouble(randState)};
-}
-
-__host__ Vec3 randomVec(double from, double to, int &randState) {
+__host__ Vec3 randomVec0to1(int &randState) {
     return {randomDouble(randState),
             randomDouble(randState),
             randomDouble(randState)};
+}
+
+__device__ Vec3 randomVec0to1(curandState *randState) {
+    return {randomFloatCuda(randState),
+            randomFloatCuda(randState),
+            randomFloatCuda(randState)};
 }
 
 __host__ Vec3 randomUnitVec(int &randState) {
