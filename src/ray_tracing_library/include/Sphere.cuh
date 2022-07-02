@@ -11,19 +11,14 @@
 class Sphere {
 
 public:
-    __host__ __device__
-    Sphere() = default;
+    __host__ __device__ Sphere() = default;
 
-    __host__ __device__
-    Sphere(const Point3 &center, double radius, const Material& mat) : _center(center), _radius(radius), _material(mat) {}
+    __host__ __device__ Sphere(const Point3 &center, double radius, const Material& mat)
+                                    : _center(center), _radius(radius), _material(mat) {}
 
-    __host__ __device__
-    bool hit(const Ray &ray, double tStart, double tEnd, HitResult &hitRes) const;
+    __host__ __device__ bool hit(const Ray &ray, double tStart, double tEnd, HitResult &hitRes) const;
 
-    __host__ __device__
-    [[nodiscard]] const Material &getMaterial() const {
-        return _material;
-    }
+    __host__ __device__ const Material &getMaterial() const;
 
 private:
     Point3 _center{};

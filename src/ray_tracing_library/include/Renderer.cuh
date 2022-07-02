@@ -13,30 +13,35 @@ class Renderer {
 
 public:
 
-    Renderer(const int imageWidth,
-             const int imageHeight,
-             const World &world,
-             const Camera &camera,
-             int rayBounces,
-             int nSamplesPerPixel)
-            : _imageWidth(imageWidth), _imageHeight(imageHeight), _world(world), _camera(camera),
-              _nRayBounces(rayBounces),
-              _nSamplesPerPixel(nSamplesPerPixel) {}
+    Renderer(int imageWidth, int imageHeight, const World &world, const Camera &camera, int rayBounces);
 
-    [[nodiscard]] std::vector<Color> render() const;
-    [[nodiscard]] std::vector<Color> render2() const;
+    Renderer() = delete;
+    Renderer(const Renderer &other) = delete;
+    Renderer &operator=(const Renderer &other) = delete;
+
+    virtual ~Renderer();
+
+    void render();
+
+    const Color * getPixelsOut() const;
+    int getNPixelsOut() const { return _imageHeight * _imageWidth; }
 
 private:
     int _imageWidth;
     int _imageHeight;
-    const World &_world;
-    const Camera &_camera;
+    World** _d_world;
+    Camera _camera;
     const int _nRayBounces;
-    const int _nSamplesPerPixel;
+    int _nSamplesPerPixel;
+    curandState *_randStates;
+    Color *_pixelsOut{};
+    Color *_renderedPixels{};
 
     static World **allocateWorldInDeviceMemory(const Sphere *ptrSpheres, size_t nSpheres);
-
     static void freeWorldFromDeviceAndItsPtr(World **d_world);
+    void initRandStates();
+
+    void initPixelAllocations();
 };
 
 

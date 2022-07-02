@@ -18,13 +18,12 @@ bool Sphere::hit(const Ray &ray, double tStart, double tEnd, HitResult &hitRes) 
     auto sqrtD = std::sqrt(discriminant);
     auto root = (-half_b - sqrtD) / a;      // Closer root
     if (root < tStart || root > tEnd) {
-        root = (-half_b + sqrtD) / a;       // Farther root
+        root = (-half_b + sqrtD) / a;              // Farther root
         if (root < tStart || root > tEnd) {
             return false;
         }
     }
-    
-    // Get color by normal of the hit point:
+
     Point3 hitPoint = ray.at(root);
     Vec3 normalOfHitPoint = normalize(hitPoint - _center);
     bool isOutwards = dot(ray.direction(), normalOfHitPoint) < 0;
@@ -34,4 +33,8 @@ bool Sphere::hit(const Ray &ray, double tStart, double tEnd, HitResult &hitRes) 
                        root,
                        isOutwards);
     return true;
+}
+
+__host__ __device__ const Material &Sphere::getMaterial() const {
+    return _material;
 }

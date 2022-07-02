@@ -3,7 +3,6 @@
 //
 
 #include <iostream>
-#include "../include/utils.cuh"
 #include <string>
 #include <vector>
 #include <memory>
@@ -24,11 +23,4 @@ void saveImgAsJpg(const std::string &filename,
     }
     std::cout << "\nSaving image to " << filename << "\n";
     stbi_write_jpg(filename.c_str(), width, height, channelCount, dataCopy.get(), width * channelCount);
-}
-
-
-template<typename T> void swap(T& t1, T& t2) {
-    T temp = std::move(t1);
-    t1 = std::move(t2);
-    t2 = std::move(temp);
 }

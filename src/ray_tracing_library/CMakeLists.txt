@@ -8,6 +8,7 @@ find_package(OpenMP REQUIRED)
 
 # Library set up:
 add_library(${PROJECT_NAME} STATIC
+        include/World.cuh
         src/World.cu
         src/Camera.cu
         src/Renderer.cu
@@ -19,14 +20,21 @@ add_library(${PROJECT_NAME} STATIC
         include/Ray.cuh
         src/Vec3.cu
         include/Vec3.cuh
+        src/my_math_cuda.cu
+        include/my_math_cuda.cuh
         src/utils.cpp
-        )
+        include/commonCuda.cuh
+        src/commonCuda.cu
+        include/my_math.h
+        src/my_math.cpp include/commonDefines.h)
 
 # CUDA:
 find_package(CUDA REQUIRED)
 set_target_properties(${PROJECT_NAME} PROPERTIES CUDA_RESOLVE_DEVICE_SYMBOLS ON)
 target_compile_options(${PROJECT_NAME} PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:
         --relocatable-device-code=true
+        --generate-line-info
+#        --device-debug
         >)
 
 #if (WIN32)

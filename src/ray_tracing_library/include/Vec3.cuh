@@ -4,34 +4,27 @@
 
 #pragma once
 
-#include "my_math.cuh"
+#include "my_math_cuda.cuh"
 
 class Vec3 {
 public:
     __host__ __device__ Vec3() = default;
-
     __host__ __device__ Vec3(double x, double y, double z) : _x{x, y, z} {}
 
     __host__ __device__ double x() const { return _x[0]; }
-
     __host__ __device__ double y() const { return _x[1]; }
-
     __host__ __device__ double z() const { return _x[2]; }
 
     __host__ __device__ Vec3 operator-() const;
 
     __host__ __device__ inline double operator[](int i) const { return _x[i]; }
-
     __host__ __device__ inline double &operator[](int i) { return _x[i]; }
 
     __host__ __device__ Vec3 &operator+=(const Vec3 &v);
-
     __host__ __device__ Vec3 &operator*=(double t);
-
     __host__ __device__ Vec3 &operator/=(double t);
 
     __host__ __device__ double length() const;
-
     __host__ __device__ double length_squared() const;
 
 
@@ -46,34 +39,25 @@ using Color = Vec3;
 
 
 __host__ __device__ Vec3 operator+(const Vec3 &u, const Vec3 &v);
-
 __host__ __device__ Vec3 operator-(const Vec3 &u, const Vec3 &v);
-
 __host__ __device__ Vec3 operator*(const Vec3 &u, const Vec3 &v);
-
 __host__ __device__ Vec3 operator*(double t, const Vec3 &v);
-
 __host__ __device__ Vec3 operator*(const Vec3 &v, double t);
-
 __host__ __device__ Vec3 operator/(Vec3 v, double t);
 
 __host__ __device__ double dot(const Vec3 &u, const Vec3 &v);
-
 __host__ __device__ Vec3 cross(const Vec3 &u, const Vec3 &v);
-
 __host__ __device__ Vec3 normalize(Vec3 v);
 
 __host__ __device__ Vec3 reflect(const Vec3 &v, const Vec3 &n);
-
 __host__ __device__ Vec3 refract(const Vec3 &rayDirNormalized, const Vec3 &n, double refractionIdxRatio);
 
-__host__ __device__ Vec3 randomVec(int &randState);
-
-__host__ __device__ Vec3 randomVec(double from, double to, int &randState);
-
-__host__ __device__ Vec3 randomUnitVec(int &randState);
-//
-__host__ __device__ Vec3 randomVecInUnitDisk(int &randState);
+__host__ Vec3 randomVec(int &randState);
+__host__ Vec3 randomVec(double from, double to, int &randState);
+__host__ Vec3 randomUnitVec(int &randState);
+__device__ Vec3 randomUnitVec(curandState *randState);
+__host__ Vec3 randomVecInUnitDisk(int &randState);
+__device__ Vec3 randomVecInUnitDisk(curandState *randState);
 
 __host__ __device__ bool isZeroVec(const Vec3 &v);
 

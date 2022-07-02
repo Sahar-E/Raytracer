@@ -24,8 +24,7 @@ Camera::Camera(Vec3 lookFrom, Vec3 lookAt, Vec3 vUp, double aspectRatio, double 
     _lowerLeftCorner = lookFrom - _horizontalVec / 2 - _verticalVec / 2 - focusDist * zVec;
 }
 
-__host__ __device__
-Ray Camera::getRay(double h_scalar, double v_scalar, int &randState) const {
+__device__ Ray Camera::getRay(double h_scalar, double v_scalar, curandState *randState) const {
     Vec3 random2dVec = randomVecInUnitDisk(randState) * _lensRadius;
     Vec3 offset = xVec * random2dVec.x() + yVec * random2dVec.y();
 

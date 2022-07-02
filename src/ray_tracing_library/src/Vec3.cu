@@ -5,7 +5,8 @@
 #include "Vec3.cuh"
 #include <cuda_runtime_api.h>
 #include <cuda_runtime.h>
-#include "my_math.cuh"
+#include "my_math_cuda.cuh"
+#include "my_math.h"
 
 __host__ __device__ Vec3 &Vec3::operator+=(const Vec3 &v) {
     _x[0] += v._x[0];
@@ -89,21 +90,35 @@ __host__ __device__ Vec3 refract(const Vec3 &rayDirNormalized, const Vec3 &n, do
     return r_out_perp + r_out_parallel;
 }
 
-__host__ __device__ Vec3 randomVec(int &randState) {
+__host__ Vec3 randomVec(int &randState) {
     return {randomDouble(randState), randomDouble(randState), randomDouble(randState)};
 }
 
-__host__ __device__ Vec3 randomVec(double from, double to, int &randState) {
+__host__ Vec3 randomVec(double from, double to, int &randState) {
     return {randomDouble(randState),
             randomDouble(randState),
             randomDouble(randState)};
 }
 
-__host__ __device__ Vec3 randomUnitVec(int &randState) {
+__host__ Vec3 randomUnitVec(int &randState) {
     return normalize({2 * randomDouble(randState) - 1, 2 * randomDouble(randState) - 1, 2 * randomDouble(randState) - 1});
 }
 
-__host__ __device__ Vec3 randomVecInUnitDisk(int &randState) {
+__device__ Vec3 randomUnitVec(curandState *randState) {
+    return normalize({2 * randomFloatCuda(randState) - 1, 2 * randomFloatCuda(randState) - 1, 2 * randomFloatCuda(randState) - 1});
+}
+
+__host__ Vec3 randomVecInUnitDisk(int &randState) {
+    while (true) {
+        auto p = randomUnitVec(randState);
+        if (1 <= p.length_squared()) {
+            continue;
+        }
+        return p;
+    }
+}
+
+__device__ Vec3 randomVecInUnitDisk(curandState *randState) {
     while (true) {
         auto p = randomUnitVec(randState);
         if (1 <= p.length_squared()) {

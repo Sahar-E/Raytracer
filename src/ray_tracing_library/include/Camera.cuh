@@ -32,10 +32,11 @@ public:
      *
      * @param h_scalar  horizontal scalar between [0,1].
      * @param v_scalar  vertical scalar between [0,1].
+     * @param randState randState for generating random numbers.
      * @return  New ray in that direction from the camera origin.
      */
-    __host__ __device__
-    Ray getRay(double h_scalar, double v_scalar, int &randState) const;
+    __device__
+    Ray getRay(double h_scalar, double v_scalar, curandState *randState) const;
 
 private:
     Point3 _origin{};

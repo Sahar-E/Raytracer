@@ -18,9 +18,8 @@ public:
     __host__ __device__
     Material() = default;
 
-    __host__ __device__ void
-    getColorAndSecondaryRay(const HitResult &hitRes, int &randState, Color &resEmittedColor, Color &resColor,
-                            Ray &resSecondaryRay) const;
+    __device__ void getColorAndSecondaryRay(const HitResult &hitRes, curandState *randState, Color &resEmittedColor,
+                                            Color &resColor, Ray &resSecondaryRay) const;
 
     __host__ __device__ static Material getLambertian(const Color &albedo) {
         return Material(albedo);
@@ -85,11 +84,11 @@ private:
                                                           _isRefractable(true) {}
 
 
-    __host__ __device__
+    __device__
     bool shouldDoReflection(const HitResult &hitRes, double refractionIdxRatio, Vec3 &rayDirNormalized,
-                            int &randState) const;
+                            curandState *randState) const;
 
-    __host__ __device__
+    __device__
     void getSpecularResult(const HitResult &hitRes, Vec3 &diffuseDir, double specularChance, Vec3 &resDir,
-                           Color &resColor, int &randState) const;
+                           Color &resColor, curandState *randState) const;
 };
