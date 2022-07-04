@@ -24,18 +24,19 @@ public:
     void render();
 
     const Color * getPixelsOut() const;
-    int getNPixelsOut() const { return _imageHeight * _imageWidth; }
+    int getNPixelsOut() const { return _imgH * _imgW; }
 
 private:
-    int _imageWidth;
-    int _imageHeight;
+    int _imgW;
+    int _imgH;
+    int _sharedMemForSpheres;
     World** _d_world;
     Camera _camera;
     const int _nRayBounces;
-    int _nSamplesPerPixel;
+    float _alreadyNPixelsGot{};
     curandState *_randStates;
     Color *_pixelsOut{};
-    Color *_renderedPixels{};
+    Ray *_rays{};
 
     static World **allocateWorldInDeviceMemory(const Sphere *ptrSpheres, size_t nSpheres);
     static void freeWorldFromDeviceAndItsPtr(World **d_world);

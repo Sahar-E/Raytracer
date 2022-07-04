@@ -18,7 +18,7 @@ __device__ float randomFloatCuda(curandState *state);
 
 __global__ void initCurand(curandState *randStates, uint32_t n_randStates, uint32_t seed);
 
-__host__ __device__ double deg2rad(double degree);
+__host__ __device__ float deg2rad(float degree);
 
 /**
 * Floating point comparison.
@@ -27,7 +27,7 @@ __host__ __device__ double deg2rad(double degree);
 * @param b     Second floating point value.
 * @return      true if the absolute difference between the two values is less than 1e-6.
 */
-__host__ __device__ bool fcmp(double a, double b);
+__host__ __device__ bool fcmp(float a, float b);
 
 
 /**
@@ -37,7 +37,7 @@ __host__ __device__ bool fcmp(double a, double b);
  * @param high      High bound.
  * @return  Clamp result.
  */
-__host__ __device__ double clamp(double toClamp, double low, double high);
+__host__ __device__ float clamp(float toClamp, float low, float high);
 
 
 /**
@@ -58,7 +58,7 @@ __host__ __device__ double clamp(double toClamp, double low, double high);
  * @param refractionIdxRatio    Refraction index of first material divided by the second.
  * @return  If possible to refract according to Snell's Law.
  */
-__host__ __device__ bool cannotRefractBySnellsLaw(double cosTheta, double refractionIdxRatio);
+__host__ __device__ bool cannotRefractBySnellsLaw(float cosTheta, float refractionIdxRatio);
 
 
 /**
@@ -68,4 +68,4 @@ __host__ __device__ bool cannotRefractBySnellsLaw(double cosTheta, double refrac
  * @param refractionIdxRatio    Refraction index of first material divided by the second.
  * @return  If should ref
  */
-__host__ __device__ double reflectSchlickApproxForFrensel(double cosTheta, double refractionIdxRatio);
+__host__ __device__ float reflectSchlickApproxForFrensel(float cosTheta, float refractionIdxRatio);

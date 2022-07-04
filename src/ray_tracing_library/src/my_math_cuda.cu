@@ -15,15 +15,15 @@ __device__ float randomFloatCuda(curandState *state) {
     return curand_uniform(state);
 }
 
-__host__ __device__ double deg2rad(double degree) {
-    return degree * CUDART_PI_F / 180.0;
+__host__ __device__ float deg2rad(float degree) {
+    return degree * CUDART_PI_F / 180.0f;
 }
 
-__host__ __device__ bool fcmp(double a, double b) {
-    return fabs(a - b) < 1e-6;
+__host__ __device__ bool fcmp(float a, float b) {
+    return fabsf(a - b) < 1e-6f;
 }
 
-__host__ __device__ double clamp(double toClamp, double low, double high) {
+__host__ __device__ float clamp(float toClamp, float low, float high) {
     if (toClamp < low) {
         return low;
     }
@@ -33,17 +33,17 @@ __host__ __device__ double clamp(double toClamp, double low, double high) {
     return toClamp;
 }
 
-__host__ __device__ bool cannotRefractBySnellsLaw(double cosTheta, double refractionIdxRatio) {
-    double sinTheta = sqrt(1.0 - cosTheta * cosTheta);
-    bool cannotRefract = refractionIdxRatio * sinTheta > 1.0;
+__host__ __device__ bool cannotRefractBySnellsLaw(float cosTheta, float refractionIdxRatio) {
+    float sinTheta = sqrtf(1.0f - cosTheta * cosTheta);
+    bool cannotRefract = refractionIdxRatio * sinTheta > 1.0f;
     return cannotRefract;
 }
 
-__host__ __device__ double reflectSchlickApproxForFrensel(double cosTheta, double refractionIdxRatio) {
-    double r0 = (1 - refractionIdxRatio) / (1 + refractionIdxRatio);
+__host__ __device__ float reflectSchlickApproxForFrensel(float cosTheta, float refractionIdxRatio) {
+    float r0 = (1.0f - refractionIdxRatio) / (1.0f + refractionIdxRatio);
     r0 = r0 * r0;
-    double tmp = 1 - cosTheta;
-    return r0 + (1 - r0) *
+    float tmp = 1.0f - cosTheta;
+    return r0 + (1.0f - r0) *
                 tmp *
                 tmp *
                 tmp *

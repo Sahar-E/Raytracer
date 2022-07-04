@@ -10,6 +10,7 @@
 #include "commonDefines.h"
 #include <iostream>
 #include <cuda_runtime_api.h>
+#include <cfloat>
 
 __global__
 void createWorld(World **deviceWorld, Sphere *spheres, size_t nSpheres) {
@@ -27,6 +28,86 @@ void freeWorld(World **deviceWorld) {
 }
 
 __global__
+void traceRay(Color *pixelsOut, Camera c  , World const *const *d_world, curandState *randStates,
+              const int imWidth, const int imHeight, const int nBounces, const float alreadyNPixelsGot) {
+    // TODO-Sahar: Still work in progress...
+    extern __shared__ Sphere spheresArr[];
+    int tIdx = blockIdx.x * blockDim.x + threadIdx.x;
+    int nPixels = imHeight * imWidth;
+    if (tIdx < nPixels) {
+
+        size_t n_spheres = (*d_world)->getNSpheres();
+        Sphere* spheres = (*d_world)->getSpheres();
+
+        // Copy to the shared memory all the spheres for each block.
+        for (int i = threadIdx.x; i < n_spheres; i += blockDim.x) {
+            spheresArr[i] = spheres[i];
+        }
+
+        curandState localRandState = randStates[tIdx];
+
+        // Get Ray:
+        int row = tIdx / imWidth;
+        int col = tIdx % imWidth;
+        auto h = (static_cast<float>(col) + randomFloatCuda(&localRandState)) / (imWidth - 1.0f);
+        auto v = 1.0f - ((static_cast<float>(row) + randomFloatCuda(&localRandState)) / (imHeight - 1.0f));
+        auto curRay = c.getRay(h, v, &localRandState);
+
+        Color attenuationColors[MAX_BOUNCES];
+        Color emittedColors[MAX_BOUNCES];
+        int hitCount = 0;
+
+        __syncthreads();    // For the spheresArr initialization.
+
+        // Iterative ray tracing:
+        while (hitCount < nBounces) {
+            bool hit = false;
+            float tEnd = FLT_MAX;
+            int hitSphereIdx = -1;
+            float rootRes;
+            for (int i = 0; i < n_spheres; ++i) {
+                if (spheresArr[i].isHit(curRay, CLOSEST_POSSIBLE_RAY_HIT, tEnd, rootRes)) {
+                    hit = true;
+                    tEnd = rootRes;
+                    hitSphereIdx = i;
+                }
+            }
+            if (hit) {
+                HitResult hitRes;
+                spheresArr[hitSphereIdx].getHitResult(curRay, rootRes, hitRes);
+
+                Color emittedColor{}, attenuation{};
+                spheresArr[hitSphereIdx].getMaterial().getColorAndSecondaryRay(hitRes, &localRandState,
+                                                                            emittedColor, attenuation, curRay);
+                attenuationColors[hitCount] = attenuation;
+                emittedColors[hitCount] = emittedColor;
+                ++hitCount;
+            } else {
+                attenuationColors[hitCount] = World::backgroundColor(curRay);
+                emittedColors[hitCount] = {0.0f, 0.0f, 0.0f};
+                ++hitCount;
+                break;
+            }
+        }
+        if (hitCount == nBounces) {
+            attenuationColors[hitCount-1] = {0.0f, 0.0f, 0.0f};
+            emittedColors[hitCount-1] = {0.0f, 0.0f, 0.0f};
+        }
+
+        // Unrolling back the results in the stacks.
+        Color res = {1.0f,1.0f,1.0f};
+        for(int i = hitCount-1; i >= 0; --i) {
+            res = emittedColors[i] + attenuationColors[i] * res;
+        }
+
+        pixelsOut[tIdx] = pixelsOut[tIdx] + (res - pixelsOut[tIdx]) / alreadyNPixelsGot;
+        randStates[tIdx] = localRandState;
+    }
+
+}
+
+
+__global__
 void writePixels(Color *pixelsOut, Camera c, World **d_world, curandState *randStates, int imWidth, int imHeight,
                  int nBounces) {
     size_t n_spheres = (*d_world)->getNSpheres();
@@ -36,38 +117,26 @@ void writePixels(Color *pixelsOut, Camera c, World **d_world, curandState *randS
         curandState localRandState = randStates[pixel_idx];
         int row = pixel_idx / imWidth;
         int col = pixel_idx % imWidth;
-        auto h = (static_cast<double>(col) + randomFloatCuda(&localRandState)) / (imWidth - 1);
-        auto v = 1 - ((static_cast<double>(row) + randomFloatCuda(&localRandState)) / (imHeight - 1));
+        auto h = (static_cast<float>(col) + randomFloatCuda(&localRandState)) / (imWidth - 1);
+        auto v = 1 - ((static_cast<float>(row) + randomFloatCuda(&localRandState)) / (imHeight - 1));
         Ray ray = c.getRay(h, v, &localRandState);
-        // TODO-Sahar: can pack up all the results in shared memory and in one swoosh return it.
+        // Get rays kernel.
+
         pixelsOut[pixel_idx] = World::rayTrace(spheres, n_spheres, ray, nBounces, &localRandState);
         randStates[pixel_idx] = localRandState;
     }
 
 }
 
-__global__
-void getAverageForPixels(Color *pixelsAverageNew, Color *pixelsAverageOld, Color *pixels, size_t n, int n_pixelsAlreadySummed) {
-    int index = blockIdx.x * blockDim.x + threadIdx.x;
-    if (index < n) {
-        pixelsAverageNew[index] = pixelsAverageOld[index] +
-                                  (pixels[index] - pixelsAverageOld[index]) / static_cast<float>(n_pixelsAlreadySummed);
-    }
-}
-
-
 void Renderer::render() {
     TimeThis t("render");
-    int nPixels = _imageHeight * _imageWidth;
+    int nPixels = _imgH * _imgW;
 
-    int blockSize = N_THREAD;
+    int blockSize = BLOCK_SIZE;
     int numBlocks = (nPixels + blockSize - 1) / blockSize;
-    writePixels<<<numBlocks, blockSize>>>(_renderedPixels, _camera, _d_world, _randStates,
-                                          _imageWidth, _imageHeight, _nRayBounces);
-    checkCudaErrors(cudaGetLastError());
-    checkCudaErrors(cudaDeviceSynchronize());
-
-    getAverageForPixels<<<numBlocks, blockSize>>>(_pixelsOut, _pixelsOut, _renderedPixels, nPixels, ++_nSamplesPerPixel);   // TODO-Sahar: 60ms - slow.
+    ++_alreadyNPixelsGot;
+    traceRay<<<numBlocks, blockSize, _sharedMemForSpheres>>>(_pixelsOut, _camera, _d_world, _randStates, _imgW, _imgH,
+                                                             _nRayBounces, _alreadyNPixelsGot);
     checkCudaErrors(cudaGetLastError());
     checkCudaErrors(cudaDeviceSynchronize());
 }
@@ -105,12 +174,13 @@ World **Renderer::allocateWorldInDeviceMemory(const Sphere *ptrSpheres, size_t n
 
 
 Renderer::Renderer(const int imageWidth, const int imageHeight, const World &world, const Camera &camera,
-                   int rayBounces) : _imageWidth(imageWidth), _imageHeight(imageHeight),
-                                                           _d_world(),
-                                                           _camera(camera),
-                                                           _randStates(),
-                                                           _nRayBounces(rayBounces),
-                                                           _nSamplesPerPixel(0) {
+                   int rayBounces) : _imgW(imageWidth), _imgH(imageHeight),
+                                     _sharedMemForSpheres(world.getTotalSizeInSharedMemory()),
+                                     _d_world(),
+                                     _camera(camera),
+                                     _randStates(),
+                                     _nRayBounces(rayBounces),
+                                     _alreadyNPixelsGot(0.0f) {
     _d_world = allocateWorldInDeviceMemory(world.getSpheres(), world.getNSpheres());
 
     initRandStates();
@@ -118,18 +188,18 @@ Renderer::Renderer(const int imageWidth, const int imageHeight, const World &wor
 }
 
 void Renderer::initPixelAllocations() {
-    int nPixels = _imageWidth * _imageHeight;
+    int nPixels = _imgW * _imgH;
     checkCudaErrors(cudaMallocManaged(&_pixelsOut, sizeof(Color) * nPixels));
-    checkCudaErrors(cudaMallocManaged(&_renderedPixels, sizeof(Color) * nPixels));
+    checkCudaErrors(cudaMallocManaged(&_rays, sizeof(Ray) * nPixels));
     for (int i = 0; i < nPixels; ++i) {
         _pixelsOut[i] = {0, 0, 0};
-        _renderedPixels[i] = {0, 0, 0};
+        _rays[i] = {{0, 0, 0}, {0,0,0}};
     }
 }
 
 void Renderer::initRandStates() {
-    int nPixels = _imageWidth * _imageHeight;
-    int nThreads = N_THREAD;
+    int nPixels = _imgW * _imgH;
+    int nThreads = BLOCK_SIZE;
     size_t blockSize = (nPixels + nThreads - 1) / nThreads;
     checkCudaErrors(cudaMalloc(&_randStates, sizeof(curandState) * nPixels));
     initCurand<<<blockSize, nThreads>>>(_randStates, nPixels, 0);
@@ -138,7 +208,7 @@ void Renderer::initRandStates() {
 }
 
 Renderer::~Renderer() {
-    checkCudaErrors(cudaFree(_renderedPixels));
+    checkCudaErrors(cudaFree(_rays));
     checkCudaErrors(cudaFree(_pixelsOut));
     checkCudaErrors(cudaFree(_randStates));
     freeWorldFromDeviceAndItsPtr(_d_world);

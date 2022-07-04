@@ -24,7 +24,7 @@ public:
      * @param aperture      Bigger aperture means smaller DOF ("More blurred background").
      * @param focusDist     The distance of the focus plane from the origin of the camera.
      */
-    Camera(Vec3 lookFrom, Vec3 lookAt, Vec3 vUp, double aspectRatio, double vFov, double aperture, double focusDist);
+    Camera(Vec3 lookFrom, Vec3 lookAt, Vec3 vUp, float aspectRatio, float vFov, float aperture, float focusDist);
 
     /**
      * Returns ray using the specified scalars.
@@ -36,7 +36,7 @@ public:
      * @return  New ray in that direction from the camera origin.
      */
     __device__
-    Ray getRay(double h_scalar, double v_scalar, curandState *randState) const;
+    Ray getRay(float h_scalar, float v_scalar, curandState *randState) const;
 
 private:
     Point3 _origin{};
@@ -48,8 +48,8 @@ private:
     Vec3 xVec{};
     Vec3 yVec{};
 
-    double _aspectRatio{};
-    double _lensRadius{};
+    float _aspectRatio{};
+    float _lensRadius{};
 };
 
 

@@ -16,16 +16,32 @@
 
 
 __device__
-Color World::rayTrace(Sphere *spheres, size_t n_spheres, const Ray &ray, int bounce, curandState *randState) {
-    auto curRay(ray);
+Color World::rayTrace(const Sphere *spheres, const size_t n_spheres, const Ray &ray, int bounce, curandState *randState) {
+    auto curRay(ray);       // TODO-Sahar: Still work in progress...
     Color attenuationColors[MAX_BOUNCES];
     Color emittedColors[MAX_BOUNCES];
     int hitCount = 0;
     while (hitCount < bounce) {
         HitResult hitRes;
         Material material{};
-        bool hit = getHitResult(spheres, n_spheres, curRay, hitRes, material);
+//        bool hit = getHitResult(spheres, n_spheres, curRay, hitRes, material);
+        bool hit = false;
+        float tEnd = DBL_MAX;
+        int hitSphereIdx = -1;
+        float rootRes;
+        if (spheres != nullptr) {
+            for (int i = 0; i < n_spheres; ++i) {
+                if (spheres[i].isHit(curRay, CLOSEST_POSSIBLE_RAY_HIT, tEnd, rootRes)) {
+                    hit = true;
+                    tEnd = rootRes;
+                    hitSphereIdx = i;
+                }
+            }
+        }
         if (hit) {
+            material = spheres[hitSphereIdx].getMaterial();
+            spheres[hitSphereIdx].getHitResult(curRay, rootRes, hitRes);
+
             Color emittedColor{}, attenuation{};
             material.getColorAndSecondaryRay(hitRes, randState, emittedColor, attenuation, curRay);
             attenuationColors[hitCount] = attenuation;
@@ -51,12 +67,16 @@ Color World::rayTrace(Sphere *spheres, size_t n_spheres, const Ray &ray, int bou
     return res;
 }
 
+__host__ __device__ int World::getTotalSizeInSharedMemory() const {
+    return getNSpheres() * sizeof(Sphere);
+}
+
 __host__ __device__
 bool World::getHitResult(Sphere *spheres, size_t n_spheres, const Ray &ray, HitResult &hitRes, Material &material){
     bool hit = false;
-    double tEnd = DBL_MAX;
+    float tEnd = DBL_MAX;
     int hitSphereIdx = -1;
-    double rootRes;
+    float rootRes;
     if (spheres != nullptr) {
         for (int i = 0; i < n_spheres; ++i) {   // TODO-Sahar: revert this line
             if (spheres[i].isHit(ray, CLOSEST_POSSIBLE_RAY_HIT, tEnd, rootRes)) {
@@ -75,10 +95,10 @@ bool World::getHitResult(Sphere *spheres, size_t n_spheres, const Ray &ray, HitR
 
 __host__ __device__
 Color World::backgroundColor(const Ray &ray) {
-    double intensity = 0.5;
+    float intensity = 0.5f;
     auto unitDir = normalize(ray.direction());
-    auto t = 0.5 * (unitDir.y() + 1.0);
-    return alphaBlending({0.4, 0.4, 1}, {.9, .9, .9}, t) * intensity;
+    auto t = 0.5f * (unitDir.y() + 1.0f);
+    return alphaBlending({0.4f, 0.4f, 1.0f}, {.9f, .9f, .9f}, t) * intensity;
 }
 
 __host__ __device__
@@ -105,7 +125,7 @@ World World::initWorld2() {
     sphereList.push_back(Sphere({4, 5, 4}, 1, whiteLight));
 
 
-    double radius = 1;
+    float radius = 1;
     std::vector<Vec3> bigBallsLocs = {{1.5,  radius, 4},
                                       {0.5,  radius, 2},
                                       {-0.5, radius, 0}};
@@ -117,7 +137,7 @@ World World::initWorld2() {
     Material glass = Material::getGlass(white, 1.5);
     sphereList.emplace_back(Sphere(bigBallsLocs[2], radius, glass));
 
-    double smallSphereRadius = 0.2;
+    float smallSphereRadius = 0.2;
     int randState = 1;
     for (int xLoc = -8; xLoc < 8; ++xLoc) {
         for (int zLoc = -17; zLoc < 12; ++zLoc) {
@@ -129,8 +149,8 @@ World World::initWorld2() {
                 }
             }
             if (!locationIsOccupied) {
-                Point3 sphereLoc = {xLoc + 0.7 * randomDouble(randState), smallSphereRadius, zLoc + 0.7 * randomDouble(randState)};
-                double randomMaterialChooser = randomDouble(randState);
+                Point3 sphereLoc = {xLoc + 0.7f * randomDouble(randState), smallSphereRadius, zLoc + 0.7f * randomDouble(randState)};
+                float randomMaterialChooser = randomDouble(randState);
                 Material mat;
                 if (randomMaterialChooser < 0.5) {
                     auto albedo = randomVec0to1(randState) * randomVec0to1(randState);

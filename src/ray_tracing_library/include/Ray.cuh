@@ -16,7 +16,7 @@ public:
 
     __host__ __device__  Vec3 direction() const { return _dir; }
 
-    __host__ __device__  Point3 at(double t) const {
+    __host__ __device__  Point3 at(float t) const {
         return _orig + _dir * t;
     }
 

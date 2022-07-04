@@ -7,8 +7,8 @@
 #include "Camera.cuh"
 
 
-Camera::Camera(Vec3 lookFrom, Vec3 lookAt, Vec3 vUp, double aspectRatio, double vFov,
-               double aperture, double focusDist)
+Camera::Camera(Vec3 lookFrom, Vec3 lookAt, Vec3 vUp, float aspectRatio, float vFov,
+               float aperture, float focusDist)
         : _origin(lookFrom), _aspectRatio(aspectRatio), _lensRadius(aperture / 2) {
     auto vTheta = deg2rad(vFov);
     auto h = atan(vTheta / 2);
@@ -24,7 +24,7 @@ Camera::Camera(Vec3 lookFrom, Vec3 lookAt, Vec3 vUp, double aspectRatio, double 
     _lowerLeftCorner = lookFrom - _horizontalVec / 2 - _verticalVec / 2 - focusDist * zVec;
 }
 
-__device__ Ray Camera::getRay(double h_scalar, double v_scalar, curandState *randState) const {
+__device__ Ray Camera::getRay(float h_scalar, float v_scalar, curandState *randState) const {
     Vec3 random2dVec = randomVecInUnitDisk(randState) * _lensRadius;
     Vec3 offset = xVec * random2dVec.x() + yVec * random2dVec.y();
 

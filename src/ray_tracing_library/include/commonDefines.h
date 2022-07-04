@@ -5,4 +5,4 @@
 #pragma once
 
 #define MAX_BOUNCES 10
-#define N_THREAD 256
+#define BLOCK_SIZE 256

@@ -9,7 +9,7 @@
 #include "stb_library/stb_image_write.h"
 
 void saveImgAsJpg(const std::string &filename,
-                  const std::vector<std::tuple<double, double, double>> &data,
+                  const std::vector<std::tuple<float, float, float>> &data,
                   const int width,
                   const int height,
                   const int channelCount) {

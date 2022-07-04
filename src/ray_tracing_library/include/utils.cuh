@@ -19,7 +19,7 @@
  * @param channelCount  3 for RGB.
  */
 void saveImgAsJpg(const std::string &filename,
-                  const std::vector<std::tuple<double, double, double>> &data,
+                  const std::vector<std::tuple<float, float, float>> &data,
                   int width,
                   int height,
                   int channelCount);
