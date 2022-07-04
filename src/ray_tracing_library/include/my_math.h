@@ -6,6 +6,6 @@
 
 #include <random>
 
-float randomDouble(int &randState);
-float randomDouble(int &randState, float from, float to);
+float randomFloat(int &randState);
+float randomFloat(int &randState, float from, float to);
 

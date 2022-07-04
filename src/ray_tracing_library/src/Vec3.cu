@@ -91,9 +91,9 @@ __host__ __device__ Vec3 refract(const Vec3 &rayDirNormalized, const Vec3 &n, fl
 }
 
 __host__ Vec3 randomVec0to1(int &randState) {
-    return {randomDouble(randState),
-            randomDouble(randState),
-            randomDouble(randState)};
+    return {randomFloat(randState),
+            randomFloat(randState),
+            randomFloat(randState)};
 }
 
 __device__ Vec3 randomVec0to1(curandState *randState) {
@@ -103,7 +103,8 @@ __device__ Vec3 randomVec0to1(curandState *randState) {
 }
 
 __host__ Vec3 randomUnitVec(int &randState) {
-    return normalize({2.0f * randomDouble(randState) - 1.0f, 2.0f * randomDouble(randState) - 1.0f, 2.0f * randomDouble(randState) - 1.0f});
+    return normalize({2.0f * randomFloat(randState) - 1.0f, 2.0f * randomFloat(randState) - 1.0f, 2.0f * randomFloat(
+            randState) - 1.0f});
 }
 
 __device__ Vec3 randomUnitVec(curandState *randState) {

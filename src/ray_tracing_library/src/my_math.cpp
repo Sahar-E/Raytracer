@@ -4,12 +4,12 @@
 
 #include "my_math.h"
 
-float randomDouble(int &randState) {
+float randomFloat(int &randState) {
     static std::uniform_real_distribution<float> distribution(0.0, 1.0);
     static std::minstd_rand generator(1);
     return distribution(generator);
 }
 
-float randomDouble(int &randState, float from, float to) {
-    return randomDouble(randState) * (from - to) + from;
+float randomFloat(int &randState, float from, float to) {
+    return randomFloat(randState) * (from - to) + from;
 }
