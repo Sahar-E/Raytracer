@@ -12,7 +12,7 @@ Camera::Camera(Vec3 lookFrom, Vec3 lookAt, Vec3 vUp, float aspectRatio, float vF
         : _origin(lookFrom), _aspectRatio(aspectRatio), _lensRadius(aperture / 2) {
     auto vTheta = deg2rad(vFov);
     auto h = atan(vTheta / 2);
-    auto viewportHeight = 2.0 * h;
+    auto viewportHeight = 2.0f * h;
     auto viewportWidth = _aspectRatio * viewportHeight;
 
     zVec = normalize((lookFrom - lookAt));

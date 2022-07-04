@@ -14,83 +14,8 @@
 #include "commonDefines.h"
 
 
-
-__device__
-Color World::rayTrace(const Sphere *spheres, const size_t n_spheres, const Ray &ray, int bounce, curandState *randState) {
-    auto curRay(ray);       // TODO-Sahar: Still work in progress...
-    Color attenuationColors[MAX_BOUNCES];
-    Color emittedColors[MAX_BOUNCES];
-    int hitCount = 0;
-    while (hitCount < bounce) {
-        HitResult hitRes;
-        Material material{};
-//        bool hit = getHitResult(spheres, n_spheres, curRay, hitRes, material);
-        bool hit = false;
-        float tEnd = DBL_MAX;
-        int hitSphereIdx = -1;
-        float rootRes;
-        if (spheres != nullptr) {
-            for (int i = 0; i < n_spheres; ++i) {
-                if (spheres[i].isHit(curRay, CLOSEST_POSSIBLE_RAY_HIT, tEnd, rootRes)) {
-                    hit = true;
-                    tEnd = rootRes;
-                    hitSphereIdx = i;
-                }
-            }
-        }
-        if (hit) {
-            material = spheres[hitSphereIdx].getMaterial();
-            spheres[hitSphereIdx].getHitResult(curRay, rootRes, hitRes);
-
-            Color emittedColor{}, attenuation{};
-            material.getColorAndSecondaryRay(hitRes, randState, emittedColor, attenuation, curRay);
-            attenuationColors[hitCount] = attenuation;
-            emittedColors[hitCount] = emittedColor;
-            ++hitCount;
-        } else {
-            attenuationColors[hitCount] = backgroundColor(curRay);
-            emittedColors[hitCount] = {0,0,0};
-            ++hitCount;
-            break;
-        }
-    }
-    if (hitCount == bounce) {
-        attenuationColors[hitCount-1] = {0, 0, 0};
-        emittedColors[hitCount-1] = {0, 0, 0};
-    }
-
-    // Unrolling back the results in the stacks.
-    Color res = {1,1,1};
-    for(int i = hitCount-1; i >= 0; --i) {
-        res = emittedColors[i] + attenuationColors[i] * res;
-    }
-    return res;
-}
-
-__host__ __device__ int World::getTotalSizeInSharedMemory() const {
+__host__ __device__ int World::getTotalSizeInMemoryForObjects() const {
     return getNSpheres() * sizeof(Sphere);
-}
-
-__host__ __device__
-bool World::getHitResult(Sphere *spheres, size_t n_spheres, const Ray &ray, HitResult &hitRes, Material &material){
-    bool hit = false;
-    float tEnd = DBL_MAX;
-    int hitSphereIdx = -1;
-    float rootRes;
-    if (spheres != nullptr) {
-        for (int i = 0; i < n_spheres; ++i) {   // TODO-Sahar: revert this line
-            if (spheres[i].isHit(ray, CLOSEST_POSSIBLE_RAY_HIT, tEnd, rootRes)) {
-                hit = true;
-                tEnd = rootRes;
-                hitSphereIdx = i;
-            }
-        }
-    }
-    if (hit) {
-        material = spheres[hitSphereIdx].getMaterial();
-        spheres[hitSphereIdx].getHitResult(ray, rootRes, hitRes);
-    }
-    return hit;
 }
 
 __host__ __device__
@@ -102,7 +27,7 @@ Color World::backgroundColor(const Ray &ray) {
 }
 
 __host__ __device__
-size_t World::getNSpheres() const {
+int World::getNSpheres() const {
     return _nSpheres;
 }
 
@@ -149,8 +74,9 @@ World World::initWorld2() {
                 }
             }
             if (!locationIsOccupied) {
-                Point3 sphereLoc = {xLoc + 0.7f * randomDouble(randState), smallSphereRadius, zLoc + 0.7f * randomDouble(randState)};
-                float randomMaterialChooser = randomDouble(randState);
+                Point3 sphereLoc = {xLoc + 0.7f * randomFloat(randState), smallSphereRadius, zLoc + 0.7f * randomFloat(
+                        randState)};
+                float randomMaterialChooser = randomFloat(randState);
                 Material mat;
                 if (randomMaterialChooser < 0.5) {
                     auto albedo = randomVec0to1(randState) * randomVec0to1(randState);
@@ -158,7 +84,7 @@ World World::initWorld2() {
                 } else if (randomMaterialChooser < 0.8) {
                     auto albedo = randomVec0to1(randState) * randomVec0to1(randState);
                     auto specularColor = albedo + randomVec0to1(randState) * 0.2;
-                    mat = Material::getSpecular(albedo, specularColor, randomDouble(randState), randomDouble(randState));
+                    mat = Material::getSpecular(albedo, specularColor, randomFloat(randState), randomFloat(randState));
                 } else if (randomMaterialChooser < 0.9) {
                     auto albedo = randomVec0to1(randState) * randomVec0to1(randState);
                     auto emittedColor = randomVec0to1(randState) * randomVec0to1(randState);
@@ -223,10 +149,10 @@ World World::initWorld1() {
     sphereList.push_back(Sphere({0.15, -0.4, -1.45}, 0.1, neonGreenGlow));
     sphereList.push_back(Sphere({-0.8, -0.4, -1.3}, 0.1, lambertianRedBrown));
     sphereList.push_back(Sphere({0, -1000.5, -2}, 1000, lambertianBrown));
-    return {sphereList.data(), sphereList.size()};
+    return {sphereList.data(), static_cast<int>(sphereList.size())};
 }
 
-__host__ __device__ World::World(const Sphere *spheresArr, size_t numSpheres)
+__host__ __device__ World::World(const Sphere *spheresArr, int numSpheres)
         : _spheres(numSpheres <= 0 && spheresArr != nullptr ? nullptr : new Sphere[numSpheres]),
           _nSpheres(numSpheres) {
     for (int i = 0; i < _nSpheres; ++i) {

@@ -106,28 +106,6 @@ void traceRay(Color *pixelsOut, Camera c  , World const *const *d_world, curandS
 
 }
 
-
-__global__
-void writePixels(Color *pixelsOut, Camera c, World **d_world, curandState *randStates, int imWidth, int imHeight,
-                 int nBounces) {
-    size_t n_spheres = (*d_world)->getNSpheres();
-    Sphere* spheres = (*d_world)->getSpheres();
-    int pixel_idx = blockIdx.x * blockDim.x + threadIdx.x;
-    if (pixel_idx < imHeight * imWidth) {
-        curandState localRandState = randStates[pixel_idx];
-        int row = pixel_idx / imWidth;
-        int col = pixel_idx % imWidth;
-        auto h = (static_cast<float>(col) + randomFloatCuda(&localRandState)) / (imWidth - 1);
-        auto v = 1 - ((static_cast<float>(row) + randomFloatCuda(&localRandState)) / (imHeight - 1));
-        Ray ray = c.getRay(h, v, &localRandState);
-        // Get rays kernel.
-
-        pixelsOut[pixel_idx] = World::rayTrace(spheres, n_spheres, ray, nBounces, &localRandState);
-        randStates[pixel_idx] = localRandState;
-    }
-
-}
-
 void Renderer::render() {
     TimeThis t("render");
     int nPixels = _imgH * _imgW;
@@ -175,7 +153,7 @@ World **Renderer::allocateWorldInDeviceMemory(const Sphere *ptrSpheres, size_t n
 
 Renderer::Renderer(const int imageWidth, const int imageHeight, const World &world, const Camera &camera,
                    int rayBounces) : _imgW(imageWidth), _imgH(imageHeight),
-                                     _sharedMemForSpheres(world.getTotalSizeInSharedMemory()),
+                                     _sharedMemForSpheres(world.getTotalSizeInMemoryForObjects()),
                                      _d_world(),
                                      _camera(camera),
                                      _randStates(),
@@ -216,10 +194,4 @@ Renderer::~Renderer() {
 
 const Color * Renderer::getPixelsOut() const {
     return _pixelsOut;
-}
-
-World **allocateWorldInDeviceMemory2(const Sphere *ptrSpheres, size_t nSpheres) {
-    auto **d_world = new World*;
-    *d_world = new World(ptrSpheres, nSpheres);
-    return d_world;
 }
