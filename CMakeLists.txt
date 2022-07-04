@@ -28,8 +28,6 @@ target_compile_options(${PROJECT_NAME} PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:
         --relocatable-device-code=true
         >)
 
-
-
 # UNIX, WIN32, WINRT, CYGWIN, APPLE are environment variables as flags set by default system
 if(UNIX)
     message("This is a ${CMAKE_SYSTEM_NAME} system")
