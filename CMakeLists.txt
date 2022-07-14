@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.8.12)
 set(CMAKE_CXX_STANDARD 20)
 project(ray_tracer LANGUAGES CXX CUDA)
 #set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
@@ -9,12 +9,12 @@ FIND_PACKAGE(CUDA REQUIRED)
 set(CUDA_ENABLE 1)
 
 
-# OpenMP:
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
-find_package(OpenMP REQUIRED)
+## OpenMP:
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
+#find_package(OpenMP REQUIRED)
 
 
-add_executable(${PROJECT_NAME} main.cu)
+add_executable(${PROJECT_NAME} main.cpp temp.cpp)
 
 # CUDA:
 set(CMAKE_CUDA_STANDARD 14)
@@ -43,8 +43,21 @@ endif()
 
 
 # Libraries:
-add_subdirectory(src/stb_library)
+include_directories(src/dependencies/)
+
+add_subdirectory(src/dependencies/stb_library)
 target_link_libraries(${PROJECT_NAME} stb_library)
 
 add_subdirectory(src/ray_tracing_library)
 target_link_libraries(${PROJECT_NAME} ray_tracing_library)
+
+
+find_package(OpenGL REQUIRED)
+add_subdirectory(src/dependencies/glfw-3.3.7)
+target_link_libraries(${PROJECT_NAME} glfw OpenGL::GL)
+
+add_subdirectory(src/dependencies/glew-2.1.0/build/cmake)
+target_link_libraries(${PROJECT_NAME} glew_s)
+
+add_subdirectory(src/dependencies/imgui-docking)
+target_link_libraries(${PROJECT_NAME} imgui)

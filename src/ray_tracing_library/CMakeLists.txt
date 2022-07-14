@@ -46,5 +46,5 @@ target_compile_options(${PROJECT_NAME} PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:
 
 # Include:
 target_include_directories(${PROJECT_NAME} PUBLIC include)
-target_include_directories(${PROJECT_NAME} PUBLIC ../stb_library)
+target_include_directories(${PROJECT_NAME} PUBLIC ../dependencies/stb_library)
 target_link_libraries(${PROJECT_NAME} stb_library)

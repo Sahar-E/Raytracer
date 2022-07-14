@@ -97,7 +97,7 @@ World World::initWorld2() {
         }
     }
 
-    return {sphereList.data(), sphereList.size()};
+    return {sphereList.data(), static_cast<int>(sphereList.size())};
 }
 
 World World::initWorld1() {
