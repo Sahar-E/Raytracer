@@ -51,6 +51,10 @@ target_link_libraries(${PROJECT_NAME} stb_library)
 add_subdirectory(src/ray_tracing_library)
 target_link_libraries(${PROJECT_NAME} ray_tracing_library)
 
+add_subdirectory(src/gui)
+target_link_libraries(${PROJECT_NAME} gui)
+
+
 
 find_package(OpenGL REQUIRED)
 add_subdirectory(src/dependencies/glfw-3.3.7)

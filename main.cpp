@@ -23,12 +23,14 @@
 #include <imgui-docking/include/imgui.h>
 #include <imgui-docking/include/imgui_impl_glfw.h>
 #include <imgui-docking/include/imgui_impl_opengl3.h>
-#include <glew-2.1.0/include/GL/glew.h>
-#include <GLFW/glfw3.h>
+#include "glew-2.1.0/include/GL/glew.h"
+#include "glfw-3.3.7/include/GLFW/glfw3.h"
 #include <string>
 #include <sstream>
 #include <regex>
-#include "commonOpenGl.h"
+#include "commonOpenGL.h"
+#include "VertexBuffer.h"
+#include "IndexBuffer.h"
 
 
 static std::tuple<std::string, std::string> parseShader(const std::string &filepath) {
@@ -107,13 +109,16 @@ int main() {
 
 
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(640, 480, "Hello Pitzi", nullptr, nullptr);
+    window = glfwCreateWindow(800, 600, "Hello Pitzi", nullptr, nullptr);
     if (!window) {
         glfwTerminate();
         return -1;
     }
+
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
+
+    glfwSwapInterval(1);
 
     if (glewInit() != GLEW_OK) {
         std::cerr << "glewInit() failed\n";
@@ -121,107 +126,116 @@ int main() {
 
 
     std::cout <<  "OpenGL version: " << glGetString(GL_VERSION) << std::endl;
+    {
+        float positions[8] = {
+                -0.5f, -0.5f,
+                0.5f, -0.5f,
+                0.5f, 0.5f,
+                -0.5f, 0.5f
+        };
+        unsigned int indices[] = {
+                0, 1, 2,
+                2, 3, 0
+        };
 
-    auto [vertexShader, fragmentShader] = parseShader("resources/shaders/Basic.shader");
-    float positions[8] = {
-            -0.5f, -0.5f,
-            0.5f, -0.5f,
-            0.5f, 0.5f,
-            -0.5f, 0.5f
-    };
-    unsigned int indices[] ={
-            0, 1, 2,
-            2, 3, 0
-    };
+        VertexBuffer vb(positions, sizeof(float) * 4 * 2);
+        checkGLErrors(glEnableVertexAttribArray(0));
+        checkGLErrors(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), nullptr));
 
-    unsigned int buffer;
-    checkGLErrors(glGenBuffers(1, &buffer));
-    checkGLErrors(glBindBuffer(GL_ARRAY_BUFFER, buffer));
-    checkGLErrors(glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6*2, positions, GL_STATIC_DRAW));
+        IndexBuffer ib(indices, 6);
 
-    checkGLErrors(glEnableVertexAttribArray(0));
-    checkGLErrors(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), nullptr));
+        auto [vertexShader, fragmentShader] = parseShader("resources/shaders/Basic.shader");
+        unsigned int shader = createShader(vertexShader, fragmentShader);
+        checkGLErrors(glUseProgram(shader));
 
+        checkGLErrors(int location = glGetUniformLocation(shader, "u_color"));
+        assert(location != -1);
+        checkGLErrors(glUniform4f(location, 0.2f, 0.2f, 0.9f, 1.0f));
 
-    unsigned int ibo;
-    checkGLErrors(glGenBuffers(1, &ibo));
-    checkGLErrors(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo));
-    checkGLErrors(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * 6, indices, GL_STATIC_DRAW));
+        ImGui::CreateContext();
+        ImGui_ImplGlfw_InitForOpenGL(window, true);
+        ImGui_ImplOpenGL3_Init(glsl_version);
+        ImGui::StyleColorsDark();
 
+        // Our state
+        bool show_demo_window = true;
+        bool show_another_window = false;
+        ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
-    unsigned int shader = createShader(vertexShader, fragmentShader);
-    checkGLErrors(glUseProgram(shader));
+        float r = 0.0f;
+        float increment = 0.05f;
 
-    ImGui::CreateContext();
-    ImGui_ImplGlfw_InitForOpenGL(window, true);
-    ImGui_ImplOpenGL3_Init(glsl_version);
-    ImGui::StyleColorsDark();
+        /* Loop until the user closes the window */
+        while (!glfwWindowShouldClose(window)) {
+            /* Render here */
+            checkGLErrors(glClear(GL_COLOR_BUFFER_BIT));
 
-    // Our state
-    bool show_demo_window = true;
-    bool show_another_window = false;
-    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+            // Start the Dear ImGui frame
+            ImGui_ImplOpenGL3_NewFrame();
+            ImGui_ImplGlfw_NewFrame();
+            ImGui::NewFrame();
 
+            checkGLErrors(glUniform4f(location, r, 0.2f, 0.2f, 1.0f));
 
-
-    /* Loop until the user closes the window */
-    while (!glfwWindowShouldClose(window)) {
-        /* Render here */
-        checkGLErrors(glClear(GL_COLOR_BUFFER_BIT));
-
-        // Start the Dear ImGui frame
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-
-//        GLClearError();
-//        glDrawElements(GL_TRIANGLES, 6, GL_INT, nullptr);
-//        GLCheckError();
-
-        checkGLErrors(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
+            ib.bind();
 
 
-        // 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
-        {
-            static float f = 0.0f;
-            static int counter = 0;
+            checkGLErrors(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
 
-            ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
+            if (r > 1.0f || r < 0.0f) {
+                increment = -increment;
+            }
+            r += increment;
 
-            ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-            ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-            ImGui::Checkbox("Another Window", &show_another_window);
+            // 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
+            {
+                static float f = 0.0f;
+                static int counter = 0;
 
-            ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-            ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
+                ImGui::Begin(
+                        "Hello, world!");                          // Create a window called "Hello, world!" and append into it.
 
-            if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-                counter++;
-            ImGui::SameLine();
-            ImGui::Text("counter = %d", counter);
+                ImGui::Text(
+                        "This is some useful text.");               // Display some text (you can use a format strings too)
+                ImGui::Checkbox("Demo Window",
+                                &show_demo_window);      // Edit bools storing our window open/close state
+                ImGui::Checkbox("Another Window", &show_another_window);
 
-            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-            ImGui::End();
+                ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+                ImGui::ColorEdit3("clear color", (float *) &clear_color); // Edit 3 floats representing a color
+
+                if (ImGui::Button(
+                        "Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
+                    counter++;
+                ImGui::SameLine();
+                ImGui::Text("counter = %d", counter);
+
+                ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate,
+                            ImGui::GetIO().Framerate);
+                ImGui::End();
+            }
+
+
+            ImGui::Render();
+            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+
+            /* Swap front and back buffers */
+            glfwSwapBuffers(window);
+
+            /* Poll for and process events */
+            glfwPollEvents();
         }
+        // Cleanup
+        ImGui_ImplOpenGL3_Shutdown();
+        ImGui_ImplGlfw_Shutdown();
+        ImGui::DestroyContext();
 
+        glDeleteProgram(shader);
 
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-
-        /* Swap front and back buffers */
-        glfwSwapBuffers(window);
-
-        /* Poll for and process events */
-        glfwPollEvents();
     }
 
-    // Cleanup
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
 
-    glDeleteProgram(shader);
     glfwTerminate();
     return 0;
 }

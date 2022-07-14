@@ -27,7 +27,8 @@ add_library(${PROJECT_NAME} STATIC
         include/commonCuda.cuh
         src/commonCuda.cu
         include/my_math.h
-        src/my_math.cpp include/commonDefines.h)
+        src/my_math.cpp
+        include/commonDefines.h)
 
 # CUDA:
 find_package(CUDA REQUIRED)
