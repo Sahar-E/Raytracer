@@ -33,6 +33,7 @@
 #include "IndexBuffer.h"
 #include "VertexArray.h"
 #include "Shader.h"
+#include "GUIRenderer.h"
 
 
 int main() {
@@ -105,26 +106,23 @@ int main() {
         bool show_another_window = false;
         ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
+        GUIRenderer renderer;
+
         float r = 0.0f;
         float increment = 0.05f;
 
         /* Loop until the user closes the window */
         while (!glfwWindowShouldClose(window)) {
-            /* Render here */
-            checkGLErrors(glClear(GL_COLOR_BUFFER_BIT));
-
             // Start the Dear ImGui frame
             ImGui_ImplOpenGL3_NewFrame();
             ImGui_ImplGlfw_NewFrame();
             ImGui::NewFrame();
 
+            /* Render here */
+            renderer.clear();
             shader.bind();
             shader.setUniform("u_color",  r, 0.2f, 0.2f, 1.0f);
-
-            ib.bind();
-            va.bind();
-
-            checkGLErrors(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
+            renderer.draw(va, ib, shader);
 
             if (r > 1.0f || r < 0.0f) {
                 increment = -increment;
