@@ -10,6 +10,9 @@ public:
     IndexBuffer(const unsigned int *data, unsigned int count);
     virtual ~IndexBuffer();
 
+    IndexBuffer(const IndexBuffer &other) = delete;
+    IndexBuffer &operator=(const IndexBuffer &other) = delete;
+
     void bind() const;
     void unbind() const;
 

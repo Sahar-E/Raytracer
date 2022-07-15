@@ -31,6 +31,7 @@
 #include "commonOpenGL.h"
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
+#include "VertexArray.h"
 
 
 static std::tuple<std::string, std::string> parseShader(const std::string &filepath) {
@@ -138,7 +139,18 @@ int main() {
                 2, 3, 0
         };
 
+
+        unsigned int vao;
+        checkGLErrors(glGenVertexArrays(1, &vao));
+        checkGLErrors(glBindVertexArray(vao));
+
+        VertexArray va;
         VertexBuffer vb(positions, sizeof(float) * 4 * 2);
+
+        VertexBufferLayout layout;
+        layout.push<float>(2);
+        va.addBuffer(vb, layout);
+
         checkGLErrors(glEnableVertexAttribArray(0));
         checkGLErrors(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), nullptr));
 
@@ -178,7 +190,7 @@ int main() {
             checkGLErrors(glUniform4f(location, r, 0.2f, 0.2f, 1.0f));
 
             ib.bind();
-
+            va.bind();
 
             checkGLErrors(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
 

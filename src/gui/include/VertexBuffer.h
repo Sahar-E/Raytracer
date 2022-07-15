@@ -10,6 +10,9 @@ public:
     VertexBuffer(const void *data, unsigned int size);
     virtual ~VertexBuffer();
 
+    VertexBuffer(const VertexBuffer &other) = delete;
+    VertexBuffer &operator=(const VertexBuffer &other) = delete;
+
     void bind() const;
     void unbind() const;
 
