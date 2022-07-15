@@ -32,69 +32,7 @@
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
 #include "VertexArray.h"
-
-
-static std::tuple<std::string, std::string> parseShader(const std::string &filepath) {
-    enum class ShaderType {
-        NONE = -1, VERTEX = 0,FRAGMENT = 1
-    };
-    std::ifstream stream(filepath);
-    std::string line;
-    std::stringstream stringstream[2];
-    ShaderType type = ShaderType::NONE;
-    while (std::getline(stream, line)) {
-        if (line.find("#shader") != std::string::npos) {
-            if (line.find("vertex") != std::string::npos) {
-                type = ShaderType::VERTEX;
-            } else if (line.find("fragment") != std::string::npos) {
-                type = ShaderType::FRAGMENT;
-            }
-        } else {
-            stringstream[static_cast<int>(type)] << line << '\n';
-        }
-    }
-    return {stringstream[static_cast<int>(ShaderType::VERTEX)].str(),
-            stringstream[static_cast<int>(ShaderType::FRAGMENT)].str()};
-}
-
-static unsigned int compileShader(unsigned int type, const std::string &source) {
-    checkGLErrors(unsigned int id = glCreateShader(type));
-    const char *src = source.c_str();
-    checkGLErrors(glShaderSource(id, 1, &src, nullptr));
-    checkGLErrors(glCompileShader(id));
-
-    int result;
-    checkGLErrors(glGetShaderiv(id, GL_COMPILE_STATUS, &result));
-    if (result == GL_FALSE) {
-        int length;
-        checkGLErrors(glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length));
-        auto log = std::make_unique<char[]>(length + 1);
-        checkGLErrors(glGetShaderInfoLog(id,length, &length, log.get()));
-        auto whatFailed = (type == GL_VERTEX_SHADER) ? "shader!\n" : "fragment!\n";
-        std::cerr << "Failed to compile" << whatFailed;
-        std::cerr << log << std::endl;
-        checkGLErrors(glDeleteShader(id));
-        return 0;
-    }
-
-    return id;
-}
-
-static unsigned int createShader(const std::string& vertexShader, const std::string& fragmentShader){
-    checkGLErrors(unsigned int program = glCreateProgram());
-    unsigned int vs =  compileShader(GL_VERTEX_SHADER, vertexShader);
-    unsigned int fs =  compileShader(GL_FRAGMENT_SHADER, fragmentShader);
-
-    checkGLErrors(glAttachShader(program, vs));
-    checkGLErrors(glAttachShader(program, fs));
-    checkGLErrors(glLinkProgram(program));
-    checkGLErrors(glValidateProgram(program));
-
-    checkGLErrors(glDeleteShader(vs));
-    checkGLErrors(glDeleteShader(fs));
-
-    return program;
-}
+#include "Shader.h"
 
 
 int main() {
@@ -139,11 +77,6 @@ int main() {
                 2, 3, 0
         };
 
-
-        unsigned int vao;
-        checkGLErrors(glGenVertexArrays(1, &vao));
-        checkGLErrors(glBindVertexArray(vao));
-
         VertexArray va;
         VertexBuffer vb(positions, sizeof(float) * 4 * 2);
 
@@ -151,18 +84,16 @@ int main() {
         layout.push<float>(2);
         va.addBuffer(vb, layout);
 
-        checkGLErrors(glEnableVertexAttribArray(0));
-        checkGLErrors(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), nullptr));
-
         IndexBuffer ib(indices, 6);
 
-        auto [vertexShader, fragmentShader] = parseShader("resources/shaders/Basic.shader");
-        unsigned int shader = createShader(vertexShader, fragmentShader);
-        checkGLErrors(glUseProgram(shader));
+        Shader shader("resources/shaders/Basic.shader");
+        shader.bind();
+        shader.setUniform("u_color", 0.2f, 0.2f, 0.9f, 1.0f);
 
-        checkGLErrors(int location = glGetUniformLocation(shader, "u_color"));
-        assert(location != -1);
-        checkGLErrors(glUniform4f(location, 0.2f, 0.2f, 0.9f, 1.0f));
+        va.unbind();
+        vb.unbind();
+        ib.unbind();
+        shader.unbind();
 
         ImGui::CreateContext();
         ImGui_ImplGlfw_InitForOpenGL(window, true);
@@ -187,7 +118,8 @@ int main() {
             ImGui_ImplGlfw_NewFrame();
             ImGui::NewFrame();
 
-            checkGLErrors(glUniform4f(location, r, 0.2f, 0.2f, 1.0f));
+            shader.bind();
+            shader.setUniform("u_color",  r, 0.2f, 0.2f, 1.0f);
 
             ib.bind();
             va.bind();
@@ -242,9 +174,6 @@ int main() {
         ImGui_ImplOpenGL3_Shutdown();
         ImGui_ImplGlfw_Shutdown();
         ImGui::DestroyContext();
-
-        glDeleteProgram(shader);
-
     }
 
 

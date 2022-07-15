@@ -17,5 +17,5 @@ add_library(${PROJECT_NAME} STATIC
         src/imgui_impl_glfw.cpp
         src/imgui_impl_opengl3.cpp
         src/imgui_tables.cpp
-        src/imgui_widgets.cpp src/commonOpenGl.cpp)
+        src/imgui_widgets.cpp)
 target_include_directories(${PROJECT_NAME} PUBLIC include)

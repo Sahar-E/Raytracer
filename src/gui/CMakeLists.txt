@@ -5,13 +5,14 @@ project(gui LANGUAGES CXX)
 # Library set up:
 add_library(${PROJECT_NAME} STATIC
         include/commonOpenGL.h
+        src/commonOpenGL.cpp
         src/Renderer.cpp
         include/Renderer.h
         src/VertexBuffer.cpp
         include/VertexBuffer.h
         src/IndexBuffer.cpp
         include/IndexBuffer.h
-        src/VertexArray.cpp include/VertexArray.h src/VertexBufferLayout.cpp include/VertexBufferLayout.h)
+        src/VertexArray.cpp include/VertexArray.h src/VertexBufferLayout.cpp include/VertexBufferLayout.h src/Shader.cpp include/Shader.h)
 target_include_directories(${PROJECT_NAME} PUBLIC include)
 
 

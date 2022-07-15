@@ -31,7 +31,7 @@ public:
 
     template<typename T>
     void push(unsigned int count) {
-//        static_assert(false);
+        std::cerr << "Warning: Use only specialized types for vertex\n";
     }
 
     template<>
