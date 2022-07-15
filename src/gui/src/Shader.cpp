@@ -30,11 +30,15 @@ void Shader::unbind() const {
     checkGLErrors(glUseProgram(0));
 }
 
-void Shader::setUniform(const std::string &name, float v0, float v1, float v2, float v3) {
+void Shader::setUniform4f(const std::string &name, float v0, float v1, float v2, float v3) {
     checkGLErrors(glUniform4f(getUniformLocation(name), v0, v1, v2, v3));
 }
 
-unsigned int Shader::getUniformLocation(const std::string &name) {
+void Shader::setUniform1i(const std::string &name, int value) {
+    checkGLErrors(glUniform1i(getUniformLocation(name), value));
+}
+
+int Shader::getUniformLocation(const std::string &name) {
     if (_uniformLocationCache.find(name) != _uniformLocationCache.end()) {
         return _uniformLocationCache[name];
     }

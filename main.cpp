@@ -34,6 +34,7 @@
 #include "VertexArray.h"
 #include "Shader.h"
 #include "GUIRenderer.h"
+#include "Texture.h"
 
 
 int main() {
@@ -67,21 +68,25 @@ int main() {
 
     std::cout <<  "OpenGL version: " << glGetString(GL_VERSION) << std::endl;
     {
-        float positions[8] = {
-                -0.5f, -0.5f,
-                0.5f, -0.5f,
-                0.5f, 0.5f,
-                -0.5f, 0.5f
+        float positions[] = {
+                -0.5f, -0.5f, 0.0f, 0.0f,
+                0.5f, -0.5f, 1.0f, 0.0f,
+                0.5f, 0.5f, 1.0f, 1.0f,
+                -0.5f, 0.5f, 0.0f, 1.0f
         };
         unsigned int indices[] = {
                 0, 1, 2,
                 2, 3, 0
         };
 
+        checkGLErrors(glEnable(GL_BLEND));
+        checkGLErrors(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+
         VertexArray va;
-        VertexBuffer vb(positions, sizeof(float) * 4 * 2);
+        VertexBuffer vb(positions, sizeof(float) * 4 * 4);
 
         VertexBufferLayout layout;
+        layout.push<float>(2);
         layout.push<float>(2);
         va.addBuffer(vb, layout);
 
@@ -89,7 +94,11 @@ int main() {
 
         Shader shader("resources/shaders/Basic.shader");
         shader.bind();
-        shader.setUniform("u_color", 0.2f, 0.2f, 0.9f, 1.0f);
+        shader.setUniform4f("u_color", 0.2f, 0.2f, 0.9f, 1.0f);
+
+        Texture texture("resources/textures/img.png");
+        texture.bind();
+        shader.setUniform1i("u_texture", 0);
 
         va.unbind();
         vb.unbind();
@@ -121,7 +130,7 @@ int main() {
             /* Render here */
             renderer.clear();
             shader.bind();
-            shader.setUniform("u_color",  r, 0.2f, 0.2f, 1.0f);
+            shader.setUniform4f("u_color", r, 0.2f, 0.2f, 1.0f);
             renderer.draw(va, ib, shader);
 
             if (r > 1.0f || r < 0.0f) {
