@@ -19,14 +19,13 @@
 
 
 #include <iostream>
-#include <fstream>
 #include <imgui-docking/include/imgui.h>
 #include <imgui-docking/include/imgui_impl_glfw.h>
 #include <imgui-docking/include/imgui_impl_opengl3.h>
 #include "glew-2.1.0/include/GL/glew.h"
 #include "glfw-3.3.7/include/GLFW/glfw3.h"
-#include <string>
-#include <sstream>
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
 #include <regex>
 #include "commonOpenGL.h"
 #include "VertexBuffer.h"
@@ -50,7 +49,7 @@ int main() {
 
 
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(800, 600, "Hello Pitzi", nullptr, nullptr);
+    window = glfwCreateWindow(1200, 800, "RayTracer", nullptr, nullptr);
     if (!window) {
         glfwTerminate();
         return -1;
@@ -92,9 +91,12 @@ int main() {
 
         IndexBuffer ib(indices, 6);
 
+        glm::mat4 proj = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f);
+        glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(-0,0,0));
+
         Shader shader("resources/shaders/Basic.shader");
         shader.bind();
-        shader.setUniform4f("u_color", 0.2f, 0.2f, 0.9f, 1.0f);
+//        shader.setUniform4f("u_color", 0.2f, 0.2f, 0.9f, 1.0f);
 
         Texture texture("resources/textures/img.png");
         texture.bind();
@@ -117,6 +119,7 @@ int main() {
 
         GUIRenderer renderer;
 
+        glm::vec3 translation = glm::vec3(0, 0, 0);
         float r = 0.0f;
         float increment = 0.05f;
 
@@ -129,8 +132,14 @@ int main() {
 
             /* Render here */
             renderer.clear();
+
+            glm::mat4 model = glm::translate(glm::mat4(1.0f), translation);
+            glm::mat4 mvp = proj * view * model;
+
             shader.bind();
-            shader.setUniform4f("u_color", r, 0.2f, 0.2f, 1.0f);
+//            shader.setUniform4f("u_color", r, 0.2f, 0.2f, 1.0f);
+            shader.setUniformMat4f("u_mvpMatrix", mvp);
+            
             renderer.draw(va, ib, shader);
 
             if (r > 1.0f || r < 0.0f) {
@@ -143,24 +152,25 @@ int main() {
                 static float f = 0.0f;
                 static int counter = 0;
 
-                ImGui::Begin(
-                        "Hello, world!");                          // Create a window called "Hello, world!" and append into it.
+                ImGui::Begin("SmallWindow!");                          // Create a window called "Hello, world!" and append into it.
 
-                ImGui::Text(
-                        "This is some useful text.");               // Display some text (you can use a format strings too)
-                ImGui::Checkbox("Demo Window",
-                                &show_demo_window);      // Edit bools storing our window open/close state
-                ImGui::Checkbox("Another Window", &show_another_window);
+//                ImGui::Text(
+//                        "This is some useful text.");               // Display some text (you can use a format strings too)
+//                ImGui::Checkbox("Demo Window",
+//                                &show_demo_window);      // Edit bools storing our window open/close state
+//                ImGui::Checkbox("Another Window", &show_another_window);
 
-                ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-                ImGui::ColorEdit3("clear color", (float *) &clear_color); // Edit 3 floats representing a color
+//                ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+                ImGui::SliderFloat3("Translation (x,y,z)", &translation.x, -2.0f, 2.0f);
+//                ImGui::ColorEdit3("clear color", (float *) &clear_color); // Edit 3 floats representing a color
 
-                if (ImGui::Button(
-                        "Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-                    counter++;
-                ImGui::SameLine();
-                ImGui::Text("counter = %d", counter);
-
+//                if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
+//                {
+//                    counter++;
+//                }
+//                ImGui::SameLine();
+//                ImGui::Text("counter = %d", counter);
+//
                 ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate,
                             ImGui::GetIO().Framerate);
                 ImGui::End();

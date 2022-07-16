@@ -65,3 +65,6 @@ target_link_libraries(${PROJECT_NAME} glew_s)
 
 add_subdirectory(src/dependencies/imgui-docking)
 target_link_libraries(${PROJECT_NAME} imgui)
+
+add_subdirectory(src/dependencies/glm-0.9.9.8)
+target_link_libraries(${PROJECT_NAME} glm)

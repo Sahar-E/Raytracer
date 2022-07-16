@@ -28,3 +28,6 @@ target_link_libraries(${PROJECT_NAME} glew_s)
 
 target_include_directories(${PROJECT_NAME} PUBLIC ../dependencies/imgui-docking)
 target_link_libraries(${PROJECT_NAME} imgui)
+
+target_include_directories(${PROJECT_NAME} PUBLIC ../dependencies/glm-0.9.9.8)
+target_link_libraries(${PROJECT_NAME} glm)

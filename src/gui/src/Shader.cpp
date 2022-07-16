@@ -34,6 +34,10 @@ void Shader::setUniform4f(const std::string &name, float v0, float v1, float v2,
     checkGLErrors(glUniform4f(getUniformLocation(name), v0, v1, v2, v3));
 }
 
+void Shader::setUniformMat4f(const std::string &name, const glm::mat4 &matrix) {
+    checkGLErrors(glUniformMatrix4fv(getUniformLocation(name), 1, GL_FALSE, &matrix[0][0]));
+}
+
 void Shader::setUniform1i(const std::string &name, int value) {
     checkGLErrors(glUniform1i(getUniformLocation(name), value));
 }
