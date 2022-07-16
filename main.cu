@@ -1,13 +1,13 @@
 // TODO-Sahar: Testing OpenGL...
-//#include <vector>
-//#include <World.cuh>
-//#include <Camera.cuh>
-//#include <Renderer.cuh>
-//#include "utils.cuh"
-//#include "TimeThis.h"
-//#include "commonDefines.h"
-//#include <string>
-//#include <cassert>
+#include <vector>
+#include <World.cuh>
+#include <Camera.cuh>
+#include <Renderer.cuh>
+#include "utils.cuh"
+#include "TimeThis.h"
+#include "commonDefines.h"
+#include <string>
+#include <cassert>
 //#include "cuda_runtime_api.h"
 //#include "commonCuda.cuh"
 //
@@ -39,6 +39,41 @@
 
 
 int main() {
+
+
+    TimeThis timeThis;
+    const auto aspectRatio = 3.0f / 2.0f;
+    const int image_width = 1200;
+    const int image_height = static_cast<int>(image_width / aspectRatio);
+    const int rayBounces = 7;
+    float vFov = 26.0f;
+    float aperture = 0.005f;
+    int nFrames = 1;
+
+    assert(0 < rayBounces && rayBounces <= MAX_BOUNCES);
+
+    Vec3 vUp = {0, 1, 0};
+    Vec3 lookFrom = {0, 0.5, 2.5};
+    Vec3 lookAt = {0., 0.2, 0};
+    float focusDist = (lookFrom - lookAt).length();
+
+
+
+    auto world = World::initWorld1();
+    std::cout << "Size: " << world.getTotalSizeInMemoryForObjects() << "\n";
+    std::cout << "nSpheres: " << world.getNSpheres()  << "\n";
+    assert(world.getTotalSizeInMemoryForObjects() < 48 * pow(2, 10) && "There is a hard limit for NVIDIA's shared memory size of 48KB for one block.");
+    auto camera = Camera(lookFrom, lookAt, vUp, aspectRatio, vFov, aperture, focusDist);
+    Renderer renderer(image_width, image_height, world, camera, rayBounces);
+
+//    for (int j = 0; j < nFrames; ++j) {
+//        renderer.render();
+//        std::cout << "Done iteration #: " << j  << "\n";
+//    }
+    
+    
+    
+    
 //    std::cout << "Hello" << std::endl;
     GLFWwindow *window;
 
@@ -125,7 +160,7 @@ int main() {
         bool show_another_window = false;
         ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
-        GUIRenderer renderer;
+        GUIRenderer guiRenderer;
 
         glm::vec3 translation = glm::vec3(0, 0, 0);
         float r = 0.0f;
@@ -139,7 +174,7 @@ int main() {
             ImGui::NewFrame();
 
             /* Render here */
-            renderer.clear();
+            guiRenderer.clear();
 
             glm::mat4 model = glm::translate(glm::mat4(1.0f), translation);
             glm::mat4 mvp = proj * view * model;
@@ -147,8 +182,8 @@ int main() {
             shader.bind();
 //            shader.setUniform4f("u_color", r, 0.2f, 0.2f, 1.0f);
             shader.setUniformMat4f("u_mvpMatrix", mvp);
-            
-            renderer.draw(va, ib, shader);
+
+            guiRenderer.draw(va, ib, shader);
 
             if (r > 1.0f || r < 0.0f) {
                 increment = -increment;
@@ -247,7 +282,7 @@ int main() {
 //        rgb[i] = {pixel.x(), pixel.y(), pixel.z()};
 //    }
 //    saveImgAsJpg(filename, rgb, image_width, image_height, channelCount);
-
+//
 //    std::cout << "Done." << "\n";
 //    return 0;
 //}

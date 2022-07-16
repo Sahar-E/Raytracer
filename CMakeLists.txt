@@ -14,7 +14,7 @@ set(CUDA_ENABLE 1)
 #find_package(OpenMP REQUIRED)
 
 
-add_executable(${PROJECT_NAME} main.cpp temp.cpp)
+add_executable(${PROJECT_NAME} main.cu temp.cpp)
 
 # CUDA:
 set(CMAKE_CUDA_STANDARD 14)
