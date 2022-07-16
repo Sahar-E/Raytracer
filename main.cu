@@ -182,6 +182,9 @@ int main() {
         GUIRenderer guiRenderer;
 
         glm::vec3 translation = glm::vec3(0, 0, 0);
+
+        glm::vec3 cameraLookFrom = glm::vec3(lookFrom.x(), lookFrom.y(), lookFrom.z());
+        glm::vec3 cameraLookAt = glm::vec3(lookAt.x(), lookAt.y(), lookAt.z());
         float r = 0.0f;
         float increment = 0.05f;
 
@@ -231,6 +234,17 @@ int main() {
 
 //                ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
                 ImGui::SliderFloat3("Translation (x,y,z)", &translation.x, -2.0f, 2.0f);
+                ImGui::SliderFloat3("Camera LookFrom (x,y,z)", &cameraLookFrom.x, -15.0f, 15.0f);
+                ImGui::SliderFloat3("Camera LookAt (x,y,z)", &cameraLookAt.x, -15.0f, 15.0f);
+                Vec3 sliderLookFrom = {cameraLookFrom.x, cameraLookFrom.y, cameraLookFrom.z};
+                Vec3 sliderLookAt = {cameraLookAt.x, cameraLookAt.y, cameraLookAt.z};
+                if (!isZeroVec((sliderLookFrom - lookFrom)) || !isZeroVec((sliderLookAt - lookAt))) {
+                    lookFrom = sliderLookFrom;
+                    lookAt = sliderLookAt;
+                    renderer.clearPixels();
+                    renderer.setCamera(Camera(lookFrom, lookAt, vUp, aspectRatio, vFov, aperture, focusDist));
+                }
+
 //                ImGui::ColorEdit3("clear color", (float *) &clear_color); // Edit 3 floats representing a color
 
 //                if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)

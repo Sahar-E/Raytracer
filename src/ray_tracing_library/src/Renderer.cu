@@ -196,6 +196,18 @@ const Color * Renderer::getPixelsOut() const {
     return _pixelsOut;
 }
 
+void Renderer::setCamera(const Camera &camera) {
+    _camera = camera;
+}
+
+void Renderer::clearPixels() {
+    int nPixels = _imgW * _imgH;
+    for (int i = 0; i < nPixels; ++i) {
+        _pixelsOut[i] = {0, 0, 0};
+    }
+    _alreadyNPixelsGot = 0;
+}
+
 //std::shared_ptr<unsigned char[]> Renderer::getPixelsOutAsChars() const {
 //
 //    std::shared_ptr<unsigned char[]> ptr = std::shared_ptr<unsigned char[]>();

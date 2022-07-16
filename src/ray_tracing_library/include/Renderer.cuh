@@ -26,6 +26,9 @@ public:
     const Color * getPixelsOut() const;
     int getNPixelsOut() const { return _imgH * _imgW; }
 
+    void setCamera(const Camera &camera);
+    void clearPixels();
+
 private:
     int _imgW;
     int _imgH;
