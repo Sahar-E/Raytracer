@@ -12,7 +12,7 @@ add_library(${PROJECT_NAME} STATIC
         include/VertexBuffer.h
         src/IndexBuffer.cpp
         include/IndexBuffer.h
-        src/VertexArray.cpp include/VertexArray.h src/VertexBufferLayout.cpp include/VertexBufferLayout.h src/Shader.cpp include/Shader.h src/Texture.cpp include/Texture.h)
+        src/VertexArray.cpp include/VertexArray.h src/VertexBufferLayout.cpp include/VertexBufferLayout.h src/Shader.cpp include/Shader.h src/Texture.cpp include/Texture.h src/LiveTexture.cpp include/LiveTexture.h)
 target_include_directories(${PROJECT_NAME} PUBLIC include)
 
 

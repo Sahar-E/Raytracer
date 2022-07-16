@@ -34,6 +34,8 @@
 #include "Shader.h"
 #include "GUIRenderer.h"
 #include "Texture.h"
+#include "stb_library/include/stb_library/stb_image.h"
+#include "LiveTexture.h"
 
 
 int main() {
@@ -98,7 +100,13 @@ int main() {
         shader.bind();
 //        shader.setUniform4f("u_color", 0.2f, 0.2f, 0.9f, 1.0f);
 
-        Texture texture("resources/textures/img.png");
+
+        stbi_set_flip_vertically_on_load(true);
+        int w, h, channelsInFile;
+        auto p = std::shared_ptr<unsigned char>(stbi_load("resources/textures/img.png", &w, &h, &channelsInFile, 4));
+        LiveTexture texture(p, w, h);
+
+//        Texture texture("resources/textures/img.png");
         texture.bind();
         shader.setUniform1i("u_texture", 0);
 

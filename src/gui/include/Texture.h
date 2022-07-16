@@ -5,11 +5,13 @@
 #pragma once
 
 #include <string>
+#include <memory>
 
 class Texture {
 public:
     explicit Texture(const std::string &filepath);
-    ~Texture();
+    virtual ~Texture();
+
     Texture(const Texture &other) = delete;
     Texture &operator=(const Texture &other) = delete;
 
@@ -24,10 +26,13 @@ public:
         return _height;
     }
 
+protected:
+    Texture(std::string filepath, std::shared_ptr<unsigned char> buffer, int width, int height, int bpp);
 
-private:
+protected:
     unsigned int _rendererId;
-    std::string _filepath;
-    unsigned char *_localBuffer;
-    int _width, _height, _bpp;
+    std::string _filepath;  // For debug purposes.
+    std::shared_ptr<unsigned char> _buffer;
+    int _width, _height, _channelsInFile;
 };
+
