@@ -8,12 +8,8 @@
 
 
 
-LiveTexture::LiveTexture(std::shared_ptr<unsigned char> buffer, int width, int height)
-        : Texture("filepath-NA",
-                  std::move(buffer),
-                  width,
-                  height,
-                  -1) {
+LiveTexture::LiveTexture(std::shared_ptr<unsigned char[]> buffer, int width, int height, GLenum type)
+        : Texture(buffer, width, height, type){
     checkGLErrors(glGenTextures(1, &_rendererId));
     checkGLErrors(glBindTexture(GL_TEXTURE_2D, _rendererId));
 
@@ -23,13 +19,13 @@ LiveTexture::LiveTexture(std::shared_ptr<unsigned char> buffer, int width, int h
     checkGLErrors(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
 
     checkGLErrors(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, _width, _height, 0,
-                               GL_RGBA, GL_UNSIGNED_BYTE, _buffer.get()));
+                               _type, GL_UNSIGNED_BYTE, _buffer.get()));
     checkGLErrors(glBindTexture(GL_TEXTURE_2D, 0));
 }
 
 void LiveTexture::updateTexture() {
 //    checkGLErrors(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, _width, _height, 0, GL_RGBA, GL_UNSIGNED_BYTE, _buffer.get()));
-    checkGLErrors(glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, _width, _height, GL_RGBA, GL_UNSIGNED_BYTE, _buffer.get()));
+    checkGLErrors(glBindTexture(GL_TEXTURE_2D, _rendererId));
+    checkGLErrors(glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, _width, _height, _type, GL_UNSIGNED_BYTE, _buffer.get()));
 
-    checkGLErrors(glBindTexture(GL_TEXTURE_2D, 0));
 }

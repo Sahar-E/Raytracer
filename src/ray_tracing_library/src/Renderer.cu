@@ -4,7 +4,7 @@
 
 #include <vector>
 #include "Renderer.cuh"
-#include "utils.cuh"
+#include "utils.h"
 #include "TimeThis.h"
 #include "commonCuda.cuh"
 #include "commonDefines.h"
@@ -195,3 +195,10 @@ Renderer::~Renderer() {
 const Color * Renderer::getPixelsOut() const {
     return _pixelsOut;
 }
+
+//std::shared_ptr<unsigned char[]> Renderer::getPixelsOutAsChars() const {
+//
+//    std::shared_ptr<unsigned char[]> ptr = std::shared_ptr<unsigned char[]>();
+//    copyRGBToCharArray(ptr.get(), _pixelsOut);
+//    return ptr;
+//}

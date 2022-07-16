@@ -5,8 +5,6 @@
 #pragma once
 
 #include <vector>
-#include "Vec3.cuh"
-#include "cuda_runtime_api.h"
 #include <string>
 
 /**
@@ -20,6 +18,6 @@
  */
 void saveImgAsJpg(const std::string &filename,
                   const std::vector<std::tuple<float, float, float>> &data,
-                  int width,
-                  int height,
-                  int channelCount);
+                  const int width, const int height);
+
+bool copyRGBToCharArray(unsigned char *dest, const std::vector<std::tuple<float, float, float>> &src, int n);

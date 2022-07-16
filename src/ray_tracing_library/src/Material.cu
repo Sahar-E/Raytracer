@@ -5,7 +5,7 @@
 #include "cuda_runtime_api.h"
 #include "Material.cuh"
 #include "Vec3.cuh"
-#include "utils.cuh"
+#include "utils.h"
 
 __device__ void Material::getColorAndSecondaryRay(const HitResult &hitRes, curandState *randState,
                                   Color &resEmittedColor, Color &resColor, Ray &resSecondaryRay) const {

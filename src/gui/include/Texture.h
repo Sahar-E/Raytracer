@@ -6,6 +6,7 @@
 
 #include <string>
 #include <memory>
+#include "glew-2.1.0/include/GL/glew.h"
 
 class Texture {
 public:
@@ -27,12 +28,13 @@ public:
     }
 
 protected:
-    Texture(std::string filepath, std::shared_ptr<unsigned char> buffer, int width, int height, int bpp);
+    Texture(std::shared_ptr<unsigned char[]> buffer, int width, int height, GLenum type);
 
 protected:
     unsigned int _rendererId;
     std::string _filepath;  // For debug purposes.
-    std::shared_ptr<unsigned char> _buffer;
+    std::shared_ptr<unsigned char[]> _buffer;
     int _width, _height, _channelsInFile;
+    GLenum _type;
 };
 

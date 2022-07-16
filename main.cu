@@ -3,7 +3,7 @@
 #include <World.cuh>
 #include <Camera.cuh>
 #include <Renderer.cuh>
-#include "utils.cuh"
+#include "utils.h"
 #include "TimeThis.h"
 #include "commonDefines.h"
 #include <string>
@@ -38,12 +38,23 @@
 #include "LiveTexture.h"
 
 
+void copyRGBToCharArray(std::shared_ptr<unsigned char[]> &pixelsOutAsChars, const Color *pixelsOut, int nPixels) {
+    int channelCount = 3;
+    for (int i = 0; i < nPixels; ++i) {
+        Color pixel = pixelsOut[i];
+        pixel = clamp(gammaCorrection(pixel), 0.0, 0.999);
+        pixelsOutAsChars[i * channelCount] =     static_cast<unsigned char>(pixel.x() * 255);
+        pixelsOutAsChars[i * channelCount + 1] = static_cast<unsigned char>(pixel.y() * 255);
+        pixelsOutAsChars[i * channelCount + 2] = static_cast<unsigned char>(pixel.z() * 255);
+    }
+}
+
 int main() {
 
 
     TimeThis timeThis;
     const auto aspectRatio = 3.0f / 2.0f;
-    const int image_width = 1200;
+    const int image_width = 800;
     const int image_height = static_cast<int>(image_width / aspectRatio);
     const int rayBounces = 7;
     float vFov = 26.0f;
@@ -70,10 +81,10 @@ int main() {
 //        renderer.render();
 //        std::cout << "Done iteration #: " << j  << "\n";
 //    }
-    
-    
-    
-    
+
+
+
+
 //    std::cout << "Hello" << std::endl;
     GLFWwindow *window;
 
@@ -86,7 +97,7 @@ int main() {
 
 
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(1200, 800, "RayTracer", nullptr, nullptr);
+    window = glfwCreateWindow(1920 , static_cast<int>(1920.0f / aspectRatio), "RayTracer", nullptr, nullptr);
     if (!window) {
         glfwTerminate();
         return -1;
@@ -105,10 +116,10 @@ int main() {
     std::cout <<  "OpenGL version: " << glGetString(GL_VERSION) << std::endl;
     {
         float positions[] = {
-                -0.5f, -0.5f, 0.0f, 0.0f,
-                0.5f, -0.5f, 1.0f, 0.0f,
-                0.5f, 0.5f, 1.0f, 1.0f,
-                -0.5f, 0.5f, 0.0f, 1.0f
+                -0.9999f, -0.9999f, 0.0f, 0.0f,
+                0.9999f, -0.9999f, 1.0f, 0.0f,
+                0.9999f, 0.9999f, 1.0f, 1.0f,
+                -0.9999f, 0.9999f, 0.0f, 1.0f
         };
         unsigned int indices[] = {
                 0, 1, 2,
@@ -138,8 +149,16 @@ int main() {
 
         stbi_set_flip_vertically_on_load(true);
         int w, h, channelsInFile;
-        auto p = std::shared_ptr<unsigned char>(stbi_load("resources/textures/img.png", &w, &h, &channelsInFile, 4));
-        LiveTexture texture(p, w, h);
+        auto p = std::shared_ptr<unsigned char[]>(stbi_load("resources/textures/img.png", &w, &h, &channelsInFile, 4));
+
+        int nPixels = renderer.getNPixelsOut();
+        auto rgbAsChars = std::shared_ptr<unsigned char[]>(new unsigned char[nPixels * 3]);
+
+        renderer.render();
+        copyRGBToCharArray(rgbAsChars, renderer.getPixelsOut(), nPixels);
+        LiveTexture texture(rgbAsChars, image_width, image_height, GL_RGB);
+
+//        LiveTexture texture(p, w, h, GL_RGBA);
 
 //        Texture texture("resources/textures/img.png");
         texture.bind();
@@ -176,7 +195,14 @@ int main() {
             /* Render here */
             guiRenderer.clear();
 
+//            texture.bind();
+            renderer.render();
+            copyRGBToCharArray(rgbAsChars, renderer.getPixelsOut(), nPixels);
+            texture.updateTexture();
+//            LiveTexture texture(rgbAsChars, image_width, image_height);
+
             glm::mat4 model = glm::translate(glm::mat4(1.0f), translation);
+            model = glm::scale(model, glm::vec3(1.0f, -1.0f, 1.0f));
             glm::mat4 mvp = proj * view * model;
 
             shader.bind();
