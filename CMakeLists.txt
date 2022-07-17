@@ -54,6 +54,9 @@ target_link_libraries(${PROJECT_NAME} ray_tracing_library)
 add_subdirectory(src/gui)
 target_link_libraries(${PROJECT_NAME} gui)
 
+add_subdirectory(src/application)
+target_link_libraries(${PROJECT_NAME} application)
+
 
 
 find_package(OpenGL REQUIRED)

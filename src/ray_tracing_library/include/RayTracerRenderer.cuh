@@ -6,28 +6,31 @@
 
 #include "cuda_runtime_api.h"
 #include <vector>
+#include <memory>
 #include "World.cuh"
 #include "Camera.cuh"
 
-class Renderer {
+class RayTracerRenderer {
 
 public:
 
-    Renderer(int imageWidth, int imageHeight, const World &world, const Camera &camera, int rayBounces);
+    RayTracerRenderer(int imageWidth, int imageHeight, const World &world, const Camera &camera, int rayBounces);
 
-    Renderer() = delete;
-    Renderer(const Renderer &other) = delete;
-    Renderer &operator=(const Renderer &other) = delete;
+    RayTracerRenderer() = delete;
+    RayTracerRenderer(const RayTracerRenderer &other) = delete;
+    RayTracerRenderer &operator=(const RayTracerRenderer &other) = delete;
 
-    virtual ~Renderer();
+    virtual ~RayTracerRenderer();
 
     void render();
 
     const Color * getPixelsOut() const;
+    std::shared_ptr<unsigned char[]> getPixelsOutAsChars();
     int getNPixelsOut() const { return _imgH * _imgW; }
 
     void setCamera(const Camera &camera);
     void clearPixels();
+    void syncPixelsOut();
 
 private:
     int _imgW;
@@ -39,6 +42,9 @@ private:
     float _alreadyNPixelsGot{};
     curandState *_randStates;
     Color *_pixelsOut{};
+    Color *_pixelsAverage{};
+    std::shared_ptr<unsigned char[]> _pixelsOutAsChars{};
+    std::shared_ptr<Color []> _pixelsOutAsColors{};
     Ray *_rays{};
 
     static World **allocateWorldInDeviceMemory(const Sphere *ptrSpheres, size_t nSpheres);
@@ -46,6 +52,7 @@ private:
     void initRandStates();
 
     void initPixelAllocations();
+
 };
 
 

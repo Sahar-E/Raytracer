@@ -3,13 +3,15 @@
 //
 
 #include "LiveTexture.h"
+
+#include <utility>
 #include "commonOpenGL.h"
 #include "glew-2.1.0/include/GL/glew.h"
-
+#include "../../ray_tracing_library/include/TimeThis.h"
 
 
 LiveTexture::LiveTexture(std::shared_ptr<unsigned char[]> buffer, int width, int height, GLenum type)
-        : Texture(buffer, width, height, type){
+        : Texture(std::move(buffer), width, height, type){
     checkGLErrors(glGenTextures(1, &_rendererId));
     checkGLErrors(glBindTexture(GL_TEXTURE_2D, _rendererId));
 
@@ -24,6 +26,7 @@ LiveTexture::LiveTexture(std::shared_ptr<unsigned char[]> buffer, int width, int
 }
 
 void LiveTexture::updateTexture() {
+    TimeThis t("updateTexture");
 //    checkGLErrors(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, _width, _height, 0, GL_RGBA, GL_UNSIGNED_BYTE, _buffer.get()));
     checkGLErrors(glBindTexture(GL_TEXTURE_2D, _rendererId));
     checkGLErrors(glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, _width, _height, _type, GL_UNSIGNED_BYTE, _buffer.get()));

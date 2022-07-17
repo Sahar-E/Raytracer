@@ -13,7 +13,7 @@ add_library(${PROJECT_NAME} STATIC
         src/World.cu
         src/Camera.cu
         src/Renderer.cu
-        include/Renderer.cuh
+        include/RayTracerRenderer.cuh
         src/Sphere.cu
         src/Material.cu
         include/Material.cuh

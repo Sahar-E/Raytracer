@@ -24,7 +24,7 @@ public:
         if (_title.length() == 0) {
             std::cout << "Duration (ms): " << duration << "\n";
         } else {
-            std::cout << "Duration of " << _title << " is (ms): " << duration << "\n";
+            std::cout << "Duration of \"" << _title << "\" is (ms): " << duration << "\n";
         }
     }
 
