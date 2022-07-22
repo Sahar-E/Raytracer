@@ -3,8 +3,16 @@
 
 
 int main() {
-    Application app;
-    app.start();
+    float aspectRatio = 3.0f / 2.0f;
+    int image_width = 400;
+    int image_height = static_cast<int>(image_width / aspectRatio);
+    int rayBounces = 7;
+    float vFov = 26.0f;
+    float aperture = 0.005f;
+
+    Configurations configurations = {aspectRatio, image_width, image_height, rayBounces, vFov, aperture};
+    Application &app = Application::getInstance();
+    app.start(configurations);
     return 0;
 }
 

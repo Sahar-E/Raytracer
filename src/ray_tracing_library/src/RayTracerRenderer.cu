@@ -2,6 +2,7 @@
 // Created by Sahar on 10/06/2022.
 //
 
+#include <utility>
 #include <vector>
 #include "RayTracerRenderer.cuh"
 #include "utils.h"
@@ -109,13 +110,13 @@ void traceRay(Color *pixelsOut, Color *pixelsAverage, Camera c  , World const *c
 }
 
 void RayTracerRenderer::render() {
-    TimeThis t("render");
+//    TimeThis t("render");
     int nPixels = _imgH * _imgW;
 
     int blockSize = BLOCK_SIZE;
     int numBlocks = (nPixels + blockSize - 1) / blockSize;
     ++_alreadyNPixelsGot;
-    traceRay<<<numBlocks, blockSize, _sharedMemForSpheres>>>(_pixelsOut, _pixelsAverage, _camera, _d_world, _randStates, _imgW, _imgH,
+    traceRay<<<numBlocks, blockSize, _sharedMemForSpheres>>>(_pixelsOut, _pixelsAverage, *_camera, _d_world, _randStates, _imgW, _imgH,
                                                              _nRayBounces, _alreadyNPixelsGot);
     checkCudaErrors(cudaGetLastError());
     checkCudaErrors(cudaDeviceSynchronize());
@@ -153,7 +154,7 @@ World **RayTracerRenderer::allocateWorldInDeviceMemory(const Sphere *ptrSpheres,
 }
 
 
-RayTracerRenderer::RayTracerRenderer(const int imageWidth, const int imageHeight, const World &world, const Camera &camera,
+RayTracerRenderer::RayTracerRenderer(const int imageWidth, const int imageHeight, const World &world, std::shared_ptr<Camera> camera,
                                      int rayBounces) : _imgW(imageWidth), _imgH(imageHeight),
                                      _sharedMemForSpheres(world.getTotalSizeInMemoryForObjects()),
                                      _d_world(),
@@ -206,7 +207,7 @@ const Color * RayTracerRenderer::getPixelsOut() const {
 
 
 static void copyRGBToCharArray(std::shared_ptr<unsigned char[]> &pixelsOutAsChars, const Color *pixelsOut, int nPixels) {
-    TimeThis t("copyRGBToCharArray");
+//    TimeThis t("copyRGBToCharArray");
     int channelCount = 3;
     for (int i = 0; i < nPixels; ++i) {
         Color pixel = pixelsOut[i];
@@ -232,8 +233,8 @@ void RayTracerRenderer::syncPixelsOut() {
     copyRGBToCharArray(_pixelsOutAsChars, _pixelsOutAsColors.get(), _imgH * _imgW);
 }
 
-void RayTracerRenderer::setCamera(const Camera &camera) {
-    _camera = camera;
+void RayTracerRenderer::setCamera(std::shared_ptr<Camera> camera) {
+    _camera = std::move(camera);
 }
 
 void RayTracerRenderer::clearPixels() {

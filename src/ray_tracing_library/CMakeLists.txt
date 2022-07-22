@@ -12,7 +12,7 @@ add_library(${PROJECT_NAME} STATIC
         include/World.cuh
         src/World.cu
         src/Camera.cu
-        src/Renderer.cu
+        src/RayTracerRenderer.cu
         include/RayTracerRenderer.cuh
         src/Sphere.cu
         src/Material.cu
@@ -49,3 +49,6 @@ target_compile_options(${PROJECT_NAME} PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:
 target_include_directories(${PROJECT_NAME} PUBLIC include)
 target_include_directories(${PROJECT_NAME} PUBLIC ../dependencies/stb_library)
 target_link_libraries(${PROJECT_NAME} stb_library)
+
+target_include_directories(${PROJECT_NAME} PUBLIC ../dependencies/glm-0.9.9.8)
+target_link_libraries(${PROJECT_NAME} glm)

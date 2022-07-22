@@ -14,7 +14,7 @@ class RayTracerRenderer {
 
 public:
 
-    RayTracerRenderer(int imageWidth, int imageHeight, const World &world, const Camera &camera, int rayBounces);
+    RayTracerRenderer(int imageWidth, int imageHeight, const World &world, std::shared_ptr<Camera> camera, int rayBounces);
 
     RayTracerRenderer() = delete;
     RayTracerRenderer(const RayTracerRenderer &other) = delete;
@@ -28,7 +28,7 @@ public:
     std::shared_ptr<unsigned char[]> getPixelsOutAsChars();
     int getNPixelsOut() const { return _imgH * _imgW; }
 
-    void setCamera(const Camera &camera);
+    void setCamera(std::shared_ptr<Camera> camera);
     void clearPixels();
     void syncPixelsOut();
 
@@ -37,7 +37,7 @@ private:
     int _imgH;
     int _sharedMemForSpheres;
     World** _d_world;
-    Camera _camera;
+    std::shared_ptr<Camera> _camera;
     const int _nRayBounces;
     float _alreadyNPixelsGot{};
     curandState *_randStates;

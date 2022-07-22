@@ -22,25 +22,27 @@
 #include "../../ray_tracing_library/include/TimeThis.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
+#include <glm/gtx/quaternion.hpp>
 #include "commonDefines.h"
 #include "Vec3.cuh"
 #include "World.cuh"
 #include "Camera.cuh"
 #include "RayTracerRenderer.cuh"
-
-Application::Application() {}
-
-
-int Application::start() {
-    const auto aspectRatio = 3.0f / 2.0f;
-    const int image_width = 800;
-    const int image_height = static_cast<int>(image_width / aspectRatio);
-    const int rayBounces = 7;
-    float vFov = 26.0f;
-    float aperture = 0.005f;
+#include "InputHandler.h"
 
 
-    assert(0 < rayBounces && rayBounces <= MAX_BOUNCES);
+//void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+//{
+//    if (action == GLFW_PRESS || action == GLFW_REPEAT)
+//        Application::getInstance().handleKeyboardEvent(key);
+//}
+
+
+
+
+int Application::start(const Configurations &configurations) {
+    _config = configurations;
+    assert(0 < _config.rayBounces && _config.rayBounces <= MAX_BOUNCES);
 
     Vec3 vUp = {0, 1, 0};
     Vec3 lookFrom = {0, 0.5, 2.5};
@@ -48,20 +50,21 @@ int Application::start() {
     float focusDist = (lookFrom - lookAt).length();
 
 
-
     auto world = World::initWorld1();
     std::cout << "Size: " << world.getTotalSizeInMemoryForObjects() << "\n";
     std::cout << "nSpheres: " << world.getNSpheres()  << "\n";
     assert(world.getTotalSizeInMemoryForObjects() < 48 * pow(2, 10) && "There is a hard limit for NVIDIA's shared memory size of 48KB for one block.");
-    auto camera = Camera(lookFrom, lookAt, vUp, aspectRatio, vFov, aperture, focusDist);
-    RayTracerRenderer rayTracerRenderer(image_width, image_height, world, camera, rayBounces);
+    _camera = std::make_shared<Camera>(lookFrom, lookAt, vUp, _config.aspectRatio, _config.vFov, _config.aperture, focusDist);
+    _rayTracerRenderer = std::make_shared<RayTracerRenderer>(_config.image_width, _config.image_height, world, _camera, _config.rayBounces);
 
 
-    GLFWwindow *window;
+//    GLFWwindow *_window;
     const char *glsl_version;
-    if(getGLWindow(window, aspectRatio, glsl_version) == -1) {
+    if(getGLWindow(_window, _config.aspectRatio, glsl_version) == -1) {
         return -1;
     }
+    InputHandler inputHandler(_window);
+
     initGlBlendingConfigurations();
 
     {
@@ -93,7 +96,7 @@ int Application::start() {
 
         Shader shader("resources/shaders/Basic.shader");
         shader.bind();
-        LiveTexture texture(rayTracerRenderer.getPixelsOutAsChars(), image_width, image_height, GL_RGB);
+        LiveTexture texture(_rayTracerRenderer->getPixelsOutAsChars(), _config.image_width, _config.image_height, GL_RGB);
         texture.bind();
         shader.setUniform1i("u_texture", 0);
 
@@ -102,22 +105,24 @@ int Application::start() {
         ib.unbind();
         shader.unbind();
 
-        imguiInit(window, glsl_version);
+        imguiInit(_window, glsl_version);
         GUIRenderer guiRenderer;
 
         glm::vec3 cameraLookFrom = glm::vec3(lookFrom.x(), lookFrom.y(), lookFrom.z());
         glm::vec3 cameraLookAt = glm::vec3(lookAt.x(), lookAt.y(), lookAt.z());
 
+//        glfwSetKeyCallback(window, key_callback);
+
         /* Loop until the user closes the window */
-        while (!glfwWindowShouldClose(window)) {
+        while (!glfwWindowShouldClose(_window)) {
             startImguiFrame();
 
             /* Render here */
             guiRenderer.clear();
             {
-                TimeThis t("Update texture");
-                rayTracerRenderer.render();
-                rayTracerRenderer.syncPixelsOut();
+//                TimeThis t("Update texture");
+                _rayTracerRenderer->render();
+                _rayTracerRenderer->syncPixelsOut();
                 texture.updateTexture();
             }
 
@@ -132,18 +137,79 @@ int Application::start() {
             // 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
             {
                 ImGui::Begin("SmallWindow!");
-                ImGui::SliderFloat3("Camera LookFrom (x,y,z)", &cameraLookFrom.x, -15.0f, 15.0f);
-                ImGui::SliderFloat3("Camera LookAt (x,y,z)", &cameraLookAt.x, -15.0f, 15.0f);
+                ImGui::SliderFloat3("Camera LookFrom (x,y,z) - disabled", &cameraLookFrom.x, -15.0f, 15.0f);
+                ImGui::SliderFloat3("Camera LookAt (x,y,z) - disabled", &cameraLookAt.x, -15.0f, 15.0f);
                 Vec3 sliderLookFrom = {cameraLookFrom.x, cameraLookFrom.y, cameraLookFrom.z};
                 Vec3 sliderLookAt = {cameraLookAt.x, cameraLookAt.y, cameraLookAt.z};
-                if (!isZeroVec((sliderLookFrom - lookFrom)) || !isZeroVec((sliderLookAt - lookAt))) {
-                    lookFrom = sliderLookFrom;
-                    lookAt = sliderLookAt;
-                    rayTracerRenderer.clearPixels();
-                    rayTracerRenderer.setCamera(Camera(lookFrom, lookAt, vUp, aspectRatio, vFov, aperture, focusDist));
-                }
                 ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate,
                             ImGui::GetIO().Framerate);
+                bool cameraChanged = false;
+//                std::cout << inputHandler.getMouseX() << ", " << inputHandler.getMouseY() << "\n";
+                std::cout << ImGui::GetIO().MouseDelta.x << ", " << ImGui::GetIO().MouseDelta.y << "\n";
+                if (inputHandler.isMouseMove() && !ImGui::GetIO().WantCaptureMouse) {
+                    glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+                    float speedFactor = 0.08f;
+                    float dX = ImGui::GetIO().MouseDelta.x * speedFactor;
+                    float dY = ImGui::GetIO().MouseDelta.y * speedFactor;
+                    if (dX != 0.0f || dY != 0.0f) {
+                        _camera->rotateCamera(-dX, dY);
+                        cameraChanged = true;
+                    }
+                } else {
+                    int state = glfwGetInputMode(_window, GLFW_CURSOR);
+                    if (state == GLFW_CURSOR_DISABLED) {
+                        glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+                    }
+                }
+
+
+                if (ImGui::Button("left")) {
+                    _camera->rotateCamera(-1.f, 0.0f);
+                    cameraChanged = true;
+                }
+                if (ImGui::Button("right")) {
+                    _camera->rotateCamera(1.f, 0.0f);
+                    cameraChanged = true;
+                }
+                if (ImGui::Button("up")) {
+                    _camera->rotateCamera(0.0f, -1.f);
+                    cameraChanged = true;
+                }
+                if (ImGui::Button("down")) {
+                    _camera->rotateCamera(0.0f, 1.f);
+                    cameraChanged = true;
+                }
+
+                if (inputHandler.isKeyDown(GLFW_KEY_A)) {
+                    _camera->moveCameraRight(-.1f);
+                    cameraChanged = true;
+                }
+                if (inputHandler.isKeyDown(GLFW_KEY_D)) {
+                    _camera->moveCameraRight(.1f);
+                    cameraChanged = true;
+                }
+                if (inputHandler.isKeyDown(GLFW_KEY_W)) {
+                    _camera->moveCameraForward(.1f);
+                    cameraChanged = true;
+                }
+                if (inputHandler.isKeyDown(GLFW_KEY_S)) {
+                    _camera->moveCameraForward(-.1f);
+                    cameraChanged = true;
+                }
+                if (inputHandler.isKeyDown(GLFW_KEY_SPACE) && !inputHandler.isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
+                    _camera->moveCameraUp(.1f);
+                    cameraChanged = true;
+                }
+                if (inputHandler.isKeyDown(GLFW_KEY_SPACE) && inputHandler.isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
+                    _camera->moveCameraUp(-.1f);
+                    cameraChanged = true;
+                }
+
+
+                if (cameraChanged) {
+                    _rayTracerRenderer->clearPixels();
+                }
+
                 ImGui::End();
             }
 
@@ -153,7 +219,7 @@ int Application::start() {
 
 
             /* Swap front and back buffers */
-            glfwSwapBuffers(window);
+            glfwSwapBuffers(_window);
             /* Poll for and process events */
             glfwPollEvents();
         }
@@ -164,6 +230,13 @@ int Application::start() {
     glfwTerminate();
     return 0;
 }
+
+
+Application &Application::getInstance() {
+    static Application INSTANCE;
+    return INSTANCE;
+}
+
 
 void Application::initGlBlendingConfigurations() const {
     checkGLErrors(glEnable(GL_BLEND));
@@ -215,4 +288,16 @@ int Application::getGLWindow(GLFWwindow *&window, const float aspectRatio, const
 
     std::cout << "OpenGL version: " << glGetString(GL_VERSION) << std::endl;
     return 0;
+}
+
+const std::shared_ptr<Camera> &Application::getCamera() const {
+    return _camera;
+}
+
+const std::shared_ptr<RayTracerRenderer> &Application::getRayTracerRenderer() const {
+    return _rayTracerRenderer;
+}
+
+GLFWwindow *Application::getWindow() const {
+    return _window;
 }

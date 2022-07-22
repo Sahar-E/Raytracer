@@ -24,7 +24,7 @@ public:
      * @param aperture      Bigger aperture means smaller DOF ("More blurred background").
      * @param focusDist     The distance of the focus plane from the origin of the camera.
      */
-    Camera(Vec3 lookFrom, Vec3 lookAt, Vec3 vUp, float aspectRatio, float vFov, float aperture, float focusDist);
+    Camera(Point3 lookFrom, Point3 lookAt, Vec3 vUp, float aspectRatio, float vFov, float aperture, float focusDist);
 
     /**
      * Returns ray using the specified scalars.
@@ -38,18 +38,54 @@ public:
     __device__
     Ray getRay(float h_scalar, float v_scalar, curandState *randState) const;
 
+
+    /**
+     * Rotates the camera by the specified angles.
+     * @param hRot     Yaw rotation in degrees.
+     * @param vRot     Pitch rotation in degrees.
+     */
+    void rotateCamera(float hRot, float vRot);
+
+    /**
+     * Camera movement function for the WASD keys. Moves the camera along the xAxis and zAxis.
+     * @param forward   Amount to move the camera forward (negative will move back).
+     * @param right     Amount to move the camera right (negative will move left).
+     */
+    void moveCameraForward(float forward);
+
+    /**
+     * Camera movement function for the WASD keys. Moves the camera along the xAxis and zAxis.
+     * @param right     Amount to move the camera right (negative will move left).
+     */
+    void moveCameraRight(float right);
+
+    /**
+     * Camera movement function for the WASD keys. Moves the camera along the xAxis and zAxis.
+     * @param forward   Amount to move the camera forward (negative will move back).
+     * @param right     Amount to move the camera right (negative will move left).
+     */
+    void moveCameraUp(float up);
+
 private:
     Point3 _origin{};
     Point3 _lowerLeftCorner{};
     Vec3 _horizontalVec{};
     Vec3 _verticalVec{};
 
-    Vec3 zVec{};
-    Vec3 xVec{};
-    Vec3 yVec{};
+    Vec3 _zVec{};
+    Vec3 _xVec{};
+    Vec3 _yVec{};
 
     float _aspectRatio{};
     float _lensRadius{};
+    float _focusDistTimesViewportWidth;
+    float _focusDistTimesViewportHeight;
+    float _focusDist;
+    Vec3 _vUp;
+
+    void setCameraInDir(const Vec3 &zVec);
+
+    Vec3 getLowerLeftCorner();
 };
 
 

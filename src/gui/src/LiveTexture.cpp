@@ -26,7 +26,7 @@ LiveTexture::LiveTexture(std::shared_ptr<unsigned char[]> buffer, int width, int
 }
 
 void LiveTexture::updateTexture() {
-    TimeThis t("updateTexture");
+   // TimeThis t("updateTexture");
 //    checkGLErrors(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, _width, _height, 0, GL_RGBA, GL_UNSIGNED_BYTE, _buffer.get()));
     checkGLErrors(glBindTexture(GL_TEXTURE_2D, _rendererId));
     checkGLErrors(glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, _width, _height, _type, GL_UNSIGNED_BYTE, _buffer.get()));

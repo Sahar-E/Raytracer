@@ -6,7 +6,12 @@ project(application LANGUAGES CXX)
 add_library(${PROJECT_NAME} STATIC
         include/Application.cuh
         src/Application.cu
-        )
+        src/Window.cpp
+        include/Window.h
+        src/InputHandler.cpp
+        include/InputHandler.h
+        src/KeyInput.cpp
+        include/KeyInput.h src/MouseInput.cpp include/MouseInput.h)
 target_include_directories(${PROJECT_NAME} PUBLIC include)
 
 

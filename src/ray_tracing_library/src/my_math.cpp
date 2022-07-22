@@ -13,3 +13,7 @@ float randomFloat(int &randState) {
 float randomFloat(int &randState, float from, float to) {
     return randomFloat(randState) * (from - to) + from;
 }
+
+glm::vec3 applyRotOnVec(const glm::quat &q, const glm::vec3 &vec) {
+    return q * vec * inverse(q);
+}
