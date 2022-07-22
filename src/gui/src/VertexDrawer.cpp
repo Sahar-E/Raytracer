@@ -2,10 +2,10 @@
 // Created by Sahar on 14/07/2022.
 //
 
-#include "GUIRenderer.h"
+#include "VertexDrawer.h"
 #include "commonOpenGL.h"
 
-void GUIRenderer::draw(const VertexArray &va, const IndexBuffer &ib, const Shader &shader) const{
+void VertexDrawer::draw(const VertexArray &va, const IndexBuffer &ib, const Shader &shader) {
     shader.bind();
     ib.bind();
     va.bind();
@@ -14,6 +14,6 @@ void GUIRenderer::draw(const VertexArray &va, const IndexBuffer &ib, const Shade
 
 }
 
-void GUIRenderer::clear() const {
+void VertexDrawer::clear() {
     checkGLErrors(glClear(GL_COLOR_BUFFER_BIT));
 }

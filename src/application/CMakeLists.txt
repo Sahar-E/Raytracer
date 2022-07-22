@@ -11,7 +11,10 @@ add_library(${PROJECT_NAME} STATIC
         src/InputHandler.cpp
         include/InputHandler.h
         src/KeyInput.cpp
-        include/KeyInput.h src/MouseInput.cpp include/MouseInput.h)
+        include/KeyInput.h
+        src/MouseInput.cpp
+        include/MouseInput.h
+        src/Layer.cpp include/Layer.h src/LayerRGBStream.cpp include/LayerRGBStream.h src/LayerHUD.cpp include/LayerHUD.h src/ImGuiLayerUtils.cpp include/ImGuiLayerUtils.h)
 target_include_directories(${PROJECT_NAME} PUBLIC include)
 
 

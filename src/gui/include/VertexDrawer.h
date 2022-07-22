@@ -9,11 +9,11 @@
 #include "IndexBuffer.h"
 #include "Shader.h"
 
-class GUIRenderer {
+class VertexDrawer {
 public:
 
-    void clear() const;
-    void draw(const VertexArray &va, const IndexBuffer &ib, const Shader &shader) const;
+    static void clear() ;
+    static void draw(const VertexArray &va, const IndexBuffer &ib, const Shader &shader) ;
 
 
 

@@ -10,7 +10,9 @@ int main() {
     float vFov = 26.0f;
     float aperture = 0.005f;
 
-    Configurations configurations = {aspectRatio, image_width, image_height, rayBounces, vFov, aperture};
+    int windowWidth = 1920;
+
+    Configurations configurations = {aspectRatio, image_width, image_height, rayBounces, vFov, aperture, windowWidth};
     Application &app = Application::getInstance();
     app.start(configurations);
     return 0;

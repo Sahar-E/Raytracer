@@ -32,6 +32,10 @@ public:
     void clearPixels();
     void syncPixelsOut();
 
+    int getImgW() const;
+
+    int getImgH() const;
+
 private:
     int _imgW;
     int _imgH;

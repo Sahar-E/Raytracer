@@ -8,6 +8,8 @@
 #include "RayTracerRenderer.cuh"
 #include "glew-2.1.0/include/GL/glew.h"
 #include "GLFW/glfw3.h"
+#include "Window.h"
+#include "Layer.h"
 
 
 struct Configurations {
@@ -17,6 +19,7 @@ struct Configurations {
     int rayBounces;
     float vFov;
     float aperture;
+    int windowWidth;
 };
 
 class Application {
@@ -33,21 +36,10 @@ private:
     Application &operator=(const Application &instance) = default;
     Application() = default;
 
-    int getGLWindow(GLFWwindow *&window, const float aspectRatio, const char *&glsl_version) const;
-    void imguiCleanup() const;
-    void imguiInit(GLFWwindow *window, const char *glsl_version) const;
-    void startImguiFrame() const;
-    void initGlBlendingConfigurations() const;
-
-public:
-    [[nodiscard]] const std::shared_ptr<Camera> &getCamera() const;
-    [[nodiscard]] const std::shared_ptr<RayTracerRenderer> &getRayTracerRenderer() const;
-
-    [[nodiscard]] GLFWwindow *getWindow() const;
-
 private:
     Configurations _config{};
+    std::shared_ptr<Window> _window;
     std::shared_ptr<Camera> _camera;
     std::shared_ptr<RayTracerRenderer> _rayTracerRenderer;
-    GLFWwindow *_window;
+    std::vector<std::shared_ptr<Layer>> _layers;
 };

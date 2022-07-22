@@ -6,8 +6,8 @@ project(gui LANGUAGES CXX)
 add_library(${PROJECT_NAME} STATIC
         include/commonOpenGL.h
         src/commonOpenGL.cpp
-        src/GUIRenderer.cpp
-        include/GUIRenderer.h
+        src/VertexDrawer.cpp
+        include/VertexDrawer.h
         src/VertexBuffer.cpp
         include/VertexBuffer.h
         src/IndexBuffer.cpp

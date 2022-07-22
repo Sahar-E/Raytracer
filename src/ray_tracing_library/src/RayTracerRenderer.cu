@@ -244,3 +244,11 @@ void RayTracerRenderer::clearPixels() {
     }
     _alreadyNPixelsGot = 0;
 }
+
+int RayTracerRenderer::getImgW() const {
+    return _imgW;
+}
+
+int RayTracerRenderer::getImgH() const {
+    return _imgH;
+}
