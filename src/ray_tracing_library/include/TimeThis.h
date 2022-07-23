@@ -20,11 +20,11 @@ public:
 
     virtual ~TimeThis() {
         auto endTime = std::chrono::steady_clock::now();
-        long duration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - _startTime).count();
+        long duration = std::chrono::duration_cast<std::chrono::microseconds>(endTime - _startTime).count();
         if (_title.length() == 0) {
-            std::cout << "Duration (ms): " << duration << "\n";
+            std::cout << "Duration (micro-s): " << duration << "\n";
         } else {
-            std::cout << "Duration of \"" << _title << "\" is (ms): " << duration << "\n";
+            std::cout << "Duration of \"" << _title << "\" is (micro-s): " << duration << "\n";
         }
     }
 

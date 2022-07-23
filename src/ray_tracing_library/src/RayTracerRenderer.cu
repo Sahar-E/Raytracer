@@ -29,9 +29,9 @@ void freeWorld(World **deviceWorld) {
 }
 
 __global__
-void traceRay(Color *pixelsOut, Color *pixelsAverageAccum, Camera c  , World const *const *d_world, curandState *randStates,
-              const int imWidth, const int imHeight, const int nBounces, const float alreadyNPixelsGot) {
-    // TODO-Sahar: Still work in progress...
+void traceRay(Color *pixelsOut, Color *pixelsAverageAccum, Camera c, World const *const *d_world, curandState *randStates,
+         const int imWidth, const int imHeight, const int nBounces, const float alreadyNPixelsGot) {
+    // TODO-Sahar: Profile again with NSight.
     extern __shared__ Sphere spheresArr[];
     int tIdx = blockIdx.x * blockDim.x + threadIdx.x;
     int nPixels = imHeight * imWidth;
@@ -91,8 +91,9 @@ void traceRay(Color *pixelsOut, Color *pixelsAverageAccum, Camera c  , World con
             }
         }
         if (hitCount == nBounces) {
-            attenuationColors[hitCount-1] = {0.0f, 0.0f, 0.0f};
-            emittedColors[hitCount-1] = {0.0f, 0.0f, 0.0f};
+            attenuationColors[hitCount] = {0.0f, 0.0f, 0.0f};
+            emittedColors[hitCount] = {0.0f, 0.0f, 0.0f};
+            hitCount++;
         }
 
         // Unrolling back the results in the stacks.
@@ -104,7 +105,6 @@ void traceRay(Color *pixelsOut, Color *pixelsAverageAccum, Camera c  , World con
         pixelsOut[tIdx] = clamp(gammaCorrection(pixelsAverageAccum[tIdx]), 0.0f, 0.999f) * 255.0f;;
         randStates[tIdx] = localRandState;
     }
-
 }
 
 void RayTracerRenderer::render() {
@@ -217,12 +217,9 @@ void RayTracerRenderer::syncPixelsOutAsChars() {
 }
 
 void RayTracerRenderer::clearPixels() {
-//    const std::lock_guard<std::mutex> lock(RayTracerRenderer::lock_pixelsOut_cuda);
-
+    TimeThis t("clearPixels");
     int nPixels = _imgW * _imgH;
-    for (int i = 0; i < nPixels; ++i) {
-        _pixelsOut_cuda[i] = {0, 0, 0};
-    }
+    checkCudaErrors(cudaMemset(_pixelsOut_cuda, 0, nPixels * sizeof(Color)));
     _alreadyNPixelsGot = 0;
 }
 

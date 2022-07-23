@@ -4,5 +4,5 @@
 
 #pragma once
 
-#define MAX_BOUNCES 10
+#define MAX_BOUNCES 13
 #define BLOCK_SIZE 256

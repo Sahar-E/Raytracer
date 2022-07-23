@@ -30,8 +30,8 @@ public:
 
 private:
 
-//    InputHandler(const InputHandler & application ) = delete;   // TODO-Sahar: ?
-//    InputHandler &operator=(const InputHandler &instance) = delete;
+    InputHandler(const InputHandler & application ) = delete;   // TODO-Sahar: ?
+    InputHandler &operator=(const InputHandler &instance) = delete;
 
     static void cursorPositionCallback(GLFWwindow* window, double xpos, double ypos);
     static void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);

@@ -39,7 +39,7 @@ void LayerHUD::imGuiRayTracerSettings() {
 
 void LayerHUD::imGuiNRayBounces() const {
     static int nRayBounces = _layerRGB->getRayTracerRenderer()->getNRayBounces();
-    ImGui::SliderInt("# Ray Bounces", &nRayBounces, 1, 11);
+    ImGui::SliderInt("# Ray Bounces", &nRayBounces, 1, 12);
     if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled))
     {
         ImGui::SetTooltip("Number of RayTracer's Bounces for each ray cast into the scene..");
