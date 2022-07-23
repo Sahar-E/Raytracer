@@ -1764,7 +1764,6 @@ static void ShowDemoWindowWidgets()
         ImGui::Separator();
 
         // Animate a simple progress bar
-        IMGUI_DEMO_MARKER("Widgets/Plotting/ProgressBar");
         static float progress = 0.0f, progress_dir = 1.0f;
         if (animate)
         {

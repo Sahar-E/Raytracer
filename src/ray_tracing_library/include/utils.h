@@ -20,4 +20,7 @@ void saveImgAsJpg(const std::string &filename,
                   const std::vector<std::tuple<float, float, float>> &data,
                   const int width, const int height);
 
+void saveImgAsJpg(const std::string &filename, const std::shared_ptr<unsigned char[]>& data, const int width,
+                  const int height);
+
 bool copyRGBToCharArray(unsigned char *dest, const std::vector<std::tuple<float, float, float>> &src, int n);

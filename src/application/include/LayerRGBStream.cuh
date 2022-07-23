@@ -7,7 +7,7 @@
 
 #include "glew-2.1.0/include/GL/glew.h"
 #include "GLFW/glfw3.h"
-#include "Layer.h"
+#include "Layer.cuh"
 #include <memory>
 
 #include "VertexArray.h"
@@ -16,22 +16,31 @@
 #include "LiveTexture.h"
 #include "InputHandler.h"
 #include "VertexDrawer.h"
+#include "RayTracerRenderer.cuh"
+#include "Application.cuh"
 
+
+static const float CAMERA_TRANSLATION_SIZE = .1f;
+static const float CAMERA_ROT_SPEED = 0.08f;
 
 class LayerRGBStream : public Layer {
 public:
-    LayerRGBStream(std::shared_ptr<unsigned char[]> rgbBuffer, int rgbImageWidth, int rgbImageHeight);
+    LayerRGBStream(std::shared_ptr<Window> window, const Configurations &configurations);
 
     void onUpdate() override;
     void onAttach() override;
-    void onDetach() override;
+
+    const std::shared_ptr<RayTracerRenderer> &getRayTracerRenderer() const;
 
 private:
+    void updateCameraMovements();
+    bool updateCameraRotations();
+    bool updateCameraTranslations();
+    static void mouseButtonCallback(GLFWwindow *window, int button, int action, int mods);
 
 private:
-    const std::shared_ptr<unsigned char[]> _rgbBuffer;
-    int _rgb_image_width;
-    int _rgb_image_height;
+    std::shared_ptr<Camera> _camera;
+    std::shared_ptr<RayTracerRenderer> _rayTracerRenderer;
 
     std::shared_ptr<VertexArray> _va;
     std::shared_ptr<VertexBuffer> _vb;
@@ -45,4 +54,5 @@ private:
     glm::mat4 _model;
 
     std::shared_ptr<InputHandler> _inputHandler;
+    std::shared_ptr<Window> _window;
 };

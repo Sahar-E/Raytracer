@@ -9,8 +9,7 @@
 #include "glew-2.1.0/include/GL/glew.h"
 #include "GLFW/glfw3.h"
 #include "Window.h"
-#include "Layer.h"
-
+#include "Layer.cuh"
 
 struct Configurations {
     float aspectRatio;
@@ -27,7 +26,7 @@ public:
     static Application &getInstance();
     int start(const Configurations &configurations);
 
-
+    [[nodiscard]] const std::shared_ptr<Window> &getWindow() const;
 
 private:
 
@@ -36,10 +35,12 @@ private:
     Application &operator=(const Application &instance) = default;
     Application() = default;
 
+public:
+
 private:
     Configurations _config{};
     std::shared_ptr<Window> _window;
-    std::shared_ptr<Camera> _camera;
-    std::shared_ptr<RayTracerRenderer> _rayTracerRenderer;
     std::vector<std::shared_ptr<Layer>> _layers;
+
+    void attachLayers();
 };

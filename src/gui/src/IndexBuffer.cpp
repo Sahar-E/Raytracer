@@ -10,11 +10,11 @@
 IndexBuffer::IndexBuffer(const unsigned int *data, unsigned int count)
     : _count(count) {
     static_assert(sizeof(unsigned int) == sizeof(GLuint));
-
-    checkGLErrors(glGenBuffers(1, &_rendererId));
-    checkGLErrors(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _rendererId));
-    checkGLErrors(glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(unsigned int), data, GL_STATIC_DRAW));
-
+    {
+        checkGLErrors(glGenBuffers(1, &_rendererId));
+        checkGLErrors(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _rendererId));
+        checkGLErrors(glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(unsigned int), data, GL_STATIC_DRAW));
+    }
 }
 
 IndexBuffer::~IndexBuffer() {

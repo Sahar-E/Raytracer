@@ -15,26 +15,21 @@ class RayTracerRenderer {
 public:
 
     RayTracerRenderer(int imageWidth, int imageHeight, const World &world, std::shared_ptr<Camera> camera, int rayBounces);
+    virtual ~RayTracerRenderer();
 
     RayTracerRenderer() = delete;
     RayTracerRenderer(const RayTracerRenderer &other) = delete;
     RayTracerRenderer &operator=(const RayTracerRenderer &other) = delete;
 
-    virtual ~RayTracerRenderer();
-
     void render();
 
-    const Color * getPixelsOut() const;
-    std::shared_ptr<unsigned char[]> getPixelsOutAsChars();
-    int getNPixelsOut() const { return _imgH * _imgW; }
-
-    void setCamera(std::shared_ptr<Camera> camera);
     void clearPixels();
+
     void syncPixelsOut();
 
-    int getImgW() const;
-
-    int getImgH() const;
+    std::shared_ptr<unsigned char[]> getPixelsOutAsChars();
+    [[nodiscard]] int getImgW() const;
+    [[nodiscard]] int getImgH() const;
 
 private:
     int _imgW;
@@ -45,8 +40,8 @@ private:
     const int _nRayBounces;
     float _alreadyNPixelsGot{};
     curandState *_randStates;
-    Color *_pixelsOut{};
-    Color *_pixelsAverage{};
+    Color *_pixelsOut_cuda{};
+    Color *_innerPixelsAverageAccum_cuda{};
     std::shared_ptr<unsigned char[]> _pixelsOutAsChars{};
     std::shared_ptr<Color []> _pixelsOutAsColors{};
     Ray *_rays{};
@@ -54,9 +49,7 @@ private:
     static World **allocateWorldInDeviceMemory(const Sphere *ptrSpheres, size_t nSpheres);
     static void freeWorldFromDeviceAndItsPtr(World **d_world);
     void initRandStates();
-
     void initPixelAllocations();
-
 };
 
 

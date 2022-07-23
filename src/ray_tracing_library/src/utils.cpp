@@ -31,11 +31,10 @@ void saveImgAsJpg(const std::string &filename, const std::vector<std::tuple<floa
     stbi_write_jpg(filename.c_str(), width, height, channelCount, dataCopy.get(), width * channelCount);
 }
 
-//bool copyRGBToCharArray(unsigned char *dest, const Color *src, int n) {
-//
-//    for (int i = 0; i < n; ++i) {
-//        Color pixel = src[i];
-//        pixel = clamp(gammaCorrection(pixel), 0.0, 0.999);
-//        rgb[i] = {pixel.x(), pixel.y(), pixel.z()};
-//    }
-//}
+void saveImgAsJpg(const std::string &filename, const std::shared_ptr<unsigned char[]>& data, const int width,
+                  const int height) {
+    int channelCount = 3;
+    std::cout << "\nSaving image to " << filename << "\n";
+    stbi_write_jpg(filename.c_str(), width, height, channelCount, data.get(), width * channelCount);
+}
+

@@ -29,7 +29,7 @@ void freeWorld(World **deviceWorld) {
 }
 
 __global__
-void traceRay(Color *pixelsOut, Color *pixelsAverage, Camera c  , World const *const *d_world, curandState *randStates,
+void traceRay(Color *pixelsOut, Color *pixelsAverageAccum, Camera c  , World const *const *d_world, curandState *randStates,
               const int imWidth, const int imHeight, const int nBounces, const float alreadyNPixelsGot) {
     // TODO-Sahar: Still work in progress...
     extern __shared__ Sphere spheresArr[];
@@ -100,10 +100,8 @@ void traceRay(Color *pixelsOut, Color *pixelsAverage, Camera c  , World const *c
         for(int i = hitCount-1; i >= 0; --i) {
             res = emittedColors[i] + attenuationColors[i] * res;
         }
-//        res = clamp(gammaCorrection(res), 0.0f, 0.999f);
-//        res = res * 255.0f;
-        pixelsAverage[tIdx] = (pixelsAverage[tIdx] + (res - pixelsAverage[tIdx]) / alreadyNPixelsGot);
-        pixelsOut[tIdx] = clamp(gammaCorrection(pixelsAverage[tIdx]), 0.0f, 0.999f) * 255.0f;;
+        pixelsAverageAccum[tIdx] = (pixelsAverageAccum[tIdx] + (res - pixelsAverageAccum[tIdx]) / alreadyNPixelsGot);
+        pixelsOut[tIdx] = clamp(gammaCorrection(pixelsAverageAccum[tIdx]), 0.0f, 0.999f) * 255.0f;;
         randStates[tIdx] = localRandState;
     }
 
@@ -116,7 +114,7 @@ void RayTracerRenderer::render() {
     int blockSize = BLOCK_SIZE;
     int numBlocks = (nPixels + blockSize - 1) / blockSize;
     ++_alreadyNPixelsGot;
-    traceRay<<<numBlocks, blockSize, _sharedMemForSpheres>>>(_pixelsOut, _pixelsAverage, *_camera, _d_world, _randStates, _imgW, _imgH,
+    traceRay<<<numBlocks, blockSize, _sharedMemForSpheres>>>(_pixelsOut_cuda, _innerPixelsAverageAccum_cuda, *_camera, _d_world, _randStates, _imgW, _imgH,
                                                              _nRayBounces, _alreadyNPixelsGot);
     checkCudaErrors(cudaGetLastError());
     checkCudaErrors(cudaDeviceSynchronize());
@@ -158,7 +156,7 @@ RayTracerRenderer::RayTracerRenderer(const int imageWidth, const int imageHeight
                                      int rayBounces) : _imgW(imageWidth), _imgH(imageHeight),
                                      _sharedMemForSpheres(world.getTotalSizeInMemoryForObjects()),
                                      _d_world(),
-                                     _camera(camera),
+                                     _camera(std::move(camera)),
                                      _randStates(),
                                      _nRayBounces(rayBounces),
                                      _alreadyNPixelsGot(0.0f),
@@ -172,12 +170,12 @@ RayTracerRenderer::RayTracerRenderer(const int imageWidth, const int imageHeight
 
 void RayTracerRenderer::initPixelAllocations() {
     int nPixels = _imgW * _imgH;
-    checkCudaErrors(cudaMallocManaged(&_pixelsOut, sizeof(Color) * nPixels));
-    checkCudaErrors(cudaMallocManaged(&_pixelsAverage, sizeof(Color) * nPixels));
+    checkCudaErrors(cudaMallocManaged(&_pixelsOut_cuda, sizeof(Color) * nPixels));
+    checkCudaErrors(cudaMallocManaged(&_innerPixelsAverageAccum_cuda, sizeof(Color) * nPixels));
     checkCudaErrors(cudaMallocManaged(&_rays, sizeof(Ray) * nPixels));
     for (int i = 0; i < nPixels; ++i) {
-        _pixelsOut[i] = {0, 0, 0};
-        _pixelsAverage[i] = {0, 0, 0};
+        _pixelsOut_cuda[i] = {0, 0, 0};
+        _innerPixelsAverageAccum_cuda[i] = {0, 0, 0};
         _rays[i] = {{0, 0, 0}, {0,0,0}};
     }
 }
@@ -194,32 +192,20 @@ void RayTracerRenderer::initRandStates() {
 
 RayTracerRenderer::~RayTracerRenderer() {
     checkCudaErrors(cudaFree(_rays));
-    checkCudaErrors(cudaFree(_pixelsOut));
-    checkCudaErrors(cudaFree(_pixelsAverage));
+    checkCudaErrors(cudaFree(_pixelsOut_cuda));
+    checkCudaErrors(cudaFree(_innerPixelsAverageAccum_cuda));
     checkCudaErrors(cudaFree(_randStates));
     freeWorldFromDeviceAndItsPtr(_d_world);
 }
 
-const Color * RayTracerRenderer::getPixelsOut() const {
-    return _pixelsOut;
-}
-
-
 
 static void copyRGBToCharArray(std::shared_ptr<unsigned char[]> &pixelsOutAsChars, const Color *pixelsOut, int nPixels) {
-//    TimeThis t("copyRGBToCharArray");
     int channelCount = 3;
     for (int i = 0; i < nPixels; ++i) {
         Color pixel = pixelsOut[i];
-////        pixel = clamp(gammaCorrection(pixel), 0.0, 0.999);
         pixelsOutAsChars[i * channelCount] =     static_cast<unsigned char>(pixel.x());
         pixelsOutAsChars[i * channelCount + 1] = static_cast<unsigned char>(pixel.y());
         pixelsOutAsChars[i * channelCount + 2] = static_cast<unsigned char>(pixel.z());
-//
-//        pixel = clamp(gammaCorrection(pixel), 0.0, 0.999);
-//        pixelsOutAsChars[i * channelCount] =     static_cast<unsigned char>(pixel.x() * 255);
-//        pixelsOutAsChars[i * channelCount + 1] = static_cast<unsigned char>(pixel.y() * 255);
-//        pixelsOutAsChars[i * channelCount + 2] = static_cast<unsigned char>(pixel.z() * 255);
     }
 }
 
@@ -229,18 +215,14 @@ std::shared_ptr<unsigned char[]> RayTracerRenderer::getPixelsOutAsChars() {
 
 void RayTracerRenderer::syncPixelsOut() {
     size_t sizeOfCopy = _imgH * _imgW * sizeof(Color);
-    checkCudaErrors(cudaMemcpy(_pixelsOutAsColors.get(), _pixelsOut, sizeOfCopy, cudaMemcpyDefault));
+    checkCudaErrors(cudaMemcpy(_pixelsOutAsColors.get(), _pixelsOut_cuda, sizeOfCopy, cudaMemcpyDefault));
     copyRGBToCharArray(_pixelsOutAsChars, _pixelsOutAsColors.get(), _imgH * _imgW);
-}
-
-void RayTracerRenderer::setCamera(std::shared_ptr<Camera> camera) {
-    _camera = std::move(camera);
 }
 
 void RayTracerRenderer::clearPixels() {
     int nPixels = _imgW * _imgH;
     for (int i = 0; i < nPixels; ++i) {
-        _pixelsOut[i] = {0, 0, 0};
+        _pixelsOut_cuda[i] = {0, 0, 0};
     }
     _alreadyNPixelsGot = 0;
 }

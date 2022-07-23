@@ -24,7 +24,6 @@ Window::Window(const std::string &name, float aspectRatio, int width) : _name(na
     initGLWindow();
     _inputHandler = std::make_shared<InputHandler>(_window);
     initGlBlendingConfigurations();
-
 }
 
 int Window::initGLWindow() {
