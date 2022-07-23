@@ -7,6 +7,8 @@
 #include "cuda_runtime_api.h"
 #include <vector>
 #include <memory>
+#include <thread>
+#include <mutex>
 #include "World.cuh"
 #include "Camera.cuh"
 
@@ -25,9 +27,9 @@ public:
 
     void clearPixels();
 
-    void syncPixelsOut();
+    void syncPixelsOutAsChars();
 
-    std::shared_ptr<unsigned char[]> getPixelsOutAsChars();
+    std::shared_ptr<unsigned char[]> getPixelsOutAsChars() const;
     [[nodiscard]] int getImgW() const;
     [[nodiscard]] int getImgH() const;
 

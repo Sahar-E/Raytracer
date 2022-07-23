@@ -26,14 +26,14 @@ public:
 private:
     static void imGuiInit(GLFWwindow *window, const char *glsl_version);
 
+    void saveImage(const std::string &filename) const;
+    void imGuiSaveImageFeature() const;
+    void imGuiFpsInfo();
+
 private:
     GLFWwindow *_window;
     std::shared_ptr<LayerRGBStream> _layerRGB;
     std::string _glsl_version;
 
-    static void textFPS() ;
-
-    void saveImage(const std::string &filename) const;
-
-    void saveImageFeature() const;
+    void imGuiCameraSettings();
 };

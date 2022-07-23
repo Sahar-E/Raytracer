@@ -30,14 +30,27 @@ public:
     void onUpdate() override;
     void onAttach() override;
 
-    const std::shared_ptr<RayTracerRenderer> &getRayTracerRenderer() const;
+    const RayTracerRenderer &getRayTracerRenderer() const;
+
+    int getRendersPerFrame() const;
+    void setRendersPerFrame(int rendersPerFrame);
+
+    void setCameraVFov(float cameraVFov);
+    void setCameraAperture(float cameraAperture);
+    void setCameraFocusDist(float cameraFocusDist);
+    float getCameraVFov();
+    float getCameraAperture();
+    float getCameraFocusDist();
 
 private:
     void updateCameraMovements();
     bool updateCameraRotations();
     bool updateCameraTranslations();
-    static void mouseButtonCallback(GLFWwindow *window, int button, int action, int mods);
-
+    static void mouseButtonCallback_releaseReturnCursorToNormal(GLFWwindow *window, int button, int action, int mods);
+    void initCamera(const Configurations &config);
+    void initRayTracer(const Configurations &config, const World &world);
+    void setMouseButtonReleaseReturnCursorToNormal() const;
+    World initWorld(const Configurations &config) const;
 private:
     std::shared_ptr<Camera> _camera;
     std::shared_ptr<RayTracerRenderer> _rayTracerRenderer;
@@ -55,4 +68,6 @@ private:
 
     std::shared_ptr<InputHandler> _inputHandler;
     std::shared_ptr<Window> _window;
+    int _rendersPerFrame{4};
+
 };

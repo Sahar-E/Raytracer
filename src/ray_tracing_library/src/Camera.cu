@@ -12,16 +12,54 @@
 
 Camera::Camera(Point3 lookFrom, Point3 lookAt, Vec3 vUp, float aspectRatio, float vFov,
                float aperture, float focusDist)
-        : _origin(lookFrom), _aspectRatio(aspectRatio), _lensRadius(aperture / 2), _focusDist(focusDist), _vUp(vUp){
+        : _origin(lookFrom), _aspectRatio(aspectRatio), _lensRadius(aperture / 2), _focusDist(focusDist), _vUp(vUp), _vFov(vFov){
+    setFocusDistViewport(_vFov);
+    setCameraInDir(normalize((lookFrom - lookAt)));
+}
+
+void Camera::setFocusDistViewport(float vFov) {
     auto vTheta = deg2rad(vFov);
     auto h = atan(vTheta / 2);
     auto viewportHeight = 2.0f * h;
     auto viewportWidth = _aspectRatio * viewportHeight;
     _focusDistTimesViewportWidth = _focusDist * viewportWidth;
     _focusDistTimesViewportHeight = _focusDist * viewportHeight;
-
-    setCameraInDir(normalize((lookFrom - lookAt)));
 }
+
+void Camera::setFocusDist(float focusDist) {
+    _focusDist = focusDist;
+    setFocusDistViewport(_vFov);
+    _horizontalVec = _focusDistTimesViewportWidth * _xVec;
+    _verticalVec = _focusDistTimesViewportHeight * _yVec;
+    _lowerLeftCorner = getLowerLeftCorner();
+}
+
+void Camera::setAperture(float aperture) {
+    _lensRadius = aperture / 2;
+}
+
+float Camera::getAperture() const {
+    return _lensRadius * 2;
+}
+
+
+
+float Camera::getFocusDist() const {
+    return _focusDist;
+}
+
+void Camera::setVFov(float vFov) {
+    _vFov = vFov;
+    setFocusDistViewport(_vFov);
+    _horizontalVec = _focusDistTimesViewportWidth * _xVec;
+    _verticalVec = _focusDistTimesViewportHeight * _yVec;
+    _lowerLeftCorner = getLowerLeftCorner();
+}
+
+float Camera::getVFov() const {
+    return _vFov;
+}
+
 
 void Camera::setCameraInDir(const Vec3 &zVec) {
     _zVec = normalize(zVec);

@@ -15,41 +15,52 @@
 #include <imgui-docking/include/imgui.h>
 
 
-void LayerRGBStream::mouseButtonCallback(GLFWwindow *window, int button, int action, int mods) {
-    int state = glfwGetInputMode(window, GLFW_CURSOR);
-    if (state == GLFW_CURSOR_DISABLED) {
-        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-    }
-}
 
 LayerRGBStream::LayerRGBStream(std::shared_ptr<Window> window, const Configurations &config)
         : _window(std::move(window)),
           _proj(glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f)),
           _view(glm::translate(glm::mat4(1.0f), glm::vec3(-0, 0, 0))),
-          _model(glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, -1.0f, 1.0f))) {
-    assert(0 < config.rayBounces && config.rayBounces <= MAX_BOUNCES);
+          _model(glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, -1.0f, 1.0f))){
+    World world = initWorld(config);
+    initCamera(config);
+    initRayTracer(config, world);
+    setMouseButtonReleaseReturnCursorToNormal();
+}
 
-    Vec3 vUp = {0, 1, 0};
-    Vec3 lookFrom = {0, 0.5, 2.5};
-    Vec3 lookAt = {0., 0.2, -2};
-    float focusDist = (lookFrom - lookAt).length();
+World LayerRGBStream::initWorld(const Configurations &config) const {
+    assert(0 < config.rayBounces && config.rayBounces <= MAX_BOUNCES);
 
     auto world = World::initWorld1();
     assert(world.getTotalSizeInMemoryForObjects() < 48 * pow(2, 10) &&
            "There is a hard limit for NVIDIA's shared memory size of 48KB for one block.");
+    return world;
+}
 
-    _camera = std::make_shared<Camera>(lookFrom, lookAt, vUp, config.aspectRatio, config.vFov, config.aperture,
-                                       focusDist);
+void LayerRGBStream::setMouseButtonReleaseReturnCursorToNormal() const { glfwSetMouseButtonCallback(_window->getWindow(), mouseButtonCallback_releaseReturnCursorToNormal); }
+
+void LayerRGBStream::initRayTracer(const Configurations &config, const World &world) {
     _rayTracerRenderer = std::make_shared<RayTracerRenderer>(config.image_width, config.image_height, world, _camera,
                                                              config.rayBounces);
-    glfwSetMouseButtonCallback(_window->getWindow(), mouseButtonCallback);
+}
+
+void LayerRGBStream::initCamera(const Configurations &config) {
+    Vec3 vUp = {0, 1, 0};
+
+    // Arbitrary Default Camera configuration.
+    Vec3 lookFrom = {0, 0.5, 2.5};
+    Vec3 lookAt = {0., 0.2, -2};
+    _camera = std::make_shared<Camera>(lookFrom, lookAt, vUp, config.aspectRatio,
+                                       config.vFov,
+                                       config.aperture,
+                                       (lookFrom - lookAt).length());
 }
 
 void LayerRGBStream::onUpdate() {
-    _rayTracerRenderer->render();   // TODO-Sahar: move to different thread.
-    _rayTracerRenderer->syncPixelsOut();
+    for (int i = 0; i < _rendersPerFrame; i++) {
+        _rayTracerRenderer->render();   // TODO-Sahar: move to different thread.
+    }
+    _rayTracerRenderer->syncPixelsOutAsChars();
     updateCameraMovements();
-
     _texture->updateTexture();
 
     glm::mat4 mvp = _proj * _view * _model;
@@ -155,7 +166,48 @@ void LayerRGBStream::onAttach() {
     _shader->unbind();
 }
 
-const std::shared_ptr<RayTracerRenderer> &LayerRGBStream::getRayTracerRenderer() const {
-    return _rayTracerRenderer;
+int LayerRGBStream::getRendersPerFrame() const {
+    return _rendersPerFrame;
 }
 
+void LayerRGBStream::setRendersPerFrame(int rendersPerFrame) {
+    _rendersPerFrame = rendersPerFrame;
+}
+
+const RayTracerRenderer &LayerRGBStream::getRayTracerRenderer() const {
+    return *_rayTracerRenderer;
+}
+
+void LayerRGBStream::setCameraVFov(float cameraVFov) {
+    _camera->setVFov(cameraVFov);
+    _rayTracerRenderer->clearPixels();
+}
+
+void LayerRGBStream::setCameraAperture(float cameraAperture) {
+    _camera->setAperture(cameraAperture);
+    _rayTracerRenderer->clearPixels();
+}
+
+void LayerRGBStream::setCameraFocusDist(float cameraFocusDist) {
+    _camera->setFocusDist(cameraFocusDist);
+    _rayTracerRenderer->clearPixels();
+}
+
+float LayerRGBStream::getCameraVFov() {
+    return _camera->getVFov();
+}
+
+float LayerRGBStream::getCameraAperture() {
+    return _camera->getAperture();
+}
+
+float LayerRGBStream::getCameraFocusDist() {
+    return _camera->getFocusDist();
+}
+
+void LayerRGBStream::mouseButtonCallback_releaseReturnCursorToNormal(GLFWwindow *window, int button, int action, int mods) {
+    int state = glfwGetInputMode(window, GLFW_CURSOR);
+    if (state == GLFW_CURSOR_DISABLED) {
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    }
+}

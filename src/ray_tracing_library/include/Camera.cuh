@@ -66,6 +66,19 @@ public:
      */
     void moveCameraUp(float up);
 
+    void setCameraInDir(const Vec3 &zVec);
+
+    Vec3 getLowerLeftCorner();
+
+    void setFocusDistViewport(float vFov);
+
+    float getVFov() const;
+    void setVFov(float vFov);
+    float getFocusDist() const;
+    void setFocusDist(float focusDist);
+    float getAperture() const;
+    void setAperture(float focusDist);
+
 private:
     Point3 _origin{};
     Point3 _lowerLeftCorner{};
@@ -82,10 +95,8 @@ private:
     float _focusDistTimesViewportHeight;
     float _focusDist;
     Vec3 _vUp;
+    float _vFov{};
 
-    void setCameraInDir(const Vec3 &zVec);
-
-    Vec3 getLowerLeftCorner();
 };
 
 
