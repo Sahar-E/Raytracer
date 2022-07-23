@@ -33,13 +33,16 @@ public:
     [[nodiscard]] int getImgW() const;
     [[nodiscard]] int getImgH() const;
 
+    [[nodiscard]] int getNRayBounces() const;
+    void setNRayBounces(int nRayBounces);
+
 private:
     int _imgW;
     int _imgH;
     int _sharedMemForSpheres;
     World** _d_world;
     std::shared_ptr<Camera> _camera;
-    const int _nRayBounces;
+    int _nRayBounces;
     float _alreadyNPixelsGot{};
     curandState *_randStates;
     Color *_pixelsOut_cuda{};

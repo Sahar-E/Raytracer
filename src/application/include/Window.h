@@ -22,6 +22,8 @@ public:
 
     const std::shared_ptr<InputHandler> &getInputHandler() const;
 
+    float getAspectRatio() const;
+
     const std::string &getGlslVersion() const;
 
 private:

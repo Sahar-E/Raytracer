@@ -36,4 +36,25 @@ private:
     std::string _glsl_version;
 
     void imGuiCameraSettings();
+
+
+    void sameLineSpace() const;
+
+    void imGuiRenderWidthButton(int & renderWidth, const char *label, int afterPressWidth) const;
+
+    void imGuiRayTracerSettings();
+
+    void imGuiCameraAperture();
+
+    void fooimGuiCameraFocusDist();
+
+    void imGuiCameraVFov();
+
+    int _nRenders;
+
+    void imGuiNRenderCalls();
+
+    void imGuiRenderWidth();
+
+    void imGuiNRayBounces() const;
 };

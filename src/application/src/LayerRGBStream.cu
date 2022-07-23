@@ -20,11 +20,22 @@ LayerRGBStream::LayerRGBStream(std::shared_ptr<Window> window, const Configurati
         : _window(std::move(window)),
           _proj(glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f)),
           _view(glm::translate(glm::mat4(1.0f), glm::vec3(-0, 0, 0))),
-          _model(glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, -1.0f, 1.0f))){
-    World world = initWorld(config);
+          _model(glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, -1.0f, 1.0f))),
+          _rendererAspectRatio(config.aspectRatio),
+          _rendererImageWidth(config.image_width),
+          _rayBounces(config.rayBounces){
+    _world = std::make_shared<World>(initWorld(config));
     initCamera(config);
-    initRayTracer(config, world);
+
+    initRayTracerRenderer();
     setMouseButtonReleaseReturnCursorToNormal();
+}
+
+void LayerRGBStream::initRayTracerRenderer() {
+    int imageWidth = _rendererImageWidth;
+    int imageHeight = static_cast<int>(_rendererImageWidth / _rendererAspectRatio);
+    _rayTracerRenderer = std::make_shared<RayTracerRenderer>(imageWidth, imageHeight, *_world, _camera,
+                                                             _rayBounces);
 }
 
 World LayerRGBStream::initWorld(const Configurations &config) const {
@@ -37,11 +48,6 @@ World LayerRGBStream::initWorld(const Configurations &config) const {
 }
 
 void LayerRGBStream::setMouseButtonReleaseReturnCursorToNormal() const { glfwSetMouseButtonCallback(_window->getWindow(), mouseButtonCallback_releaseReturnCursorToNormal); }
-
-void LayerRGBStream::initRayTracer(const Configurations &config, const World &world) {
-    _rayTracerRenderer = std::make_shared<RayTracerRenderer>(config.image_width, config.image_height, world, _camera,
-                                                             config.rayBounces);
-}
 
 void LayerRGBStream::initCamera(const Configurations &config) {
     Vec3 vUp = {0, 1, 0};
@@ -57,7 +63,7 @@ void LayerRGBStream::initCamera(const Configurations &config) {
 
 void LayerRGBStream::onUpdate() {
     for (int i = 0; i < _rendersPerFrame; i++) {
-        _rayTracerRenderer->render();   // TODO-Sahar: move to different thread.
+        _rayTracerRenderer->render();
     }
     _rayTracerRenderer->syncPixelsOutAsChars();
     updateCameraMovements();
@@ -67,8 +73,6 @@ void LayerRGBStream::onUpdate() {
     _shader->bind();
     _shader->setUniformMat4f("u_mvpMatrix", mvp);
     VertexDrawer::draw(*_va, *_ib, *_shader);
-
-
 }
 
 void LayerRGBStream::updateCameraMovements() {
@@ -130,6 +134,10 @@ bool LayerRGBStream::updateCameraRotations() {
 }
 
 void LayerRGBStream::onAttach() {
+    initOpenGLBuffers();
+}
+
+void LayerRGBStream::initOpenGLBuffers() {
     float positions[] = {
             -0.9999f, -0.9999f, 0.0f, 0.0f,
             0.9999f, -0.9999f, 1.0f, 0.0f,
@@ -174,10 +182,6 @@ void LayerRGBStream::setRendersPerFrame(int rendersPerFrame) {
     _rendersPerFrame = rendersPerFrame;
 }
 
-const RayTracerRenderer &LayerRGBStream::getRayTracerRenderer() const {
-    return *_rayTracerRenderer;
-}
-
 void LayerRGBStream::setCameraVFov(float cameraVFov) {
     _camera->setVFov(cameraVFov);
     _rayTracerRenderer->clearPixels();
@@ -205,9 +209,23 @@ float LayerRGBStream::getCameraFocusDist() {
     return _camera->getFocusDist();
 }
 
+int LayerRGBStream::getRendererImageWidth() const {
+    return _rendererImageWidth;
+}
+
+void LayerRGBStream::setRendererImageWidth(int rendererImageWidth) {
+    _rendererImageWidth = rendererImageWidth;
+    initRayTracerRenderer();
+    initOpenGLBuffers();
+}
+
 void LayerRGBStream::mouseButtonCallback_releaseReturnCursorToNormal(GLFWwindow *window, int button, int action, int mods) {
     int state = glfwGetInputMode(window, GLFW_CURSOR);
     if (state == GLFW_CURSOR_DISABLED) {
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
     }
+}
+
+const std::shared_ptr<RayTracerRenderer> &LayerRGBStream::getRayTracerRenderer() const {
+    return _rayTracerRenderer;
 }

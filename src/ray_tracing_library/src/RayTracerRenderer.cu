@@ -233,3 +233,12 @@ int RayTracerRenderer::getImgW() const {
 int RayTracerRenderer::getImgH() const {
     return _imgH;
 }
+
+int RayTracerRenderer::getNRayBounces() const {
+    return _nRayBounces;
+}
+
+void RayTracerRenderer::setNRayBounces(int nRayBounces) {
+    _nRayBounces = nRayBounces;
+    clearPixels();
+}

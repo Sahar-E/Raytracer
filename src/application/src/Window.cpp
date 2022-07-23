@@ -5,18 +5,9 @@
 #include "Window.h"
 #include "InputHandler.h"
 #include <iostream>
-#include <utility>
-#include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
-#include "VertexArray.h"
-#include "IndexBuffer.h"
 #include "Shader.h"
 #include "LiveTexture.h"
-#include "VertexDrawer.h"
 #include "commonOpenGL.h"
-#include <imgui-docking/include/imgui.h>
-#include <imgui-docking/include/imgui_impl_glfw.h>
-#include <imgui-docking/include/imgui_impl_opengl3.h>
 
 
 Window::Window(const std::string &name, float aspectRatio, int width) : _name(name), _aspectRatio(aspectRatio),
@@ -74,4 +65,8 @@ const std::string &Window::getGlslVersion() const {
 
 const std::shared_ptr<InputHandler> &Window::getInputHandler() const {
     return _inputHandler;
+}
+
+float Window::getAspectRatio() const {
+    return _aspectRatio;
 }

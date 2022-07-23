@@ -14,7 +14,6 @@
 struct Configurations {
     float aspectRatio;
     int image_width;
-    int image_height;
     int rayBounces;
     float vFov;
     float aperture;

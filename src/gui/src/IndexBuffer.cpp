@@ -8,7 +8,7 @@
 
 
 IndexBuffer::IndexBuffer(const unsigned int *data, unsigned int count)
-    : _count(count) {
+    : _rendererId(0), _count(count) {
     static_assert(sizeof(unsigned int) == sizeof(GLuint));
     {
         checkGLErrors(glGenBuffers(1, &_rendererId));
