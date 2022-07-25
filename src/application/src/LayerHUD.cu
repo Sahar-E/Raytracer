@@ -9,8 +9,6 @@
 #include <imgui-docking/include/imgui_impl_glfw.h>
 #include <imgui-docking/include/imgui_impl_opengl3.h>
 
-#include <utility>
-
 
 LayerHUD::LayerHUD(GLFWwindow *window,
                    std::shared_ptr<LayerRGBStream> layerRGB,

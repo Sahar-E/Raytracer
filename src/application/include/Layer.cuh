@@ -5,6 +5,7 @@
 #pragma once
 
 #include <string>
+#include "Event.hpp"
 
 class Layer {
 public:
@@ -14,6 +15,7 @@ public:
     virtual void onAttach() {}
     virtual void onDetach() {}
     virtual void onUpdate() {}
+    virtual void onEvent(Event &event) {}
 
 protected:
     std::string _layerName;

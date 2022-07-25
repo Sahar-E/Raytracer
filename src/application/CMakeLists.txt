@@ -8,13 +8,19 @@ add_library(${PROJECT_NAME} STATIC
         src/Application.cu
         src/Window.cpp
         include/Window.h
-        src/InputHandler.cpp
-        include/InputHandler.h
-        src/KeyInput.cpp
-        include/KeyInput.h
-        src/MouseInput.cpp
-        include/MouseInput.h
-        src/Layer.cpp include/Layer.cuh src/LayerRGBStream.cu include/LayerRGBStream.cuh src/LayerHUD.cu include/LayerHUD.cuh src/ImGuiLayerUtils.cpp include/ImGuiLayerUtils.h)
+        src/InputHandler.cu
+        include/InputHandler.cuh
+        src/Layer.cpp
+        include/Layer.cuh
+        src/LayerRGBStream.cu
+        include/LayerRGBStream.cuh
+        src/LayerHUD.cu
+        include/LayerHUD.cuh
+        src/ImGuiLayerUtils.cpp
+        include/ImGuiLayerUtils.h
+        include/Event.hpp
+        include/common.h
+        include/ApplicationEvents.hpp include/KeyEvent.hpp include/MouseEvents.hpp)
 target_include_directories(${PROJECT_NAME} PUBLIC include)
 
 

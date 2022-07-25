@@ -10,6 +10,7 @@
 #include "GLFW/glfw3.h"
 #include "Window.h"
 #include "Layer.cuh"
+#include "MouseEvents.hpp"
 
 struct Configurations {
     float aspectRatio;
@@ -24,7 +25,7 @@ class Application {
 public:
     static Application &getInstance();
     int start(const Configurations &configurations);
-
+    void onEvent(Event &event);
     [[nodiscard]] const std::shared_ptr<Window> &getWindow() const;
 
 private:

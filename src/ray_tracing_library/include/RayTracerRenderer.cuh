@@ -7,8 +7,6 @@
 #include "cuda_runtime_api.h"
 #include <vector>
 #include <memory>
-#include <thread>
-#include <mutex>
 #include "World.cuh"
 #include "Camera.cuh"
 

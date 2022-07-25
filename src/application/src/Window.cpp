@@ -3,18 +3,104 @@
 //
 
 #include "Window.h"
-#include "InputHandler.h"
+#include "InputHandler.cuh"
 #include <iostream>
 #include "Shader.h"
 #include "LiveTexture.h"
 #include "commonOpenGL.h"
+#include "ApplicationEvents.hpp"
+#include "KeyEvent.hpp"
+#include "MouseEvents.hpp"
 
 
-Window::Window(const std::string &name, float aspectRatio, int width) : _name(name), _aspectRatio(aspectRatio),
-                                                                        _width(width), _glsl_version("#version 330") {
+void Window::onWindowSizeChanged(GLFWwindow *window, int width, int height) {
+
+}
+
+Window::Window(const std::string &name, float aspectRatio, int width) : _glsl_version("#version 330") {
+    _data.title = name;
+    _data.width = width;
+    _data.height = width / aspectRatio;
+
     initGLWindow();
-    _inputHandler = std::make_shared<InputHandler>(_window);
     initGlBlendingConfigurations();
+    setGlfwCallbacksEvents();
+}
+
+void Window::setGlfwCallbacksEvents() {
+    glfwSetWindowUserPointer(_window, &_data);
+    setGlfwSetWindowSizeCallback();
+    setGlfwSetKeyCallback();
+    setGlfwSetMouseButtonCallback();
+    setGlfwSetCursorPosCallback();
+}
+
+void Window::setGlfwSetCursorPosCallback() const {
+    glfwSetCursorPosCallback(_window, [](GLFWwindow *window, double xpos, double ypos) {
+        WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+
+        MouseMovedEvent event(static_cast<float>(xpos), static_cast<float>(ypos));
+        data.eventCallback(event);
+    });
+}
+
+void Window::setGlfwSetMouseButtonCallback() const {
+    glfwSetMouseButtonCallback(_window, [](GLFWwindow *window, int button, int action, int mods) {
+        WindowData &data = *(WindowData *) glfwGetWindowUserPointer(window);
+        switch (action)
+        {
+            case GLFW_PRESS:
+            {
+                MouseButtonPressedEvent event(button);
+                data.eventCallback(event);
+                break;
+            }
+            case GLFW_RELEASE:
+            {
+                MouseButtonReleasedEvent event(button);
+                data.eventCallback(event);
+                break;
+            }
+            default:
+                break;
+        }
+    });
+}
+
+void Window::setGlfwSetKeyCallback() const {
+    glfwSetKeyCallback(_window, [](GLFWwindow *window, int key, int scancode, int action, int mods) {
+        WindowData &data = *(WindowData *) glfwGetWindowUserPointer(window);
+
+        switch (action)
+        {
+            case GLFW_PRESS:
+            case GLFW_REPEAT:
+            {
+                KeyPressedEvent event(key);
+                data.eventCallback(event);
+                break;
+            }
+            case GLFW_RELEASE:
+            {
+                KeyReleasedEvent event(key);
+                data.eventCallback(event);
+                break;
+            }
+            default:
+                break;
+        }
+    });
+}
+
+void Window::setGlfwSetWindowSizeCallback() const {
+    glfwSetWindowSizeCallback(_window, [](GLFWwindow *window, int width, int height) {
+        WindowData &data = *(WindowData *) glfwGetWindowUserPointer(window);
+        data.width = width;
+        data.height = height;
+
+        WindowResizeEvent event(width, height);
+        data.eventCallback(event);
+    });
 }
 
 int Window::initGLWindow() {
@@ -24,7 +110,7 @@ int Window::initGLWindow() {
 
 
     /* Create a windowed mode window and its OpenGL context */
-    _window = glfwCreateWindow(_width, static_cast<int>(_width / _aspectRatio), _name.c_str(), nullptr, nullptr);
+    _window = glfwCreateWindow(_data.width, _data.height, _data.title.c_str(), nullptr, nullptr);
     if (!_window) {
         glfwTerminate();
         return -1;
@@ -63,10 +149,11 @@ const std::string &Window::getGlslVersion() const {
     return _glsl_version;
 }
 
-const std::shared_ptr<InputHandler> &Window::getInputHandler() const {
-    return _inputHandler;
+float Window::getAspectRatio() const {
+    return static_cast<float>(_data.width) / _data.height;
 }
 
-float Window::getAspectRatio() const {
-    return _aspectRatio;
+void Window::setEventCallback(const Window::EventCallbackFn &callback) {
+    _data.eventCallback = callback;
 }
+

@@ -8,18 +8,20 @@
 #include "glfw-3.3.7/include/GLFW/glfw3.h"
 #include "VertexDrawer.h"
 #include "stb_library/include/stb_library/stb_image.h"
-#include "InputHandler.h"
 #include "Window.h"
 #include "Layer.cuh"
 #include "LayerRGBStream.cuh"
 #include "LayerHUD.cuh"
 #include "ImGuiLayerUtils.h"
+#include "ApplicationEvents.hpp"
 
 
 int Application::start(const Configurations &configurations) {
     _config = configurations;
 
     _window = std::make_shared<Window>("RayTracer", _config.aspectRatio, _config.windowWidth);
+    _window->setEventCallback(BIND_EVENT_FN(Application::onEvent));
+
     _layers = std::vector<std::shared_ptr<Layer>>();
     attachLayers();
 
@@ -63,6 +65,19 @@ Application &Application::getInstance() {
 
 const std::shared_ptr<Window> &Application::getWindow() const {
     return _window;
+}
+
+
+
+void Application::onEvent(Event &event) {
+    EventDispatcher dispatcher(event);
+    dispatcher.dispatch<WindowResizeEvent>([this](WindowResizeEvent &event){
+        return true;// TODO-Sahar: add logic.
+    });
+
+    for (const auto &layer: _layers) {
+        layer->onEvent(event);
+    }
 }
 
 

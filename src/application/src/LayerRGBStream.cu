@@ -3,7 +3,6 @@
 //
 
 #include <iostream>
-#include <utility>
 
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
@@ -12,6 +11,7 @@
 #include "Application.cuh"
 #include "Vec3.cuh"
 #include "commonDefines.h"
+#include "Event.hpp"
 #include <imgui-docking/include/imgui.h>
 
 
@@ -28,7 +28,6 @@ LayerRGBStream::LayerRGBStream(std::shared_ptr<Window> window, const Configurati
     initCamera(config);
 
     initRayTracerRenderer();
-    setMouseButtonReleaseReturnCursorToNormal();
 }
 
 void LayerRGBStream::initRayTracerRenderer() {
@@ -46,8 +45,6 @@ World LayerRGBStream::initWorld(const Configurations &config) const {
            "There is a hard limit for NVIDIA's shared memory size of 48KB for one block.");
     return world;
 }
-
-void LayerRGBStream::setMouseButtonReleaseReturnCursorToNormal() const { glfwSetMouseButtonCallback(_window->getWindow(), mouseButtonCallback_releaseReturnCursorToNormal); }
 
 void LayerRGBStream::initCamera(const Configurations &config) {
     Vec3 vUp = {0, 1, 0};
@@ -86,29 +83,29 @@ void LayerRGBStream::updateCameraMovements() {
 
 bool LayerRGBStream::updateCameraTranslations() {
     bool cameraChanged = false;
-    if (_window->getInputHandler()->isKeyDown(GLFW_KEY_A)) {
+    if (InputHandler::isKeyDown(GLFW_KEY_A)) {
         _camera->moveCameraRight(-CAMERA_TRANSLATION_SIZE);
         cameraChanged = true;
     }
-    if (_window->getInputHandler()->isKeyDown(GLFW_KEY_D)) {
+    if (InputHandler::isKeyDown(GLFW_KEY_D)) {
         _camera->moveCameraRight(CAMERA_TRANSLATION_SIZE);
         cameraChanged = true;
     }
-    if (_window->getInputHandler()->isKeyDown(GLFW_KEY_W)) {
+    if (InputHandler::isKeyDown(GLFW_KEY_W)) {
         _camera->moveCameraForward(CAMERA_TRANSLATION_SIZE);
         cameraChanged = true;
     }
-    if (_window->getInputHandler()->isKeyDown(GLFW_KEY_S)) {
+    if (InputHandler::isKeyDown(GLFW_KEY_S)) {
         _camera->moveCameraForward(-CAMERA_TRANSLATION_SIZE);
         cameraChanged = true;
     }
-    if (_window->getInputHandler()->isKeyDown(GLFW_KEY_SPACE) &&
-        !_window->getInputHandler()->isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
+    if (InputHandler::isKeyDown(GLFW_KEY_SPACE) &&
+        !InputHandler::isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
         _camera->moveCameraUp(CAMERA_TRANSLATION_SIZE);
         cameraChanged = true;
     }
-    if (_window->getInputHandler()->isKeyDown(GLFW_KEY_SPACE) &&
-        _window->getInputHandler()->isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
+    if (InputHandler::isKeyDown(GLFW_KEY_SPACE) &&
+        InputHandler::isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
         _camera->moveCameraUp(-CAMERA_TRANSLATION_SIZE);
         cameraChanged = true;
     }
@@ -118,13 +115,14 @@ bool LayerRGBStream::updateCameraTranslations() {
 
 bool LayerRGBStream::updateCameraRotations() {
     bool cameraChanged = false;
-    bool isMouseMove = _window->getInputHandler()->isMouseMove();
     bool mouseNotOverImGui = !ImGui::GetIO().WantCaptureMouse;
-    bool mouseButtonPressed = glfwGetMouseButton(_window->getWindow(), GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS;
-    if (isMouseMove && mouseNotOverImGui && mouseButtonPressed) {
-        glfwSetInputMode(_window->getWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-        float dX = ImGui::GetIO().MouseDelta.x * CAMERA_ROT_SPEED;
-        float dY = ImGui::GetIO().MouseDelta.y * CAMERA_ROT_SPEED;
+    bool mouseButtonPressed = InputHandler::isMousePressed(GLFW_MOUSE_BUTTON_LEFT);
+    float dX = ImGui::GetIO().MouseDelta.x * CAMERA_ROT_SPEED;
+    float dY = ImGui::GetIO().MouseDelta.y * CAMERA_ROT_SPEED;
+    bool isMouseMoved = dX != 0 || dY != 0;
+    if (isMouseMoved && mouseNotOverImGui && mouseButtonPressed) {
+        dX = ImGui::GetIO().MouseDelta.x * CAMERA_ROT_SPEED;
+        dY = ImGui::GetIO().MouseDelta.y * CAMERA_ROT_SPEED;
         if (dX != 0.0f || dY != 0.0f) {
             _camera->rotateCamera(-dX, dY);
             cameraChanged = true;
@@ -219,13 +217,37 @@ void LayerRGBStream::setRendererImageWidth(int rendererImageWidth) {
     initOpenGLBuffers();
 }
 
-void LayerRGBStream::mouseButtonCallback_releaseReturnCursorToNormal(GLFWwindow *window, int button, int action, int mods) {
-    int state = glfwGetInputMode(window, GLFW_CURSOR);
-    if (state == GLFW_CURSOR_DISABLED) {
-        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-    }
-}
-
 const std::shared_ptr<RayTracerRenderer> &LayerRGBStream::getRayTracerRenderer() const {
     return _rayTracerRenderer;
 }
+
+
+void LayerRGBStream::onEvent(Event &event) {
+    EventDispatcher dispatcher(event);
+
+    dispatchMousePress(dispatcher);
+    dispatchMouseRelease(dispatcher);
+}
+
+void LayerRGBStream::dispatchMouseRelease(EventDispatcher &dispatcher) const {
+    dispatcher.dispatch<MouseButtonReleasedEvent>([this](MouseButtonReleasedEvent &event){
+        GLFWwindow *window = _window->getWindow();
+        int state = glfwGetInputMode(window, GLFW_CURSOR);
+        if (state == GLFW_CURSOR_DISABLED) {
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        }
+        return true;
+    });
+}
+
+void LayerRGBStream::dispatchMousePress(EventDispatcher &dispatcher) const {
+    dispatcher.dispatch<MouseButtonPressedEvent>([this](MouseButtonPressedEvent &event){
+        GLFWwindow *window = _window->getWindow();
+        int state = glfwGetInputMode(window, GLFW_CURSOR);
+        if (state == GLFW_CURSOR_NORMAL) {
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        }
+        return true;
+    });
+}
+

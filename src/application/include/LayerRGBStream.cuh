@@ -14,10 +14,11 @@
 #include "IndexBuffer.h"
 #include "Shader.h"
 #include "LiveTexture.h"
-#include "InputHandler.h"
+#include "InputHandler.cuh"
 #include "VertexDrawer.h"
 #include "RayTracerRenderer.cuh"
 #include "Application.cuh"
+#include "MouseEvents.hpp"
 
 
 static const float CAMERA_TRANSLATION_SIZE = .1f;
@@ -29,7 +30,7 @@ public:
 
     void onUpdate() override;
     void onAttach() override;
-
+    void onEvent(Event &event) override;
     const std::shared_ptr<RayTracerRenderer> &getRayTracerRenderer() const;
 
     int getRendersPerFrame() const;
@@ -49,10 +50,9 @@ private:
     void updateCameraMovements();
     bool updateCameraRotations();
     bool updateCameraTranslations();
-    static void mouseButtonCallback_releaseReturnCursorToNormal(GLFWwindow *window, int button, int action, int mods);
+
     void initCamera(const Configurations &config);
 
-    void setMouseButtonReleaseReturnCursorToNormal() const;
     World initWorld(const Configurations &config) const;
 private:
     std::shared_ptr<Camera> _camera;
@@ -81,4 +81,8 @@ private:
     void initRayTracerRenderer();
 
     void initOpenGLBuffers();
+
+    void dispatchMousePress(EventDispatcher &dispatcher) const;
+
+    void dispatchMouseRelease(EventDispatcher &dispatcher) const;
 };

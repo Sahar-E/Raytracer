@@ -7,35 +7,55 @@
 
 #include "glew-2.1.0/include/GL/glew.h"
 #include "GLFW/glfw3.h"
-#include "InputHandler.h"
+#include "InputHandler.cuh"
+#include "Event.hpp"
 #include <memory>
 #include <string>
+#include <algorithm>
 
 
 class Window {
 public:
+    using EventCallbackFn = std::function<void(Event&)>;
+
+
     Window(const std::string &name, float aspectRatio, int width);
 
     [[nodiscard]] GLFWwindow *getWindow() const;
 
-    bool shouldClose() const;
+    [[nodiscard]] bool shouldClose() const;
 
-    const std::shared_ptr<InputHandler> &getInputHandler() const;
+    void setEventCallback(const EventCallbackFn& callback);
 
-    float getAspectRatio() const;
+    [[nodiscard]] float getAspectRatio() const;
 
-    const std::string &getGlslVersion() const;
+    [[nodiscard]] const std::string &getGlslVersion() const;
 
 private:
     void onUpdate();
     int initGLWindow();
     static void initGlBlendingConfigurations() ;
+    static void onWindowSizeChanged(GLFWwindow *window, int width, int height);
 
 private:
     GLFWwindow *_window;
-    const std::string &_name;
-    float _aspectRatio;
-    int _width;
     std::string _glsl_version;
-    std::shared_ptr<InputHandler> _inputHandler;
+
+    struct WindowData
+    {
+        std::string title;
+        unsigned int width, height;
+        EventCallbackFn eventCallback;
+    };
+    WindowData _data;
+
+    void setGlfwCallbacksEvents();
+
+    void setGlfwSetWindowSizeCallback() const;
+
+    void setGlfwSetKeyCallback() const;
+
+    void setGlfwSetMouseButtonCallback() const;
+
+    void setGlfwSetCursorPosCallback() const;
 };
