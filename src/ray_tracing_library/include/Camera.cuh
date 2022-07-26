@@ -72,6 +72,8 @@ public:
 
     void setFocusDistViewport(float vFov);
 
+    void setAspectRatio(float aspectRatio);
+
     float getVFov() const;
     void setVFov(float vFov);
     float getFocusDist() const;

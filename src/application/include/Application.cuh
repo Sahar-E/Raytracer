@@ -43,4 +43,6 @@ private:
     std::vector<std::shared_ptr<Layer>> _layers;
 
     void attachLayers();
+
+    void onWindowResize(EventDispatcher &dispatcher);
 };

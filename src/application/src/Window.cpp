@@ -157,3 +157,8 @@ void Window::setEventCallback(const Window::EventCallbackFn &callback) {
     _data.eventCallback = callback;
 }
 
+void Window::resizeWindow(int width, int height) {
+    _data.width = width;
+    _data.height = height;
+}
+

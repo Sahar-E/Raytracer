@@ -12,6 +12,7 @@
 #include "Vec3.cuh"
 #include "commonDefines.h"
 #include "Event.hpp"
+#include "ApplicationEvents.hpp"
 #include <imgui-docking/include/imgui.h>
 
 
@@ -227,6 +228,13 @@ void LayerRGBStream::onEvent(Event &event) {
 
     dispatchMousePress(dispatcher);
     dispatchMouseRelease(dispatcher);
+    dispatcher.dispatch<WindowResizeEvent>([this](WindowResizeEvent &event){
+        _rendererAspectRatio = static_cast<float>(event.getWidth()) / event.getHeight();
+        _camera->setAspectRatio(_rendererAspectRatio);
+        initRayTracerRenderer();
+        initOpenGLBuffers();
+        return false;
+    });
 }
 
 void LayerRGBStream::dispatchMouseRelease(EventDispatcher &dispatcher) const {

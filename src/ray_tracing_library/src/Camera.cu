@@ -108,3 +108,9 @@ void Camera::moveCameraUp(float up) {
     _origin += _yVec * up;
     _lowerLeftCorner = getLowerLeftCorner();    // origin changed, so we need to update the lower left corner.
 }
+
+void Camera::setAspectRatio(float aspectRatio) {
+    _aspectRatio = aspectRatio;
+    setFocusDistViewport(_vFov);
+    setCameraInDir(_zVec);
+}

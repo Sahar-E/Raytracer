@@ -71,13 +71,20 @@ const std::shared_ptr<Window> &Application::getWindow() const {
 
 void Application::onEvent(Event &event) {
     EventDispatcher dispatcher(event);
-    dispatcher.dispatch<WindowResizeEvent>([this](WindowResizeEvent &event){
-        return true;// TODO-Sahar: add logic.
-    });
+    onWindowResize(dispatcher);
 
     for (const auto &layer: _layers) {
         layer->onEvent(event);
     }
+}
+
+void Application::onWindowResize(EventDispatcher &dispatcher) {
+    dispatcher.dispatch<WindowResizeEvent>([this](WindowResizeEvent &event){
+        _window->resizeWindow(event.getWidth(), event.getHeight());
+        glViewport(0, 0, event.getWidth(), event.getHeight());
+
+        return false;
+    });
 }
 
 

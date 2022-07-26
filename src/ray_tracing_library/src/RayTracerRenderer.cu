@@ -217,7 +217,6 @@ void RayTracerRenderer::syncPixelsOutAsChars() {
 }
 
 void RayTracerRenderer::clearPixels() {
-    TimeThis t("clearPixels");
     int nPixels = _imgW * _imgH;
     checkCudaErrors(cudaMemset(_pixelsOut_cuda, 0, nPixels * sizeof(Color)));
     _alreadyNPixelsGot = 0;

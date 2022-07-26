@@ -31,6 +31,8 @@ public:
 
     [[nodiscard]] const std::string &getGlslVersion() const;
 
+    void resizeWindow(int width, int height);
+
 private:
     void onUpdate();
     int initGLWindow();
