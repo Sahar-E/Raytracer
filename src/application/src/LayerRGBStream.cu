@@ -41,7 +41,7 @@ void LayerRGBStream::initRayTracerRenderer() {
 World LayerRGBStream::initWorld(const Configurations &config) const {
     assert(0 < config.rayBounces && config.rayBounces <= MAX_BOUNCES);
 
-    auto world = World::initWorld1();
+    auto world = World::initWorld2();
     assert(world.getTotalSizeInMemoryForObjects() < 48 * pow(2, 10) &&
            "There is a hard limit for NVIDIA's shared memory size of 48KB for one block.");
     return world;

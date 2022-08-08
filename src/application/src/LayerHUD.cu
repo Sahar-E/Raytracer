@@ -146,7 +146,7 @@ void LayerHUD::imGuiSaveImageFeature() const {
     if (ImGui::CollapsingHeader("Save:")) {
         int bufSize = 32;
         static char filename[32];
-        strncpy_s(filename, "test.jpg", bufSize);
+        strncpy_s(filename, "test.jpg", bufSize);   // TODO-Sahar: not good.
         ImGui::InputText("##", filename, bufSize);
         if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
             ImGui::SetTooltip("Name of the file to save. Will be saved in the root directory of the executable.");

@@ -49,23 +49,25 @@ World World::initWorld2() {
     Material whiteLight = Material::getGlowing(white * .8, white, 10);
     sphereList.push_back(Sphere({4, 5, 4}, 1, whiteLight));
 
-
     float radius = 1;
-    std::vector<Vec3> bigBallsLocs = {{1.5,  radius, 4},
-                                      {0.5,  radius, 2},
-                                      {-0.5, radius, 0}};
-    Material mirror = Material::getSpecular(white, white, 0.0, 1.0);
-    sphereList.emplace_back(Sphere(bigBallsLocs[0], radius, mirror));
-    Color redBrown = {141 / 255.0, 78 / 255.0, 44 / 255.0};
-    Material lambertianRedBrown = Material::getLambertian(redBrown);
-    sphereList.emplace_back(Sphere(bigBallsLocs[1], radius, lambertianRedBrown));
+    Vec3 locBlue(-.5, radius, 2);
+    Color neonBlue = {37 / 255.0, 50 / 255.0, 255 / 255.0};
+    Material neonBlueGlow = Material::getGlowing({37 / 255.0, 50 / 105.0, 255 / 255.0}, neonBlue, 4);
+    sphereList.emplace_back(Sphere(locBlue, radius, neonBlueGlow));
+
     Material glass = Material::getGlass(white, 1.5);
-    sphereList.emplace_back(Sphere(bigBallsLocs[2], radius, glass));
+    Vec3 locGlass(2.5,  radius, 7);
+    sphereList.emplace_back(Sphere(locGlass, radius, glass));
+
+    auto bigBallsLocs = std::vector<Vec3>();
+    bigBallsLocs.push_back(locBlue);
+    bigBallsLocs.push_back(locGlass);
 
     float smallSphereRadius = 0.2;
     int randState = 1;
     for (int xLoc = -8; xLoc < 8; ++xLoc) {
         for (int zLoc = -17; zLoc < 12; ++zLoc) {
+//        for (int zLoc = 10; zLoc < 12; ++zLoc) {
             bool locationIsOccupied;
             for (auto & bigBallsLoc : bigBallsLocs) {
                 locationIsOccupied = fabs(bigBallsLoc[0] - xLoc) < 1 && fabs(bigBallsLoc[2] - zLoc) < 1;
