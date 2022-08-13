@@ -15,6 +15,10 @@ cmake ..
 cmake --build .
 ```
 
+Example video for Real Time raytracing:
+
+<ADD_VIDEO>
+
 Last rendered image:
 
 ![Image Render Example](test.jpg?raw=true "Image Render Example.")
@@ -22,5 +26,3 @@ Last rendered image:
 Screenshot of the program:
 
 ![Screenshot Example](screenshot.png?raw=true "Screenshot Example")
-
-Example video for Real Time raytracing:
