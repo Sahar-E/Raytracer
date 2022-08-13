@@ -24,36 +24,40 @@
 static const float CAMERA_TRANSLATION_SIZE = .1f;
 static const float CAMERA_ROT_SPEED = 0.08f;
 
+/**
+ * This class implements the rendering of the camera scene.
+ */
 class LayerRGBStream : public Layer {
 public:
+
+    /**
+     * Construct a new LayerRGBStream with the given configurations.
+     * @param window            The window containing the rendering.
+     * @param configurations    The configurations of the rendering.
+     */
     LayerRGBStream(std::shared_ptr<Window> window, const Configurations &configurations);
 
     void onUpdate() override;
     void onAttach() override;
     void onEvent(Event &event) override;
+
     const std::shared_ptr<RayTracerRenderer> &getRayTracerRenderer() const;
 
     int getRendersPerFrame() const;
     void setRendersPerFrame(int rendersPerFrame);
 
     void setCameraVFov(float cameraVFov);
-    void setCameraAperture(float cameraAperture);
-    void setCameraFocusDist(float cameraFocusDist);
     float getCameraVFov();
+
+    void setCameraAperture(float cameraAperture);
     float getCameraAperture();
+
+    void setCameraFocusDist(float cameraFocusDist);
     float getCameraFocusDist();
 
     int getRendererImageWidth() const;
     void setRendererImageWidth(int rendererImageWidth);
 
-private:
-    void updateCameraMovements();
-    bool updateCameraRotations();
-    bool updateCameraTranslations();
-
-    void initCamera(const Configurations &config);
-
-    World initWorld(const Configurations &config) const;
 private:
     std::shared_ptr<Camera> _camera;
     std::shared_ptr<RayTracerRenderer> _rayTracerRenderer;
@@ -78,11 +82,62 @@ private:
     int _rendererImageWidth;
     int _rayBounces;
 
+    /**
+     * Init the RayTracerRenderer.
+     */
     void initRayTracerRenderer();
 
+    /**
+     * Init the Camera.
+     * @param config    Camera initial configurations.
+     */
+    void initCamera(const Configurations &config);
+
+    /**
+     * Init the buffers of OpenGL to be used to show the rendering of the RayTracerRenderer.
+     */
     void initOpenGLBuffers();
 
-    void dispatchMousePress(EventDispatcher &dispatcher) const;
+    /**
+     * Dispatch a mouse press event that will make the mouse cursor disabled only when pressed.
+     * @param dispatcher    The EventDispatcher.
+     */
+    void dispatchMousePressEvent(EventDispatcher &dispatcher) const;
 
+    /**
+     * Dispatch a mouse release event that will make the mouse cursor enabled.
+     * @param dispatcher    The EventDispatcher.
+     */
     void dispatchMouseRelease(EventDispatcher &dispatcher) const;
+
+    /**
+     * Dispatch a window resize event that will make the RGB stream be compatible with the new aspect ratio.
+     * @param dispatcher    The EventDispatcher.
+     */
+    void dispatchWindowResizeEvent(EventDispatcher &dispatcher);
+
+    /**
+     * Called to update the camera movement, translation and rotation.
+     */
+    void updateCameraMovements();
+
+    /**
+     * Updates the camera rotations.
+     * @return  true if camera changed, false otherwise.
+     */
+    bool updateCameraRotations();
+
+    /**
+     * Called to update the camera position.
+     * @return  true if camera changed, false otherwise.
+     */
+    bool updateCameraTranslations();
+
+
+    /**
+     * Init a world scene for the RayTracerRenderer.
+     * @param config the world configurations.
+     * @return  the new scene.
+     */
+    World initWorld(const Configurations &config) const;
 };

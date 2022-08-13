@@ -13,10 +13,6 @@
 #include "MouseEvents.hpp"
 
 
-void Window::onWindowSizeChanged(GLFWwindow *window, int width, int height) {
-
-}
-
 Window::Window(const std::string &name, float aspectRatio, int width) : _glsl_version("#version 330") {
     _data.title = name;
     _data.width = width;

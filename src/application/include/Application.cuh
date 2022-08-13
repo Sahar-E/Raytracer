@@ -21,26 +21,39 @@ struct Configurations {
     int windowWidth;
 };
 
+/**
+ * The Raytracer application.
+ */
 class Application {
 public:
     static Application &getInstance();
-    int start(const Configurations &configurations);
+
+    Application(const Application &application) = delete;
+
+    Application &operator=(const Application &instance) = delete;
+
+    /**
+     * Starts the Raytracer application.
+     * @param configurations    The configuration to use.
+     */
+    void start(const Configurations &configurations);
+
+    /**
+     * Called when the application receive an event.
+     * @param event     The event.
+     */
     void onEvent(Event &event);
+
     [[nodiscard]] const std::shared_ptr<Window> &getWindow() const;
-
-private:
-
-    virtual ~Application() = default;
-    Application(const Application & application ) = default;
-    Application &operator=(const Application &instance) = default;
-    Application() = default;
-
-public:
 
 private:
     Configurations _config{};
     std::shared_ptr<Window> _window;
     std::vector<std::shared_ptr<Layer>> _layers;
+
+    virtual ~Application() = default;
+
+    Application() = default;
 
     void attachLayers();
 

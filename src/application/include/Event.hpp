@@ -33,8 +33,10 @@ enum EventCategory {
 
 #define EVENT_CLASS_CATEGORY(category) virtual int getCategoryFlags() const override { return category; }
 
-class Event
-{
+/**
+ * Class that represent an event that can be sent throughout the application.
+ */
+class Event {
 public:
     virtual ~Event() = default;
 
@@ -43,8 +45,7 @@ public:
     [[nodiscard]] virtual const char* getName() const = 0;
     [[nodiscard]] virtual int getCategoryFlags() const = 0;
     [[nodiscard]] virtual std::string toString() const { return getName(); }
-    bool isInCategory(EventCategory category) const
-    {
+    [[nodiscard]] bool isInCategory(EventCategory category) const {
         return getCategoryFlags() & category;
     }
 
@@ -56,24 +57,25 @@ public:
         _isHandled = handled;
     }
 
-//    friend inline std::ostream& operator<<(std::ostream& os, const Event& e)
-//    {
-//        return os << e.toString();
-//    }
-
 private:
     bool _isHandled = false;
 };
 
+/**
+ * Templated dispatcher for events. Will be used to bind actions to events.
+ */
 class EventDispatcher
 {
 public:
-    explicit EventDispatcher(Event& event)
-            : m_Event(event)
-    {
-    }
+    explicit EventDispatcher(Event& event) : m_Event(event) {}
 
-    // F will be deduced by the compiler
+    /**
+     * Called when an event is handled.
+     * @tparam T        EventType.
+     * @tparam F        Function type to execute. Will be deduced by the compiler.
+     * @param func      The function.
+     * @return  Returns true if dispatched.
+     */
     template<typename T, typename F>
     bool dispatch(const F& func)
     {

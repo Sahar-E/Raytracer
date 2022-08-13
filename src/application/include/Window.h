@@ -14,30 +14,44 @@
 #include <algorithm>
 
 
+/**
+ * Represent the main window of the application.
+ */
 class Window {
 public:
     using EventCallbackFn = std::function<void(Event&)>;
 
-
+    /**
+     * Constructor for the main window of the application.
+     * @param name          The name of the window, will be displayed in the title bar.
+     * @param aspectRatio   The aspectRatio of the window.
+     * @param width         The width of the window.
+     */
     Window(const std::string &name, float aspectRatio, int width);
 
     [[nodiscard]] GLFWwindow *getWindow() const;
 
+    /**
+     * @return  True if should close the window. For example, will be true if the user press the exit button.
+     */
     [[nodiscard]] bool shouldClose() const;
 
+    /**
+     * Sets a callback function to be called when the there is an event that is sent in the window.
+     * @param callback  The callback function.
+     */
     void setEventCallback(const EventCallbackFn& callback);
 
     [[nodiscard]] float getAspectRatio() const;
 
     [[nodiscard]] const std::string &getGlslVersion() const;
 
+    /**
+     * Setter for width and height of the window.
+     * @param width     The new width of the window.
+     * @param height    The new height of the window.
+     */
     void resizeWindow(int width, int height);
-
-private:
-    void onUpdate();
-    int initGLWindow();
-    static void initGlBlendingConfigurations() ;
-    static void onWindowSizeChanged(GLFWwindow *window, int width, int height);
 
 private:
     GLFWwindow *_window;
@@ -60,4 +74,11 @@ private:
     void setGlfwSetMouseButtonCallback() const;
 
     void setGlfwSetCursorPosCallback() const;
+
+    void onUpdate();
+
+    int initGLWindow();
+
+    static void initGlBlendingConfigurations();
+
 };

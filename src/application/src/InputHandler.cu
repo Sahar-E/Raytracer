@@ -6,13 +6,13 @@
 #include "Application.cuh"
 
 
-bool InputHandler::isKeyDown(int key) {
-    auto state = glfwGetKey(Application::getInstance().getWindow()->getWindow(), key);
+bool InputHandler::isKeyDown(int keyType) {
+    auto state = glfwGetKey(Application::getInstance().getWindow()->getWindow(), keyType);
     return state == GLFW_PRESS || state == GLFW_REPEAT;
 }
 
-bool InputHandler::isMousePressed(int button) {
-    auto state = glfwGetMouseButton(Application::getInstance().getWindow()->getWindow(), button);
+bool InputHandler::isMousePressed(int buttonType) {
+    auto state = glfwGetMouseButton(Application::getInstance().getWindow()->getWindow(), buttonType);
     return state == GLFW_PRESS;
 }
 

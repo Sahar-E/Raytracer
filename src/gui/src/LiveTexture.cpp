@@ -7,7 +7,6 @@
 #include <utility>
 #include "commonOpenGL.h"
 #include "glew-2.1.0/include/GL/glew.h"
-#include "../../ray_tracing_library/include/TimeThis.h"
 
 
 LiveTexture::LiveTexture(std::shared_ptr<unsigned char[]> buffer, int width, int height, GLenum type)

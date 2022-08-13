@@ -27,7 +27,6 @@ LayerRGBStream::LayerRGBStream(std::shared_ptr<Window> window, const Configurati
           _rayBounces(config.rayBounces){
     _world = std::make_shared<World>(initWorld(config));
     initCamera(config);
-
     initRayTracerRenderer();
 }
 
@@ -41,7 +40,7 @@ void LayerRGBStream::initRayTracerRenderer() {
 World LayerRGBStream::initWorld(const Configurations &config) const {
     assert(0 < config.rayBounces && config.rayBounces <= MAX_BOUNCES);
 
-    auto world = World::initWorld2();
+    auto world = World::initWorld1();
     assert(world.getTotalSizeInMemoryForObjects() < 48 * pow(2, 10) &&
            "There is a hard limit for NVIDIA's shared memory size of 48KB for one block.");
     return world;
@@ -50,9 +49,9 @@ World LayerRGBStream::initWorld(const Configurations &config) const {
 void LayerRGBStream::initCamera(const Configurations &config) {
     Vec3 vUp = {0, 1, 0};
 
-    // Arbitrary Default Camera configuration.
-    Vec3 lookFrom = {0, 0.5, 2.5};
-    Vec3 lookAt = {0., 0.2, -2};
+    // Arbitrary initial positions camera configuration.
+    Vec3 lookFrom = {0, 4, 15};
+    Vec3 lookAt = {0, 0, 0};
     _camera = std::make_shared<Camera>(lookFrom, lookAt, vUp, config.aspectRatio,
                                        config.vFov,
                                        config.aperture,
@@ -226,8 +225,12 @@ const std::shared_ptr<RayTracerRenderer> &LayerRGBStream::getRayTracerRenderer()
 void LayerRGBStream::onEvent(Event &event) {
     EventDispatcher dispatcher(event);
 
-    dispatchMousePress(dispatcher);
+    dispatchMousePressEvent(dispatcher);
     dispatchMouseRelease(dispatcher);
+    dispatchWindowResizeEvent(dispatcher);
+}
+
+void LayerRGBStream::dispatchWindowResizeEvent(EventDispatcher &dispatcher) {
     dispatcher.dispatch<WindowResizeEvent>([this](WindowResizeEvent &event){
         _rendererAspectRatio = static_cast<float>(event.getWidth()) / event.getHeight();
         _camera->setAspectRatio(_rendererAspectRatio);
@@ -248,7 +251,7 @@ void LayerRGBStream::dispatchMouseRelease(EventDispatcher &dispatcher) const {
     });
 }
 
-void LayerRGBStream::dispatchMousePress(EventDispatcher &dispatcher) const {
+void LayerRGBStream::dispatchMousePressEvent(EventDispatcher &dispatcher) const {
     dispatcher.dispatch<MouseButtonPressedEvent>([this](MouseButtonPressedEvent &event){
         GLFWwindow *window = _window->getWindow();
         int state = glfwGetInputMode(window, GLFW_CURSOR);

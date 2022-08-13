@@ -22,20 +22,20 @@ void LayerHUD::onUpdate() {
     imGuiFpsInfo();
     imGuiCameraSettings();
     imGuiRayTracerSettings();
-    imGuiSaveImageFeature();
+    imGuiSaveImageSection();
 
     ImGui::End();
 }
 
 void LayerHUD::imGuiRayTracerSettings() {
     if (ImGui::CollapsingHeader("Ray Tracer settings:")) {
-        imGuiNRenderCalls();
-        imGuiRenderWidth();
-        imGuiNRayBounces();
+        imGuiNRenderCallsSlider();
+        imGuiRenderWidthButtons();
+        imGuiNRayBouncesSlider();
     }
 }
 
-void LayerHUD::imGuiNRayBounces() const {
+void LayerHUD::imGuiNRayBouncesSlider() const {
     static int nRayBounces = _layerRGB->getRayTracerRenderer()->getNRayBounces();
     ImGui::SliderInt("# Ray Bounces", &nRayBounces, 1, 12);
     if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled))
@@ -47,21 +47,21 @@ void LayerHUD::imGuiNRayBounces() const {
     }
 }
 
-void LayerHUD::imGuiRenderWidth() {
+void LayerHUD::imGuiRenderWidthButtons() {
     ImGui::Text("Render width:");
     static int renderWidth = _layerRGB->getRendererImageWidth();
     imGuiRenderWidthButton(renderWidth, "80", 80);
-    sameLineSpace();
+    imGuiSameLineSpace();
     imGuiRenderWidthButton(renderWidth, "240", 240);
-    sameLineSpace();
+    imGuiSameLineSpace();
     imGuiRenderWidthButton(renderWidth, "400", 400);
-    sameLineSpace();
+    imGuiSameLineSpace();
     imGuiRenderWidthButton(renderWidth, "800", 800);
 
     imGuiRenderWidthButton(renderWidth, "1200", 1200);
-    sameLineSpace();
+    imGuiSameLineSpace();
     imGuiRenderWidthButton(renderWidth, "1600", 1600);
-    sameLineSpace();
+    imGuiSameLineSpace();
     imGuiRenderWidthButton(renderWidth, "2000", 2000);
 
     if (renderWidth != _layerRGB->getRendererImageWidth()) {
@@ -69,7 +69,7 @@ void LayerHUD::imGuiRenderWidth() {
     }
 }
 
-void LayerHUD::imGuiNRenderCalls() {
+void LayerHUD::imGuiNRenderCallsSlider() {
     _nRenders = _layerRGB->getRendersPerFrame();
     ImGui::SliderInt("# RayTracer Render Calls per Frame", &_nRenders, 1, 15);
     if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled))
@@ -81,8 +81,8 @@ void LayerHUD::imGuiNRenderCalls() {
     }
 }
 
-void LayerHUD::imGuiRenderWidthButton(int & renderWidth, const char *label, int afterPressWidth) const {
-    if (ImGui::Button(label)) {
+void LayerHUD::imGuiRenderWidthButton(int & renderWidth, const char *buttonLabel, int afterPressWidth) const {
+    if (ImGui::Button(buttonLabel)) {
         renderWidth = afterPressWidth;
     }
     if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
@@ -90,18 +90,19 @@ void LayerHUD::imGuiRenderWidthButton(int & renderWidth, const char *label, int 
     }
 }
 
-void LayerHUD::sameLineSpace() const { ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x); }
-
+void LayerHUD::imGuiSameLineSpace() const {
+    ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
+}
 
 void LayerHUD::imGuiCameraSettings() {
     if (ImGui::CollapsingHeader("Camera settings:", ImGuiTreeNodeFlags_FramePadding)) {
-        imGuiCameraVFov();
-        fooimGuiCameraFocusDist();
-        imGuiCameraAperture();
+        imGuiCameraVFovSlider();
+        imGuiCameraFocusDistSlider();
+        imGuiCameraApertureSlider();
     }
 }
 
-void LayerHUD::imGuiCameraVFov() {
+void LayerHUD::imGuiCameraVFovSlider() {
     static float cameraVFov = _layerRGB->getCameraVFov();
     ImGui::SliderFloat("Camera Vertical Fov", &cameraVFov, 1.0f, 170.f);
     if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
@@ -112,7 +113,7 @@ void LayerHUD::imGuiCameraVFov() {
     }
 }
 
-void LayerHUD::fooimGuiCameraFocusDist() {
+void LayerHUD::imGuiCameraFocusDistSlider() {
     static float cameraFocusDist = _layerRGB->getCameraFocusDist();
     ImGui::SliderFloat("Camera Focus Distance", &cameraFocusDist, 0.01f, 50.f);
     if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
@@ -123,7 +124,7 @@ void LayerHUD::fooimGuiCameraFocusDist() {
     }
 }
 
-void LayerHUD::imGuiCameraAperture() {
+void LayerHUD::imGuiCameraApertureSlider() {
     static float cameraAperture = _layerRGB->getCameraAperture();
     ImGui::SliderFloat("Camera Aperture", &cameraAperture, 0.00001f, 0.1f);
     if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
@@ -142,17 +143,21 @@ void LayerHUD::imGuiFpsInfo() {
                 ImGui::GetIO().Framerate * _nRenders);
 }
 
-void LayerHUD::imGuiSaveImageFeature() const {
+void LayerHUD::imGuiSaveImageSection() const {
     if (ImGui::CollapsingHeader("Save:")) {
-        int bufSize = 32;
-        static char filename[32];
-        strncpy_s(filename, "test.jpg", bufSize);   // TODO-Sahar: not good.
+        static const int bufSize = 64;
+        static char filename[64];
+        static bool isFirstInit = false;
+        if (isFirstInit) {
+            strncpy_s(filename, "test.jpg", bufSize);
+            isFirstInit = true;
+        }
         ImGui::InputText("##", filename, bufSize);
         if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
             ImGui::SetTooltip("Name of the file to save. Will be saved in the root directory of the executable.");
         }
 
-        sameLineSpace();
+        imGuiSameLineSpace();
 
         if (ImGui::Button("Save Image")) {
             saveImage(filename);
@@ -166,15 +171,11 @@ void LayerHUD::saveImage(const std::string &filename) const {
 }
 
 
-void LayerHUD::imGuiInit(GLFWwindow *window, const char *glsl_version) {
-    ImGui::CreateContext();
-    ImGui_ImplGlfw_InitForOpenGL(window, true);
-    ImGui_ImplOpenGL3_Init(glsl_version);
-    ImGui::StyleColorsDark();
-}
-
 void LayerHUD::onAttach() {
-    imGuiInit(getWindow(), _glsl_version.c_str());
+    ImGui::CreateContext();
+    ImGui_ImplGlfw_InitForOpenGL(getWindow(), true);
+    ImGui_ImplOpenGL3_Init(_glsl_version.c_str());
+    ImGui::StyleColorsDark();
 }
 
 void LayerHUD::onDetach() {

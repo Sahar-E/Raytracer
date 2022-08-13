@@ -16,7 +16,7 @@
 #include "ApplicationEvents.hpp"
 
 
-int Application::start(const Configurations &configurations) {
+void Application::start(const Configurations &configurations) {
     _config = configurations;
 
     _window = std::make_shared<Window>("RayTracer", _config.aspectRatio, _config.windowWidth);
@@ -44,7 +44,6 @@ int Application::start(const Configurations &configurations) {
     ImGuiLayerUtils::imGuiCleanup();
     _layers.clear();
     glfwTerminate();
-    return 0;
 }
 
 void Application::attachLayers() {
