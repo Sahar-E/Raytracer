@@ -19,4 +19,8 @@ Last rendered image:
 
 ![Image Render Example](test.jpg?raw=true "Image Render Example.")
 
+Screenshot of the program:
+
+![Screenshot Example](screenshot.png?raw=true "Screenshot Example")
+
 Example video for Real Time raytracing:
