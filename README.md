@@ -18,3 +18,5 @@ cmake --build .
 Last rendered image:
 
 ![Image Render Example](test.jpg?raw=true "Image Render Example.")
+
+Example video for Real Time raytracing:
