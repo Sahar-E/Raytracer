@@ -28,6 +28,7 @@ public:
         }
     }
 
+private:
     std::chrono::time_point<std::chrono::steady_clock> _startTime;
     std::string _title;
 };

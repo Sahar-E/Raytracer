@@ -79,21 +79,21 @@ __host__ __device__ Vec3 normalize(Vec3 v) {
     return v / v.length();
 }
 
-__host__ __device__ Vec3 reflect(const Vec3 &v, const Vec3 &n) {
-    return v - 2.0f * dot(v, n) * n;
+__host__ __device__ Vec3 reflect(const Vec3 &vec, const Vec3 &normal) {
+    return vec - 2.0f * dot(vec, normal) * normal;
 }
 
-__host__ __device__ Vec3 refract(const Vec3 &rayDirNormalized, const Vec3 &n, float refractionIdxRatio) {
-    float cosTheta = fminf(dot(-rayDirNormalized, n), 1.0f);
-    Vec3 r_out_perp = refractionIdxRatio * (rayDirNormalized + cosTheta * n);
-    Vec3 r_out_parallel = -sqrtf(fabsf(1.0f - r_out_perp.length_squared())) * n;
+__host__ __device__ Vec3 refract(const Vec3 &rayDirNormalized, const Vec3 &normal, float refractionIdxRatio) {
+    float cosTheta = fminf(dot(-rayDirNormalized, normal), 1.0f);
+    Vec3 r_out_perp = refractionIdxRatio * (rayDirNormalized + cosTheta * normal);
+    Vec3 r_out_parallel = -sqrtf(fabsf(1.0f - r_out_perp.length_squared())) * normal;
     return r_out_perp + r_out_parallel;
 }
 
 __host__ Vec3 randomVec0to1(int &randState) {
-    return {randomFloat(randState),
-            randomFloat(randState),
-            randomFloat(randState)};
+    return {randomFloat(),
+            randomFloat(),
+            randomFloat()};
 }
 
 __device__ Vec3 randomVec0to1(curandState *randState) {
@@ -103,8 +103,7 @@ __device__ Vec3 randomVec0to1(curandState *randState) {
 }
 
 __host__ Vec3 randomUnitVec(int &randState) {
-    return normalize({2.0f * randomFloat(randState) - 1.0f, 2.0f * randomFloat(randState) - 1.0f, 2.0f * randomFloat(
-            randState) - 1.0f});
+    return normalize({2.0f * randomFloat() - 1.0f, 2.0f * randomFloat() - 1.0f, 2.0f * randomFloat() - 1.0f});
 }
 
 __device__ Vec3 randomUnitVec(curandState *randState) {

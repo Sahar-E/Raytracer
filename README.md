@@ -2,6 +2,10 @@
 
 Still under construction :)
 
+prerequisites:
+* CUDA libraries installed on your machine with nvcc compiler.
+* CMake
+
 To build, use cmake:
 
 ```

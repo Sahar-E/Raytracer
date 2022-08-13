@@ -9,6 +9,9 @@
 #include <curand_kernel.h>
 #include "my_math_cuda.cuh"
 
+/**
+ * Represent a 3D vector.
+ */
 class Vec3 {
 public:
     __host__ __device__ Vec3() = default;
@@ -52,8 +55,22 @@ __host__ __device__ float dot(const Vec3 &u, const Vec3 &v);
 __host__ __device__ Vec3 cross(const Vec3 &u, const Vec3 &v);
 __host__ __device__ Vec3 normalize(Vec3 v);
 
-__host__ __device__ Vec3 reflect(const Vec3 &v, const Vec3 &n);
-__host__ __device__ Vec3 refract(const Vec3 &rayDirNormalized, const Vec3 &n, float refractionIdxRatio);
+/**
+ * Reflect vector vec with normal vector.
+ * @param vec    The vector to reflect.
+ * @param normal The normal vector to reflect with.
+ * @return  the reflected vector.
+ */
+__host__ __device__ Vec3 reflect(const Vec3 &vec, const Vec3 &normal);
+
+/**
+ * Refract a vector rayDirNormalized with normal vector according to the given refractionIdxRatio.
+ * @param rayDirNormalized    The normalized vector to refract.
+ * @param normal              The normal vector to refract with.
+ * @param refractionIdxRatio  The refraction index ratio between the first material and the second.
+ * @return  refracted vector.
+ */
+__host__ __device__ Vec3 refract(const Vec3 &rayDirNormalized, const Vec3 &normal, float refractionIdxRatio);
 
 __host__ Vec3 randomVec0to1(int &randState);
 __device__ Vec3 randomVec0to1(curandState *randState);

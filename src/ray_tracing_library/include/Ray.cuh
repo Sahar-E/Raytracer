@@ -6,10 +6,18 @@
 
 #include "Vec3.cuh"
 
+/**
+ * Represent a ray casted in the scene.
+ */
 class Ray {
 public:
     __host__ __device__ Ray() = default;
 
+    /**
+     * Ray constructor.
+     * @param origin    The starting point of the ray.
+     * @param direction The direction of the ray.
+     */
     __host__ __device__ Ray(const Point3 &origin, const Vec3 &direction) : _orig(origin), _dir(direction) {}
 
     __host__ __device__  Point3 origin() const { return _orig; }

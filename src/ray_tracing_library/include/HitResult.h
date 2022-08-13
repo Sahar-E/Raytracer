@@ -7,6 +7,9 @@
 #include <memory>
 #include "Ray.cuh"
 
+/**
+ * Struct that holds the hit data after the collision of ray with an object.
+ */
 struct HitResult {
     Ray hittingRay{};
     Vec3 normal{};

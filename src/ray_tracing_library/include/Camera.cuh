@@ -8,6 +8,9 @@
 #include "Vec3.cuh"
 #include "Ray.cuh"
 
+/**
+ * Camera object that will used to calculate the rays to cast from.
+ */
 class Camera {
 
 public:
@@ -74,11 +77,13 @@ public:
 
     void setAspectRatio(float aspectRatio);
 
-    float getVFov() const;
+    [[nodiscard]] float getVFov() const;
     void setVFov(float vFov);
-    float getFocusDist() const;
+
+    [[nodiscard]] float getFocusDist() const;
     void setFocusDist(float focusDist);
-    float getAperture() const;
+
+    [[nodiscard]] float getAperture() const;
     void setAperture(float focusDist);
 
 private:
@@ -98,7 +103,6 @@ private:
     float _focusDist;
     Vec3 _vUp;
     float _vFov{};
-
 };
 
 

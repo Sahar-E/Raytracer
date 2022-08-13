@@ -21,16 +21,6 @@ bool copyRGBToCharArray(unsigned char *dest, const std::vector<std::tuple<float,
     return true;
 }
 
-void saveImgAsJpg(const std::string &filename, const std::vector<std::tuple<float, float, float>> &data, const int width,
-             const int height) {
-    int n = height * width;
-    int channelCount = 3;
-    auto dataCopy = std::make_unique<unsigned char[]>(n * channelCount);
-    copyRGBToCharArray(dataCopy.get(), data, n);
-    std::cout << "\nSaving image to " << filename << "\n";
-    stbi_write_jpg(filename.c_str(), width, height, channelCount, dataCopy.get(), width * channelCount);
-}
-
 void saveImgAsJpg(const std::string &filename, const std::shared_ptr<unsigned char[]>& data, const int width,
                   const int height) {
     int channelCount = 3;

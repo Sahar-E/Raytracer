@@ -9,15 +9,24 @@
 #include "cuda_runtime.h"
 #include <curand_kernel.h>
 
+/**
+ * Init the CUDA random states in the device memory.
+ * @param randStates    pointer to the CUDA random states array.
+ * @param n_randStates  number of random states.
+ * @param seed     seed for the random number generator.
+ */
+__global__ void initCurand(curandState *randStates, uint32_t n_randStates, uint32_t seed);
 
 /**
  * @return a random real in [0,1).
  */
-
 __device__ float randomFloatCuda(curandState *state);
 
-__global__ void initCurand(curandState *randStates, uint32_t n_randStates, uint32_t seed);
-
+/**
+ * Converts degrees to radians.
+ * @param degree    The degrees to convert.
+ * @return      result in radians.
+ */
 __host__ __device__ float deg2rad(float degree);
 
 /**

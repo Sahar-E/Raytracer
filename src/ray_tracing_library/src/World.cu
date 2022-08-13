@@ -76,9 +76,8 @@ World World::initWorld2() {
                 }
             }
             if (!locationIsOccupied) {
-                Point3 sphereLoc = {xLoc + 0.7f * randomFloat(randState), smallSphereRadius, zLoc + 0.7f * randomFloat(
-                        randState)};
-                float randomMaterialChooser = randomFloat(randState);
+                Point3 sphereLoc = {xLoc + 0.7f * randomFloat(), smallSphereRadius, zLoc + 0.7f * randomFloat()};
+                float randomMaterialChooser = randomFloat();
                 Material mat;
                 if (randomMaterialChooser < 0.5) {
                     auto albedo = randomVec0to1(randState) * randomVec0to1(randState);
@@ -86,7 +85,7 @@ World World::initWorld2() {
                 } else if (randomMaterialChooser < 0.8) {
                     auto albedo = randomVec0to1(randState) * randomVec0to1(randState);
                     auto specularColor = albedo + randomVec0to1(randState) * 0.2;
-                    mat = Material::getSpecular(albedo, specularColor, randomFloat(randState), randomFloat(randState));
+                    mat = Material::getSpecular(albedo, specularColor, randomFloat(), randomFloat());
                 } else if (randomMaterialChooser < 0.9) {
                     auto albedo = randomVec0to1(randState) * randomVec0to1(randState);
                     auto emittedColor = randomVec0to1(randState) * randomVec0to1(randState);

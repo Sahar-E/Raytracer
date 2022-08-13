@@ -11,7 +11,7 @@
  * Represent a material property for the renderer.
  *
  *
- * It is not implemented with OOP design in order to gain performance.
+ * It is not implemented with OOP design in order to gain performance via memory alignment.
  */
 class Material {
 public:
