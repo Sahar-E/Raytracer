@@ -9,14 +9,22 @@
 #include "IndexBuffer.h"
 #include "Shader.h"
 
+/**
+ * Responsible for drawing into shaders.
+ */
 class VertexDrawer {
 public:
 
-    static void clear() ;
-    static void draw(const VertexArray &va, const IndexBuffer &ib, const Shader &shader) ;
+    /**
+     * Clear. Called once per main loop iteration.
+     */
+    static void clear();
 
-
-
-private:
-
+    /**
+     * Draw the vertex array data according to the index buffer into the shader.
+     * @param va          The vertex array buffer data.
+     * @param ib          The index buffer.
+     * @param shader      The shader to draw the into.
+     */
+    static void draw(const VertexArray &va, const IndexBuffer &ib, const Shader &shader);
 };

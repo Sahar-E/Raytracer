@@ -24,6 +24,8 @@
 static const float CAMERA_TRANSLATION_SIZE = .1f;
 static const float CAMERA_ROT_SPEED = 0.08f;
 
+static const char *const BASIC_SHADER_FILEPATH = "resources/shaders/Basic.shader";
+
 /**
  * This class implements the rendering of the camera scene.
  */

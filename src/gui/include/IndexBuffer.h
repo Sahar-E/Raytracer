@@ -5,6 +5,9 @@
 #pragma once
 
 
+/**
+ * Class that responsible for handling the indices that will be used in OpenGL rendering of the VertexBuffer.
+ */
 class IndexBuffer {
 public:
     IndexBuffer(const unsigned int *data, unsigned int count);
@@ -24,5 +27,4 @@ public:
 private:
     unsigned int _rendererId;
     unsigned int _count;
-
 };

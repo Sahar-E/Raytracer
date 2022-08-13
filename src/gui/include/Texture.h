@@ -8,6 +8,9 @@
 #include <memory>
 #include "glew-2.1.0/include/GL/glew.h"
 
+/**
+ * Class that handles the texture for OpenGL rendering.
+ */
 class Texture {
 public:
     explicit Texture(const std::string &filepath);

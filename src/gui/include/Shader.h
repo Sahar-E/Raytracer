@@ -8,8 +8,17 @@
 #include <unordered_map>
 #include "glm/glm.hpp"
 
+/**
+ * This class implements the OpenGL shader program. Will handle setting the uniforms and attributes of the shader
+ * program.
+ */
 class Shader {
 public:
+
+    /**
+     *  Constructs a new instance of Shader with the given shader file.
+     * @param filepath
+     */
     explicit Shader(const std::string &filepath);
     virtual ~Shader();
 

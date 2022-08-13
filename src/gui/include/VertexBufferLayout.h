@@ -25,6 +25,10 @@ struct VertexBufferElement {
     }
 };
 
+/**
+ * Responsible for creating and initializing the buffer layout that will hold VertexBufferElements. When items are
+ * pushed, will update the stride alignment of the vertex buffer according to the number of vertex elements and type.
+ */
 class VertexBufferLayout {
 public:
     VertexBufferLayout() :stride(0) {}

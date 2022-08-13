@@ -8,6 +8,9 @@
 #include "VertexBuffer.h"
 #include "VertexBufferLayout.h"
 
+/**
+ * Class that is responsible to manage the binding of vertex buffers and their layout information.
+ */
 class VertexArray {
 public:
     VertexArray();

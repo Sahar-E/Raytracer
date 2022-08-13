@@ -152,13 +152,13 @@ void LayerRGBStream::initOpenGLBuffers() {
     _vb = std::make_shared<VertexBuffer>(positions, sizeof(float) * 4 * 4);
 
     _layout = std::make_shared<VertexBufferLayout>();
-    _layout->push<float>(2);
-    _layout->push<float>(2);
+    _layout->push<float>(2);  // position.
+    _layout->push<float>(2);  // where to sample from.
     _va->addBuffer(*_vb, *_layout);
 
     _ib = std::make_shared<IndexBuffer>(indices, 6);
 
-    _shader = std::make_shared<Shader>("resources/shaders/Basic.shader");
+    _shader = std::make_shared<Shader>(BASIC_SHADER_FILEPATH);
     _shader->bind();
     _texture = std::make_shared<LiveTexture>(_rayTracerRenderer->getPixelsOutAsChars(),
                                              _rayTracerRenderer->getImgW(),

@@ -5,6 +5,9 @@
 #pragma once
 
 
+/**
+ * Responsible for handling the OpenGL ArrayBuffer object.
+ */
 class VertexBuffer {
 public:
     VertexBuffer(const void *data, unsigned int size);
