@@ -70,6 +70,14 @@ compiler installed.
 ## Usage
 
 Launch the application executable.
+To move the camera, use the following keybindings:
+- W - move the camera forward.
+- S - move the camera backward.
+- D - move the camera right.
+- A - move the camera left.
+- SPACE - move the camera up.
+- SHIFT+SPACE - move the camera down.
+- MOUSE_PRESS_LEFT + MOUSE_MOVEMENT - pan the camera according to the mouse movements.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
