@@ -83,31 +83,33 @@ void LayerRGBStream::updateCameraMovements() {
 
 bool LayerRGBStream::updateCameraTranslations() {
     bool cameraChanged = false;
-    if (InputHandler::isKeyDown(GLFW_KEY_A)) {
-        _camera->moveCameraRight(-CAMERA_TRANSLATION_SIZE);
-        cameraChanged = true;
-    }
-    if (InputHandler::isKeyDown(GLFW_KEY_D)) {
-        _camera->moveCameraRight(CAMERA_TRANSLATION_SIZE);
-        cameraChanged = true;
-    }
-    if (InputHandler::isKeyDown(GLFW_KEY_W)) {
-        _camera->moveCameraForward(CAMERA_TRANSLATION_SIZE);
-        cameraChanged = true;
-    }
-    if (InputHandler::isKeyDown(GLFW_KEY_S)) {
-        _camera->moveCameraForward(-CAMERA_TRANSLATION_SIZE);
-        cameraChanged = true;
-    }
-    if (InputHandler::isKeyDown(GLFW_KEY_SPACE) &&
-        !InputHandler::isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
-        _camera->moveCameraUp(CAMERA_TRANSLATION_SIZE);
-        cameraChanged = true;
-    }
-    if (InputHandler::isKeyDown(GLFW_KEY_SPACE) &&
-        InputHandler::isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
-        _camera->moveCameraUp(-CAMERA_TRANSLATION_SIZE);
-        cameraChanged = true;
+    if (!ImGui::GetIO().WantCaptureKeyboard) {
+        if (InputHandler::isKeyDown(GLFW_KEY_A)) {
+            _camera->moveCameraRight(-CAMERA_TRANSLATION_SIZE);
+            cameraChanged = true;
+        }
+        if (InputHandler::isKeyDown(GLFW_KEY_D)) {
+            _camera->moveCameraRight(CAMERA_TRANSLATION_SIZE);
+            cameraChanged = true;
+        }
+        if (InputHandler::isKeyDown(GLFW_KEY_W)) {
+            _camera->moveCameraForward(CAMERA_TRANSLATION_SIZE);
+            cameraChanged = true;
+        }
+        if (InputHandler::isKeyDown(GLFW_KEY_S)) {
+            _camera->moveCameraForward(-CAMERA_TRANSLATION_SIZE);
+            cameraChanged = true;
+        }
+        if (InputHandler::isKeyDown(GLFW_KEY_SPACE) &&
+            !InputHandler::isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
+            _camera->moveCameraUp(CAMERA_TRANSLATION_SIZE);
+            cameraChanged = true;
+        }
+        if (InputHandler::isKeyDown(GLFW_KEY_SPACE) &&
+            InputHandler::isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
+            _camera->moveCameraUp(-CAMERA_TRANSLATION_SIZE);
+            cameraChanged = true;
+        }
     }
     return cameraChanged;
 }
@@ -253,10 +255,12 @@ void LayerRGBStream::dispatchMouseRelease(EventDispatcher &dispatcher) const {
 
 void LayerRGBStream::dispatchMousePressEvent(EventDispatcher &dispatcher) const {
     dispatcher.dispatch<MouseButtonPressedEvent>([this](MouseButtonPressedEvent &event){
-        GLFWwindow *window = _window->getWindow();
-        int state = glfwGetInputMode(window, GLFW_CURSOR);
-        if (state == GLFW_CURSOR_NORMAL) {
-            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        if (!ImGui::GetIO().WantCaptureMouse) {
+            GLFWwindow *window = _window->getWindow();
+            int state = glfwGetInputMode(window, GLFW_CURSOR);
+            if (state == GLFW_CURSOR_NORMAL) {
+                glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+            }
         }
         return true;
     });

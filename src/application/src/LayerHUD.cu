@@ -147,10 +147,10 @@ void LayerHUD::imGuiSaveImageSection() const {
     if (ImGui::CollapsingHeader("Save:")) {
         static const int bufSize = 64;
         static char filename[64];
-        static bool isFirstInit = false;
+        static bool isFirstInit = true;
         if (isFirstInit) {
             strncpy(filename, "test.jpg", bufSize);
-            isFirstInit = true;
+            isFirstInit = false;
         }
         ImGui::InputText("##", filename, bufSize);
         if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
