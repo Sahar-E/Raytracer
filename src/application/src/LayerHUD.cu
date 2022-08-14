@@ -128,7 +128,7 @@ void LayerHUD::imGuiCameraApertureSlider() {
     static float cameraAperture = _layerRGB->getCameraAperture();
     ImGui::SliderFloat("Camera Aperture", &cameraAperture, 0.00001f, 0.1f);
     if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-        ImGui::SetTooltip("The smaller the aperture, the sharper the image.");
+        ImGui::SetTooltip("The smaller the aperture, the Depth Of Field in the image.");
     }
     if (fabs(cameraAperture - _layerRGB->getCameraAperture()) > 0.00001f) {
         _layerRGB->setCameraAperture(cameraAperture);
