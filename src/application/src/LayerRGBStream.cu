@@ -152,8 +152,8 @@ void LayerRGBStream::initOpenGLBuffers() {
     _vb = std::make_shared<VertexBuffer>(positions, sizeof(float) * 4 * 4);
 
     _layout = std::make_shared<VertexBufferLayout>();
-    _layout->push<float>(2);  // position.
-    _layout->push<float>(2);  // where to sample from.
+    _layout->push_float(2);  // position.
+    _layout->push_float(2);  // where to sample from.
     _va->addBuffer(*_vb, *_layout);
 
     _ib = std::make_shared<IndexBuffer>(indices, 6);

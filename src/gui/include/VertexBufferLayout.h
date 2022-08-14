@@ -33,25 +33,17 @@ class VertexBufferLayout {
 public:
     VertexBufferLayout() :stride(0) {}
 
-    template<typename T>
-    void push(unsigned int count) {
-        std::cerr << "Warning: Use only specialized types for vertex\n";
-    }
-
-    template<>
-    void push<float>(unsigned int count) {
+    void push_float(unsigned int count) {
         elements.push_back({GL_FLOAT, count, GL_FALSE});
         stride += count * VertexBufferElement::getSizeOfType(GL_FLOAT);
     }
 
-    template<>
-    void push<unsigned int>(unsigned int count) {
+    void push_uint(unsigned int count) {
         elements.push_back({GL_UNSIGNED_INT, count, GL_FALSE});
         stride += count * VertexBufferElement::getSizeOfType(GL_UNSIGNED_INT);
     }
 
-    template<>
-    void push<unsigned char>(unsigned int count) {
+    void push_uchar(unsigned int count) {
         elements.push_back({GL_UNSIGNED_BYTE, count, GL_TRUE});
         stride += count * VertexBufferElement::getSizeOfType(GL_UNSIGNED_BYTE);
     }

@@ -149,7 +149,7 @@ void LayerHUD::imGuiSaveImageSection() const {
         static char filename[64];
         static bool isFirstInit = false;
         if (isFirstInit) {
-            strncpy_s(filename, "test.jpg", bufSize);
+            strncpy(filename, "test.jpg", bufSize);
             isFirstInit = true;
         }
         ImGui::InputText("##", filename, bufSize);
