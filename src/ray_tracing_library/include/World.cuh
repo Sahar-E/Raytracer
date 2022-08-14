@@ -8,7 +8,7 @@
 #include <vector>
 #include "Sphere.cuh"
 
-#define CLOSEST_POSSIBLE_RAY_HIT 0.001
+#define CLOSEST_POSSIBLE_RAY_HIT 0.0005
 
 /**
  * This class represents a scene that can be used to render ray casted images.
