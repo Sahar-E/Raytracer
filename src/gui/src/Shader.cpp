@@ -10,6 +10,7 @@
 #include <fstream>
 #include <string>
 #include <sstream>
+#include <memory>
 
 
 Shader::Shader(const std::string &filepath) : _filepath(filepath), _rendererId(0) {
@@ -70,7 +71,7 @@ unsigned int Shader::compileShader(unsigned int type, const std::string &source)
         checkGLErrors(glGetShaderInfoLog(id,length, &length, log.get()));
         auto whatFailed = (type == GL_VERTEX_SHADER) ? "shader!\n" : "fragment!\n";
         std::cerr << "Failed to compile" << whatFailed;
-        std::cerr << log << std::endl;
+        std::cerr << log.get() << std::endl;
         checkGLErrors(glDeleteShader(id));
         return 0;
     }
