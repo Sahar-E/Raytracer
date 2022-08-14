@@ -132,19 +132,24 @@ World World::initWorld1() {
 
     Material glass = Material::getGlass(white, 1.5);
 
-    sphereList.push_back(Sphere({4, 4.5, -3}, 0.5, whiteLight));
+    sphereList.push_back(Sphere({5, 3.5, -3}, 0.5, whiteLight));
 
     sphereList.push_back(Sphere({0, 0, -2}, 0.5, lambertianRedBrown));
-    sphereList.push_back(Sphere({1.6, 0, -3}, 0.5, mirror));
+    sphereList.push_back(Sphere({1.6, 0, -3}, 0.5, glass));
     sphereList.push_back(Sphere({-1.6, -0.2, -2.5}, 0.3, metalGold));
 
     sphereList.push_back(Sphere({0.9, -0.4, -2.2}, 0.1, lambertianDarkGreen));
     sphereList.push_back(Sphere({0.4, -0.4, -2.5}, 0.1, lambertianBezh));
+    sphereList.push_back(Sphere({2, -0.4, -1.5}, 0.1, lambertianBezh));
+    sphereList.push_back(Sphere({3, -0.4, -3.5}, 0.1, lambertianGreen));
+    sphereList.push_back(Sphere({2.5, -0.4, -2.5}, 0.1, neonGreenGlow));
+    sphereList.push_back(Sphere({1.5, -0.4, -2.5}, 0.1, lambertianRedBrown));
     sphereList.push_back(Sphere({0.5, -0.4, -2.2}, 0.1, glass));
     sphereList.push_back(Sphere({1, -0.4, -1.5}, 0.1, metalGreen));
     sphereList.push_back(Sphere({-2.9, -0.4, -3.3}, 0.1, lambertianGreen));
     sphereList.push_back(Sphere({-0.5, -0.4, -2.8}, 0.1, mirror));
     sphereList.push_back(Sphere({-0.8, -0.4, -1.7}, 0.1, neonPurpleGlow));
+    sphereList.push_back(Sphere({-2.15, -0.4, -1.1}, 0.1, lambertianGreen));
     sphereList.push_back(Sphere({-2.15, -0.4, -1.1}, 0.1, lambertianGreen));
     sphereList.push_back(Sphere({-0.45, -0.4, -1.2}, 0.1, glass));
     sphereList.push_back(Sphere({0.15, -0.4, -1.45}, 0.1, neonGreenGlow));
