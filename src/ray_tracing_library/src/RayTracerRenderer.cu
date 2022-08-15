@@ -31,7 +31,7 @@ void freeWorld(World **deviceWorld) {
 __global__
 void traceRay(Color *pixelsOut, Color *pixelsAverageAccum, Camera c, World const *const *d_world, curandState *randStates,
          const int imWidth, const int imHeight, const int nBounces, const float alreadyNPixelsGot) {
-    // TODO-Sahar: Profile again with NSight.
+    // TODO-Sahar: Profile again with NSight, and then refactor this function.
     extern __shared__ Sphere spheresArr[];
     int tIdx = blockIdx.x * blockDim.x + threadIdx.x;
     int nPixels = imHeight * imWidth;

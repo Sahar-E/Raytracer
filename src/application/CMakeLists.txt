@@ -40,14 +40,14 @@ target_link_libraries(${PROJECT_NAME} imgui)
 target_include_directories(${PROJECT_NAME} PUBLIC ../dependencies/glm-0.9.9.8)
 target_link_libraries(${PROJECT_NAME} glm)
 
-target_include_directories(${PROJECT_NAME} PUBLIC ../gui)
+target_include_directories(${PROJECT_NAME} PUBLIC ../openGL)
 target_link_libraries(${PROJECT_NAME} gui)
 
 target_include_directories(${PROJECT_NAME} PUBLIC ../ray_tracing_library)
 target_link_libraries(${PROJECT_NAME} ray_tracing_library)
 
 
-#
+
 ## CUDA:
 #find_package(CUDA REQUIRED)
 #set_target_properties(${PROJECT_NAME} PROPERTIES CUDA_RESOLVE_DEVICE_SYMBOLS ON)
