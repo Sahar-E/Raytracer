@@ -51,7 +51,7 @@ target_link_libraries(${PROJECT_NAME} stb_library)
 add_subdirectory(src/ray_tracing_library)
 target_link_libraries(${PROJECT_NAME} ray_tracing_library)
 
-add_subdirectory(src/gui)
+add_subdirectory(src/openGL)
 target_link_libraries(${PROJECT_NAME} gui)
 
 add_subdirectory(src/application)
