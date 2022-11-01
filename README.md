@@ -95,6 +95,10 @@ Screenshot of the program:
 
 ![Screenshot Example](screenshot.png?raw=true "Screenshot Example")
 
+Screenshot of the save from the video:
+
+![Screenshot Example](test_save.jpg?raw=true "Image Save Example")
+
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
