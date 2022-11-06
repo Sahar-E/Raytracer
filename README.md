@@ -36,7 +36,7 @@
 
 This project is a ray tracer / path tracer visualizer that provides a way to move freely in the scene with the keyboard and mouse
 similar to a free camera in a world. The tracing algorithm is calculated on the GPU using the 
-[CUDA C++ toolkit](https://developer.nvidia.com/cuda-toolkit). The program is written mainly in C++20 and CUDA-C++17 with cmake.
+[CUDA C++ toolkit](https://developer.nvidia.com/cuda-toolkit). The program is written mainly in C++20 and CUDA-C++17 and built with cmake.
 To present the result in realtime, I used [OpenGL](https://en.wikipedia.org/wiki/OpenGL) 
 with [glfw](https://github.com/glfw/glfw), 
 [glew](https://github.com/nigels-com/glew) to have a windowed program and also
