@@ -85,11 +85,8 @@ To move the camera, use the following keybindings:
 
 Example video for Real Time raytracing:
 
-<ADD_VIDEO>
+[![youtube demo video](raytracer-play_video.jpg)](https://www.youtube.com/watch?v=9vIK6G56i2s)
 
-Last rendered image:
-
-![Image Render Example](test.jpg?raw=true "Image Render Example.")
 
 Screenshot of the program:
 
@@ -99,6 +96,9 @@ Screenshot of the save from the video:
 
 ![Screenshot Example](test_save.jpg?raw=true "Image Save Example")
 
+Last rendered image:
+
+![Image Render Example](test.jpg?raw=true "Image Render Example.")
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
